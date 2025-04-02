@@ -1,0 +1,26 @@
+{
+    "common": {
+      "loading": "Cargando...",
+      "languageSwitcher": {
+        "english": "Inglés",
+        "spanish": "Español"
+      }
+    },
+    "metadata": {
+      "title": "Panel de Kia",
+      "description": "Un panel moderno para vehículos Kia"
+    },
+    "sidebar": {
+      "title": "Barra lateral"
+    },
+    "topNav": {
+      "title": "Navegación superior"
+    },
+    "content": {
+      "title": "Contenido principal"
+    },
+    "top-nav": {
+      "title": "Gestión de residuos",
+      "dashboard": "Tablero"
+    }
+  }

@@ -1,0 +1,26 @@
+{
+    "common": {
+      "loading": "Loading...",
+      "languageSwitcher": {
+        "english": "English",
+        "spanish": "Spanish"
+      }
+    },
+    "metadata": {
+      "title": "Kia Dashboard",
+      "description": "A modern dashboard for Kia vehicles"
+    },
+    "sidebar": {
+      "title": "Sidebar"
+    },
+    "topNav": {
+      "title": "Top Navigation"
+    },
+    "content": {
+      "title": "Main Content"
+    },
+    "top-nav": {
+      "title": "Waste Management",
+      "dashboard": "Dashboard"
+    }
+  } 
