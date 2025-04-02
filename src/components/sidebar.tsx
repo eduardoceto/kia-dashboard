@@ -18,12 +18,29 @@ import {
 
 import { Home } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"
+import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation"
+import { useLocale } from "next-intl"
 
-export default function Sidebar() {
+type Props = {
+  children?: React.ReactNode
+}
+
+export default function Sidebar({ children }: Props = {}) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { theme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
 
   function handleNavigation() {
     setIsMobileMenuOpen(false)
@@ -38,11 +55,18 @@ export default function Sidebar() {
     icon: any
     children: React.ReactNode
   }) {
+    const pathname = usePathname()
+    const locale = useLocale()
+    const isActive = pathname === `/${locale}${href}`
+
     return (
       <Link
         href={href}
         onClick={handleNavigation}
-        className="flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]"
+        className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors 
+          ${isActive ? "text-dark dark:text-white bg-gray-300/50 dark:bg-[#1F1F23]/50"
+          : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]/50"
+        }`}
       >
         <Icon className="h-4 w-4 mr-3 flex-shrink-0" />
         {children}
@@ -51,7 +75,7 @@ export default function Sidebar() {
   }
 
   return (
-    <>
+    <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
       <button
         type="button"
         className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-white dark:bg-[#0F0F12] shadow-md"
@@ -97,7 +121,7 @@ export default function Sidebar() {
                   Overview
                 </div>
                 <div className="KiaSignature space-y-1">
-                  <NavItem href="#" icon={Home}>
+                  <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
                   <NavItem href="#" icon={BarChart2}>
@@ -147,7 +171,7 @@ export default function Sidebar() {
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
-    </>
+      {children}
+    </div>
   )
 }
-

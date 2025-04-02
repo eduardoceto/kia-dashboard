@@ -4,7 +4,9 @@ import { ThemeProvider } from "@/src/components/theme-provider"
 import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {notFound} from 'next/navigation';
 import { routing } from "@/src/i18n/routing";
-import { getTranslations } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
+import Sidebar from "@/src/components/sidebar";
+import TopNav from "@/src/components/top-nav";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,16 +31,20 @@ export default async function RootLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  const messages = await getMessages();
   
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            {children}
+            <Sidebar>
+              <TopNav >
+                {children}
+              </TopNav>
+            </Sidebar>
           </ThemeProvider>
         </NextIntlClientProvider>
-        
       </body>
     </html>
   )

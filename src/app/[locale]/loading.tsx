@@ -1,7 +1,7 @@
 "use client";
 
 import Box from "@/src/components/box";
-import { BounceLoader, PropagateLoader } from "react-spinners";
+import { PropagateLoader } from "react-spinners";
 
 const Loading = () => {
     return (
