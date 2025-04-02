@@ -11,7 +11,7 @@ import TopNav from "@/src/components/top-nav";
 const inter = Inter({ subsets: ["latin"] })
 
 
-export async function generateMetadata({params}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const {locale} = await params;
   const t = await getTranslations({locale, namespace: 'metadata'});
 
