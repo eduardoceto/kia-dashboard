@@ -15,11 +15,8 @@ interface BreadcrumbItem {
   href?: string
 }
 
-type Props = {
-    children?: React.ReactNode;
-}
 
-export default function TopNav({ children }: Props = {}) {
+export default function TopNav() {
   const t = useTranslations('top-nav');
 
   
@@ -29,10 +26,6 @@ export default function TopNav({ children }: Props = {}) {
   ]
 
   return (
-    <div className="KiaSignature w-full flex-col">
-      <header 
-        className="Formula1 border-b  border-gray-200 dark:border-[#1F1F23]"
-        style={{ height: "64px" }}>
         <nav className="px-3 sm:px-6 flex items-center justify-between bg-white dark:bg-[#0F0F12] border-b border-gray-200 dark:border-[#1F1F23] h-full">
           <div className="font-medium text-sm hidden sm:flex items-center space-x-1 truncate max-w-[300px]">
             {breadcrumbs.map((item, index) => (
@@ -86,12 +79,6 @@ export default function TopNav({ children }: Props = {}) {
             </DropdownMenu>
           </div>
         </nav>
-      </header>
-      <main className="flex-1 overflow-auto p-6 bg-white dark:bg-[#0F0F12]">
-        {children}
-      </main>
-    </div>
-    
   )
 }
 

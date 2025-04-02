@@ -25,11 +25,9 @@ import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
 import { useLocale } from "next-intl"
 
-type Props = {
-  children?: React.ReactNode
-}
 
-export default function Sidebar({ children }: Props = {}) {
+
+export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -75,7 +73,7 @@ export default function Sidebar({ children }: Props = {}) {
   }
 
   return (
-    <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
+    <>
       <button
         type="button"
         className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-white dark:bg-[#0F0F12] shadow-md"
@@ -124,13 +122,13 @@ export default function Sidebar({ children }: Props = {}) {
                   <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
-                  <NavItem href="#" icon={BarChart2}>
+                  <NavItem href="/analytics" icon={BarChart2}>
                     Analytics
                   </NavItem>
-                  <NavItem href="#" icon={Building2}>
+                  <NavItem href="/organization" icon={Building2}>
                     Organization
                   </NavItem>
-                  <NavItem href="#" icon={Folder}>
+                  <NavItem href="/files" icon={Folder}>
                     Files
                   </NavItem>
                 </div>
@@ -141,27 +139,16 @@ export default function Sidebar({ children }: Props = {}) {
                   Team
                 </div>
                 <div className="KiaSignature space-y-1">
-                  <NavItem href="#" icon={Users2}>
+                  <NavItem href="/members" icon={Users2}>
                     Members
                   </NavItem>
-                  <NavItem href="#" icon={Shield}>
+                  <NavItem href="/permissions" icon={Shield}>
                     Permissions
                   </NavItem>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* <div className="px-4 py-4 border-t border-gray-200 dark:border-[#1F1F23]">
-            <div className="space-y-1">
-              <NavItem href="#" icon={Settings}>
-                Settings
-              </NavItem>
-              <NavItem href="#" icon={HelpCircle}>
-                Help
-              </NavItem>
-            </div>
-          </div> */}
         </div>
       </nav>
 
@@ -171,7 +158,6 @@ export default function Sidebar({ children }: Props = {}) {
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
-      {children}
-    </div>
+    </>
   )
 }

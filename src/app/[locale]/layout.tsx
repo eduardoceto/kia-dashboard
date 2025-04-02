@@ -7,6 +7,8 @@ import { routing } from "@/src/i18n/routing";
 import { getMessages, getTranslations } from "next-intl/server";
 import Sidebar from "@/src/components/sidebar";
 import TopNav from "@/src/components/top-nav";
+import { useTheme } from "next-themes";
+import HeaderSide from "@/src/components/headerSide";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -38,11 +40,9 @@ export default async function RootLayout({
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Sidebar>
-              <TopNav >
-                {children}
-              </TopNav>
-            </Sidebar>
+            <HeaderSide>
+              {children}
+            </HeaderSide>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
