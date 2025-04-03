@@ -11,12 +11,14 @@ import {
   CreditCard,
 } from "lucide-react"
 import React from "react"
+import { FaRegTrashAlt } from "react-icons/fa";
+import { type IconType } from "react-icons/lib";
 
 interface ListItem {
   id: string
   title: string
   subtitle: string
-  icon: LucideIcon
+  icon: LucideIcon | IconType
   iconStyle: string
   date: string
   time?: string
@@ -57,14 +59,14 @@ const statusConfig = {
 const ITEMS: ListItem[] = [
   {
     id: "1",
-    title: "Emergency Fund",
-    subtitle: "3 months of expenses saved",
-    icon: PiggyBank,
+    title: "Desechos Metalicos",
+    subtitle: "Desechos metalicos reciclables de la planta 1",
+    icon: FaRegTrashAlt,
     iconStyle: "savings",
-    date: "Target: Dec 2024",
-    amount: "$15,000",
+    date: "Objetivo: Marzo 2025",
+    amount: "1 en el dia de hoy",
     status: "in-progress",
-    progress: 65,
+    progress: 0,
   },
   {
     id: "2",
