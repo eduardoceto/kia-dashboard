@@ -136,3 +136,9 @@
 .Formula1 {
   font-family: Formula1;
 }
+
+@media (width < 64rem) {
+  .sm\:px-6 {
+      display:none;
+  }
+}
