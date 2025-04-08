@@ -125,9 +125,6 @@ export default function Sidebar() {
                   <NavItem href="/analytics" icon={BarChart2}>
                     Analytics
                   </NavItem>
-                  <NavItem href="/organization" icon={Building2}>
-                    Organization
-                  </NavItem>
                   <NavItem href="/files" icon={Folder}>
                     Files
                   </NavItem>
@@ -136,11 +133,11 @@ export default function Sidebar() {
 
               <div>
                 <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  Team
+                  User
                 </div>
                 <div className="KiaSignature space-y-1">
                   <NavItem href="/members" icon={Users2}>
-                    Members
+                    Settings
                   </NavItem>
                   <NavItem href="/permissions" icon={Shield}>
                     Permissions
