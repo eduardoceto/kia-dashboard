@@ -35,12 +35,12 @@ const statusConfig = {
     class: "text-blue-600 dark:text-blue-400",
     icon: Info,
   },
-  pending: {
+  "pending": {
     bg: "bg-amber-50 dark:bg-amber-900/20",
     class: "text-amber-600 dark:text-amber-400",
     icon: Info,
   },
-  completed: {
+  "completed": {
     bg: "bg-green-50 dark:bg-green-900/20",
     class: "text-green-600 dark:text-green-400",
     icon: Info,
