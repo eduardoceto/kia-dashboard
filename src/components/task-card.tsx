@@ -3,22 +3,12 @@
 import { useState } from "react"
 import { Trash, Calendar, ArrowRight, Wrench, ClipboardCheck, Shield, Info, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-interface Task {
-  id: string
-  title: string
-  description: string
-  status: string
-  progress: number
-  target: number
-  frequency: string
-  dueDate: string
-  category?: "waste" | "maintenance" | "audit" | "safety"
-}
+import type { Task } from "@/types"
+import useLogModal from "../hooks/useLogModal"
+import { log } from "console"
 
 interface TaskCardProps {
   task: Task
-  onUploadLog: () => void
   onDelete: () => void
 }
 
@@ -47,8 +37,10 @@ const statusConfig = {
   },
 }
 
-export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
+export function TaskCard({ task, onDelete }: TaskCardProps) {
   const [isHovering, setIsHovering] = useState(false)
+
+  const logModal = useLogModal();
 
   const getFrequencyLabel = (frequency: string) => {
     switch (frequency) {
@@ -153,9 +145,10 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
               "text-blue-600 dark:text-blue-400",
               "hover:text-blue-700 dark:hover:text-blue-300",
               "hover:bg-blue-50 dark:hover:bg-blue-900/20",
+              "hover:cursor-pointer",
               "transition-colors duration-200",
             )}
-            onClick={onUploadLog}
+            onClick={logModal.onOpen}
           >
             Upload Log
             <Upload className="w-3.5 h-3.5" />

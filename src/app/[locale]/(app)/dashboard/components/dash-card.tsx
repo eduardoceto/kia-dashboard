@@ -7,24 +7,9 @@ import { useTasks } from "@/src/hooks/use-tasks"
 import type { Task } from "@/types"
 import type { LogData } from "@/types"
 
-
 export default function TasksPage() {
   const { tasks, completeTask, deleteTask } = useTasks()
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
-  const [isLogModalOpen, setIsLogModalOpen] = useState(false)
 
-  const handleUploadLog = (task: Task) => {
-    setSelectedTask(task)
-    setIsLogModalOpen(true)
-  }
-
-  const handleLogSubmit = (logData: LogData) => {
-    if (selectedTask) {
-      completeTask(selectedTask.id, logData)
-    }
-    setIsLogModalOpen(false)
-    setSelectedTask(null)
-  }
 
   return (
     <div>
@@ -34,9 +19,8 @@ export default function TasksPage() {
           <div className="flex gap-3 min-w-full p-1">
             {tasks.map((task) => (
               <TaskCard
-                key={task.id}
-                task={task}
-                onUploadLog={() => handleUploadLog(task)}
+                key={task.id}x
+                task={task as Task}
                 onDelete={() => deleteTask(task.id)}
               />
             ))}
@@ -49,13 +33,6 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
-
-      <LogUploadModal
-        isOpen={isLogModalOpen}
-        onClose={() => setIsLogModalOpen(false)}
-        onSubmit={handleLogSubmit}
-        task={selectedTask}
-      />
     </div>
   )
 }

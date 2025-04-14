@@ -17,3 +17,18 @@ export interface LogData {
   attachments: string[]
   completionPercentage: number
 }
+
+
+export interface UserProfile {
+  employee_id: string
+  role: string | null
+  name: string | null
+  email: string | null
+}
+
+export interface LogData {
+  notes: string
+  completionDate: string
+  attachments: string[]
+  completionPercentage: number
+}

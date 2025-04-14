@@ -9,30 +9,13 @@ import { Input } from "@/src/components/ui/input"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Label } from "@/src/components/ui/label"
 import { UploadIcon as FileUpload } from "lucide-react"
+import { LogData } from "@/types"
+import useLogModal from "@/src/hooks/useLogModal"
 
 
 
-interface LogData {
-  notes: string
-  completionDate: string
-  attachments: string[]
-  completionPercentage: number
-}
-
-interface Task {
-  id: string
-  title: string
-  description: string
-}
-
-interface LogUploadModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (data: LogData) => void
-  task: Task | null
-}
-
-export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadModalProps) {
+export function LogUploadModal() {
+  const { isOpen, onClose, onSubmit, task } = useLogModal()
   const [formData, setFormData] = useState<LogData>({
     notes: "",
     completionDate: new Date().toISOString().split("T")[0],
@@ -65,7 +48,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
+      <DialogContent className="bg-white dark:bg-zinc-900/90 backdrop-blur-sm text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Upload Task Log</DialogTitle>
         </DialogHeader>
