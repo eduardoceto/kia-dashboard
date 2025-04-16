@@ -15,15 +15,22 @@ import {
   HelpCircle,
   Menu,
 } from "lucide-react"
+import { RiFolderHistoryFill } from "react-icons/ri";
+import { FaFileExport } from "react-icons/fa6";
+import { IoMdSettings } from "react-icons/io";
+import { FaFileUpload } from "react-icons/fa";
 
 import { Home } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
 import { useLocale } from "next-intl"
+
+import { useTranslations } from "use-intl"
+import { useManager } from "../hooks/useManager"
 
 
 
@@ -31,6 +38,7 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const manager = useManager()
 
   useEffect(() => {
     setMounted(true)
@@ -116,32 +124,53 @@ export default function Sidebar() {
             <div className="space-y-6">
               <div>
                 <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                  Overview
+                  General
                 </div>
                 <div className="KiaSignature space-y-1">
                   <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
-                  <NavItem href="/analytics" icon={BarChart2}>
-                    Analytics
-                  </NavItem>
-                  <NavItem href="/files" icon={Folder}>
-                    Files
-                  </NavItem>
+                  {manager.isManager && (
+                    <NavItem href="/analytics" icon={BarChart2}>
+                      Analytics
+                    </NavItem>
+                  )}
                 </div>
               </div>
+
+              <div>
+                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  Files
+                </div>
+                <div className="KiaSignature space-y-1">
+                  <NavItem href="/upload" icon={FaFileUpload}>
+                    Upload Log
+                  </NavItem>
+                  <NavItem href="/history" icon={RiFolderHistoryFill}>
+                    History
+                  </NavItem>
+                  {manager.isManager && (
+                    <NavItem href="/export" icon={FaFileExport}>
+                      Export Report
+                    </NavItem>
+                  )}
+                </div>
+              </div>
+              
 
               <div>
                 <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                   User
                 </div>
                 <div className="KiaSignature space-y-1">
-                  <NavItem href="/members" icon={Users2}>
+                  <NavItem href="/settings" icon={IoMdSettings}>
                     Settings
                   </NavItem>
-                  <NavItem href="/permissions" icon={Shield}>
-                    Permissions
-                  </NavItem>
+                  {manager.isManager && (
+                    <NavItem href="/permissions" icon={Users2}>
+                      User Permissions
+                    </NavItem>
+                  )}
                 </div>
               </div>
             </div>

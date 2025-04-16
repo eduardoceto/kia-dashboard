@@ -1,8 +1,8 @@
 import { BarChart4, LineChart } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 
-import { YearComparisonGraph } from "@/src/components/yearlyComparisonGraph"
-import { MultiGraphPanel } from "@/src/components/multiGraphPanel"
+import { YearComparisonGraph } from "@/src/components/graphs/yearlyComparisonGraph"
+import { MultiGraphPanel } from "@/src/components/graphs/multiGraphPanel"
 
 
 export default function UnifiedWasteDashboard() {

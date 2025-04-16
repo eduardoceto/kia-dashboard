@@ -7,7 +7,10 @@ import Link from "next/link"
 import { createClient } from "../utils/supabase/client" // Use client Supabase client
 import { useRouter } from 'next/navigation' // Import useRouter for redirection
 import { IconType } from "react-icons/lib"
-import { FaUserClock } from "react-icons/fa" // Import the icon here
+import { FaUserClock } from "react-icons/fa"
+import { FaCircleUser } from "react-icons/fa6"
+import { PiUserCircleGearFill } from "react-icons/pi";
+import { useManager } from "../hooks/useManager"
 
 interface MenuItem {
     label: string
@@ -18,30 +21,26 @@ interface MenuItem {
 }
 
 interface Profile01Props {
-    name: string // Make props required as they are passed down
+    name: string 
     role: string
 }
 
-// Remove defaultProfile if props are always provided
-// const defaultProfile = { ... }
 
-// Remove async, accept props directly
-export default function Profile01({ name, role }: Profile01Props) { // Use the renamed prop
-    const router = useRouter(); // Get router instance
-    const supabase = createClient(); // Create client-side Supabase instance
+export default function Profile01({ name, role }: Profile01Props) { 
+    const router = useRouter(); 
+    const supabase = createClient(); 
+    const manager = useManager().isManager; // Use the custom hook to get manager data
+
+
 
     const menuItems: MenuItem[] = [
         {
             label: "Settings",
-            href: "#", // Update with actual settings path if needed
+            href: "/settings", 
             icon: <Settings className="w-4 h-4" />,
         },
-        // Add other menu items if necessary
+
     ]
-
-    // Remove server-side data fetching
-    // const { data, error } = await supabase.auth.getUser() ...
-
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) {
@@ -61,9 +60,15 @@ export default function Profile01({ name, role }: Profile01Props) { // Use the r
                 <div className="relative px-6 pt-12 pb-6">
                     <div className="flex items-center gap-4 mb-8">
                     <div className="relative shrink-0">
-                                <FaUserClock
-                                    className="rounded-full w-16 h-16 border-2 border-white dark:border-zinc-900 text-gray-600 dark:text-gray-300" // Adjust size/styling as needed
-                                />
+                                {manager ? (
+                                    <PiUserCircleGearFill
+                                        className="rounded-full w-16 h-16 border-2 border-white dark:border-zinc-900 text-gray-600 dark:text-gray-300" // Adjust size/styling as needed
+                                    />
+                                ) : (
+                                    <FaCircleUser
+                                        className="rounded-full w-16 h-16 border-2 border-white dark:border-zinc-900 text-gray-600 dark:text-gray-300" // Adjust size/styling as needed
+                                    />
+                                )}
                             <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900" />
                         </div>
 

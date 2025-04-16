@@ -4,10 +4,8 @@ import List02 from "@/src/components/list-02"
 import DashCard from "./components/dash-card"
 import { VscGraph } from "react-icons/vsc";
 import { SlGraph } from "react-icons/sl";
-import { UniqueGraph } from "@/src/components/uniqueGraph";
-import { MultiGraphPanel } from "@/src/components/multiGraphPanel";
-import { YearComparisonGraph } from "@/src/components/yearlyComparisonGraph";
-import { StandaloneGraph } from "@/src/components/standAloneGraph";
+import { YearComparisonGraph } from "@/src/components/graphs/yearlyComparisonGraph";
+import { StandaloneGraph } from "@/src/components/graphs/standAloneGraph";
 
 export default function () {
   return (

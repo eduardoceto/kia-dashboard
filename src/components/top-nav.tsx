@@ -8,8 +8,11 @@ import Link from "next/link"
 import { ThemeToggle } from "./theme-toggle"
 import LanguageSwitcher from "./languageSwitcher"
 import { useTranslations } from 'next-intl';
-import { FaUserClock } from "react-icons/fa"; // Import the icon here
+import { FaUserClock } from "react-icons/fa";
+import { FaCircleUser } from "react-icons/fa6"; // Import the icon here
 import { UserProfile } from "@/types";
+import { PiUserCircleGearFill } from "react-icons/pi";
+import { useManager } from "@/src/hooks/useManager"
 
 
 
@@ -26,13 +29,14 @@ type Props = {
 // Make sure TopNav accepts props
 export default function TopNav({ children, userProfile }: Props) {
     const t = useTranslations('top-nav');
-
+    
+    const manager = useManager().isManager;
     const breadcrumbs: BreadcrumbItem[] = [
         { label: t('title') },
         { label: t('dashboard'), href: "/dashboard" },
     ]
 
-    const profileName = userProfile.employee_id ?? 'User';
+    const profileName = userProfile.name ?? 'User';
     const profileRole = userProfile.role ?? 'Role';
 
     return (
@@ -74,7 +78,11 @@ export default function TopNav({ children, userProfile }: Props) {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger className="focus:outline-none">
-                                <FaUserClock className="rounded-full ring-2 ring-gray-200 dark:ring-[#2B2B30] sm:w-8 sm:h-8 cursor-pointer text-gray-600 dark:text-gray-300 p-1" />
+                            {manager ? (
+                                <PiUserCircleGearFill className="rounded-full ring-2 ring-gray-200 dark:ring-[#2B2B30] sm:w-8 sm:h-8 cursor-pointer text-gray-600 dark:text-gray-300 p-0.9" />
+                            ) : (
+                                <FaCircleUser className="rounded-full size-max ring-2 ring-gray-200 dark:ring-[#2B2B30] sm:w-8 sm:h-8 cursor-pointer text-gray-600 dark:text-gray-300 p-0.9" />
+                            )}
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             align="end"

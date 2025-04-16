@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import getUserInfo from "@/src/actions/getUserInfo";
 import LogUploadProvider from "@/src/providers/LogUploadProvider";
 
+import ManagerProvider from "@/src/providers/ManagerProvider";
+
 
 
 
@@ -27,10 +29,12 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
     return(
         <>
-            <LogUploadProvider />
-            <HeaderSide userProfile={userProfile}>
-                {children}
-            </HeaderSide>
+            <ManagerProvider>
+                <LogUploadProvider />
+                <HeaderSide userProfile={userProfile}>
+                    {children}
+                </HeaderSide>
+            </ManagerProvider>
         </>
     );
 }
