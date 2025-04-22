@@ -1,8 +1,7 @@
 import { createClient } from "../utils/supabase/server"; // Changed import path
-import { cookies } from "next/headers";
 import { UserProfile } from "@/types";
 
-const getUserInfo = async (): Promise<UserProfile> => {
+const GetUserInfo = async (): Promise<UserProfile> => {
     const supabase = await createClient();
     const { data: sessionData , error: sessionError } = await supabase.auth.getUser();
     if (sessionError) {
@@ -20,11 +19,11 @@ const getUserInfo = async (): Promise<UserProfile> => {
     const userProfile: UserProfile = {
         employee_id: data.employee_id || null,
         email: data.email,
-        name: data.full_name || null,
+        full_name: data.full_name || null,
         role: data.role,
     };
 
     return userProfile;
 }
 
-export default getUserInfo;
+export default GetUserInfo;

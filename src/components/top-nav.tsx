@@ -36,8 +36,8 @@ export default function TopNav({ children, userProfile }: Props) {
         { label: t('dashboard'), href: "/dashboard" },
     ]
 
-    const profileName = userProfile.name ?? 'User';
-    const profileRole = userProfile.role ?? 'Role';
+    const profileName = userProfile?.full_name || "User";
+    const profileRole = userProfile?.role || "User";
 
     return (
         <header

@@ -6,6 +6,7 @@ import getUserInfo from "@/src/actions/getUserInfo";
 import LogUploadProvider from "@/src/providers/LogUploadProvider";
 
 import ManagerProvider from "@/src/providers/ManagerProvider";
+import UserProvider from "@/src/providers/UserProvider";
 
 
 
@@ -18,22 +19,18 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         redirect('/login');
     }
 
-    // Determine avatar representation: URL or a specific string identifier
-    let avatarRepresentation: string | null = user.user_metadata?.avatar_url ?? null;
-    if (!avatarRepresentation) {
-        // Use a specific string when there's no avatar URL
-        avatarRepresentation = 'default_icon';
-    }
 
     const userProfile = await getUserInfo();
 
     return(
         <>
             <ManagerProvider>
+            <UserProvider>
                 <LogUploadProvider />
-                <HeaderSide userProfile={userProfile}>
+                <HeaderSide>
                     {children}
                 </HeaderSide>
+            </UserProvider>
             </ManagerProvider>
         </>
     );

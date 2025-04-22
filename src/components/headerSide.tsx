@@ -5,16 +5,16 @@ import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
 import TopNav from "@/src/components/top-nav"
-import { UserProfile } from "@/types"
+import { useUser } from "../hooks/useUser"
 
 interface LayoutProps {
     children: ReactNode;
-    userProfile: UserProfile; // Add userProfile prop
 }
 
-export default function HeaderSide({ children, userProfile }: LayoutProps) { // Destructure userProfile
+export default function HeaderSide({ children }: LayoutProps) { // Destructure userProfile
     const { theme } = useTheme()
     const [mounted, setMounted] = useState(false)
+    const { profile: userProfile, loading } = useUser()
 
     useEffect(() => {
         setMounted(true)
@@ -22,6 +22,10 @@ export default function HeaderSide({ children, userProfile }: LayoutProps) { // 
 
     if (!mounted) {
         return null // Or a loading skeleton
+    }
+    
+    if (loading) {
+        return <div className="">Loading user info...</div> // Or a loading skeleton
     }
 
     return (

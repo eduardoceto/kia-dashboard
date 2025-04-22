@@ -5,6 +5,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from "@/src/i18n/routing";
 import { getMessages, getTranslations } from "next-intl/server";
+import { Toaster } from "@/src/components/ui/sonner";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,6 +37,7 @@ export default async function RootLayout({
         <body className={inter.className}>
             <NextIntlClientProvider messages={messages}>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+                <Toaster />
                 {children}
             </ThemeProvider>
             </NextIntlClientProvider>
