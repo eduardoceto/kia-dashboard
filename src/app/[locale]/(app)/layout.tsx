@@ -20,8 +20,6 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     }
 
 
-    const userProfile = await getUserInfo();
-
     return(
         <>
             <ManagerProvider>

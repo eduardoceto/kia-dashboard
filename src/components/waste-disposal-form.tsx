@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react" // Added useEffect
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -16,37 +16,19 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/src/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/src/utils/supabase/client" // Import Supabase client
 
-// Sample driver data with associated company, origin, destination, license plates, and economic number
-const drivers = [
-  {
-    id: "1",
-    name: "Juan Pérez",
-    company: "Transportes México",
-    origin: "Planta Norte",
-    destination: "Centro de Reciclaje",
-    plates: "ABC-123",
-    numeroEconomico: "ECO-001",
-  },
-  {
-    id: "2",
-    name: "María González",
-    company: "EcoTransporte",
-    origin: "Almacén Central",
-    destination: "Planta de Tratamiento",
-    plates: "XYZ-789",
-    numeroEconomico: "ECO-002",
-  },
-  {
-    id: "3",
-    name: "Carlos Rodríguez",
-    company: "Logística Ambiental",
-    origin: "Planta Sur",
-    destination: "Centro de Disposición",
-    plates: "LMN-456",
-    numeroEconomico: "ECO-003",
-  },
-]
+// Define the type for a driver based on your Supabase table structure
+interface Driver {
+  id: string
+  nombre: string // Changed from name
+  compania: string // Changed from company
+  procedencia: string // Changed from origin
+  destino: string // Changed from destination
+  placas: string // Changed from plates
+  numero_economico: string // Changed from numeroEconomico (snake_case)
+  // Add other relevant fields if necessary
+}
 
 // Sample waste items with name, weight, and timestamp (for sorting by newest)
 const wasteItems = [
@@ -142,6 +124,46 @@ export default function WasteDisposalForm() {
   const [selectedDriverId, setSelectedDriverId] = useState("")
   const [selectedWasteItems, setSelectedWasteItems] = useState<string[]>([])
   const [wasteCommandOpen, setWasteCommandOpen] = useState(false)
+  const [drivers, setDrivers] = useState<Driver[]>([]) // State for drivers
+  const [isLoadingDrivers, setIsLoadingDrivers] = useState(true) // Loading state
+  const [driverError, setDriverError] = useState<string | null>(null) // Error state
+
+  const supabase = createClient() // Initialize Supabase client
+
+  // Fetch drivers from Supabase on component mount
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      setIsLoadingDrivers(true)
+      setDriverError(null)
+      try {
+        // Adjust 'drivers' to your actual table name and column names if different
+        const { data, error } = await supabase
+          .from("drivers") // Replace 'drivers' with your actual table name
+          // Select necessary columns using actual database names
+          .select("id, nombre, compania, procedencia, destino, placas, numero_economico")
+
+        if (error) {
+          // Throw the specific Supabase error for better context
+          throw error
+        }
+
+        if (data) {
+          // Ensure the fetched data matches the Driver interface
+          setDrivers(data as Driver[])
+        }
+      } catch (error: any) {
+        // Log the full error object for more details
+        console.error("Error fetching drivers:", error)
+        // Optionally, try stringifying if the object is complex or doesn't log well
+        // console.error("Error fetching drivers (stringified):", JSON.stringify(error, null, 2));
+        setDriverError(`Error al cargar los choferes: ${error?.message || 'Detalles no disponibles'}. Intente de nuevo.`)
+      } finally {
+        setIsLoadingDrivers(false)
+      }
+    }
+
+    fetchDrivers()
+  }, [supabase]) // Dependency array includes supabase client instance
 
   // Generate automatic values
   const currentDate = format(new Date(), "yyyy-MM-dd")
@@ -164,18 +186,28 @@ export default function WasteDisposalForm() {
     },
   })
 
-  // Handle driver selection and autofill
+  // Handle driver selection and autofill (uses the 'drivers' state)
   const handleDriverChange = (driverId: string) => {
     setSelectedDriverId(driverId)
+    // Find driver from the state variable 'drivers'
     const selectedDriver = drivers.find((driver) => driver.id === driverId)
 
     if (selectedDriver) {
-      form.setValue("nombreChofer", selectedDriver.name)
-      form.setValue("compania", selectedDriver.company)
-      form.setValue("procedencia", selectedDriver.origin)
-      form.setValue("destino", selectedDriver.destination)
-      form.setValue("placas", selectedDriver.plates)
-      form.setValue("numeroEconomico", selectedDriver.numeroEconomico)
+      // Use correct property names from the Driver interface
+      form.setValue("nombreChofer", selectedDriver.nombre)
+      form.setValue("compania", selectedDriver.compania)
+      form.setValue("procedencia", selectedDriver.procedencia)
+      form.setValue("destino", selectedDriver.destino)
+      form.setValue("placas", selectedDriver.placas)
+      form.setValue("numeroEconomico", selectedDriver.numero_economico) // Use snake_case here
+    } else {
+      // Optionally clear fields if driver not found (e.g., if selection is cleared)
+      form.resetField("nombreChofer")
+      form.resetField("compania")
+      form.resetField("procedencia")
+      form.resetField("destino")
+      form.resetField("placas")
+      form.resetField("numeroEconomico")
     }
   }
 
@@ -301,18 +333,45 @@ export default function WasteDisposalForm() {
               {/* Driver selection dropdown */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Seleccionar Chofer</label>
-                <Select value={selectedDriverId} onValueChange={handleDriverChange}>
+                <Select
+                  value={selectedDriverId}
+                  onValueChange={handleDriverChange}
+                  disabled={isLoadingDrivers || !!driverError} // Disable while loading or if error
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar chofer" />
+                    <SelectValue
+                      placeholder={
+                        isLoadingDrivers
+                          ? "Cargando choferes..."
+                          : driverError
+                            ? "Error al cargar"
+                            : "Seleccionar chofer"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {drivers.map((driver) => (
-                      <SelectItem key={driver.id} value={driver.id}>
-                        {driver.name}
+                    {isLoadingDrivers ? (
+                      <SelectItem value="loading" disabled>
+                        Cargando...
                       </SelectItem>
-                    ))}
+                    ) : driverError ? (
+                      <SelectItem value="error" disabled>
+                        {driverError}
+                      </SelectItem>
+                    ) : drivers.length === 0 ? (
+                      <SelectItem value="no-drivers" disabled>
+                        No hay choferes disponibles
+                      </SelectItem>
+                    ) : (
+                      drivers.map((driver) => (
+                        <SelectItem key={driver.id} value={driver.id}>
+                          {driver.nombre} - {driver.compania}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                {driverError && <p className="text-sm text-red-600 mt-1">{driverError}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -561,7 +620,7 @@ export default function WasteDisposalForm() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting || isLoadingDrivers}>
                 {isSubmitting ? "Guardando..." : "Guardar Registro"}
               </Button>
             </form>

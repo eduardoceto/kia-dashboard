@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
 import TopNav from "@/src/components/top-nav"
 import { useUser } from "../hooks/useUser"
+import { LoaderCircle } from "lucide-react"
 
 interface LayoutProps {
     children: ReactNode;
@@ -25,7 +26,14 @@ export default function HeaderSide({ children }: LayoutProps) { // Destructure u
     }
     
     if (loading) {
-        return <div className="">Loading user info...</div> // Or a loading skeleton
+        return (
+            <div className="flex items-center justify-center h-screen">
+                
+                <LoaderCircle className="h-12 w-12 animate-spin" />
+                <p className="text-lg font-medium">Cargando...</p>
+                <p className="text-sm text-muted-foreground">Por favor espera un momento.</p>
+            </div>
+        ) // Or a loading skeleton
     }
 
     return (

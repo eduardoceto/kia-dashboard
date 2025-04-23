@@ -19,6 +19,7 @@ import { RiFolderHistoryFill } from "react-icons/ri";
 import { FaFileExport } from "react-icons/fa6";
 import { IoMdSettings } from "react-icons/io";
 import { FaFileUpload } from "react-icons/fa";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { Home } from "lucide-react"
 import Link from "next/link"
@@ -106,14 +107,14 @@ export default function Sidebar() {
                 alt="Kia Logo"
                 width={100}
                 height={100}
-                className="flex-shrink-0 hidden dark:block "
+                className="flex-shrink-0 hidden dark:block width:auto height:auto"
               />
               <Image
                 src="https://upload.wikimedia.org/wikipedia/commons/b/b6/KIA_logo3.svg"
                 alt="Kia Logo"
                 width={100}
                 height={100}
-                className="flex-shrink-0 block dark:hidden"
+                className="flex-shrink-0 block dark:hidden width:auto height:auto"
               />
             </div>
           </div>
@@ -152,6 +153,11 @@ export default function Sidebar() {
                   {manager.isManager && (
                     <NavItem href="/export" icon={FaFileExport}>
                       Export Report
+                    </NavItem>
+                  )}
+                  {manager.isManager && (
+                    <NavItem href="/other" icon={BsThreeDotsVertical}>
+                      Other
                     </NavItem>
                   )}
                 </div>

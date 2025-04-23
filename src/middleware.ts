@@ -27,7 +27,6 @@ export async function middleware(request: NextRequest) {
   // If updateSession modified the response (e.g., set cookies), use the modified response
   response = authResult ?? response;
 
-  const cookieStore = await cookies()
 
   // --- 3. Handle Authorization (Role Check) ---
   // Create a Supabase client instance to read user data using cookies potentially set by updateSession
@@ -37,7 +36,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Define protected paths and required role
-  const protectedPaths = ['/analytics', '/permissions', '/export']; // Paths requiring admin role
+  const protectedPaths = ['/analytics', '/permissions', '/export', 'other']; // Paths requiring admin role
   const requiredRole = 'admin';
   const locale = request.nextUrl.pathname.split('/')[1] || routing.defaultLocale;
   const requestedPath = request.nextUrl.pathname.replace(`/${locale}`, '') || '/';
