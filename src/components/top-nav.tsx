@@ -1,14 +1,12 @@
 "use client" // Ensure TopNav is a client component if it wasn't already
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import Image from "next/image"
 import { Bell, ChevronRight } from "lucide-react"
 import Profile01 from "./profile-01" // Import Profile01
 import Link from "next/link"
 import { ThemeToggle } from "./theme-toggle"
 import LanguageSwitcher from "./languageSwitcher"
 import { useTranslations } from 'next-intl';
-import { FaUserClock } from "react-icons/fa";
 import { FaCircleUser } from "react-icons/fa6"; // Import the icon here
 import { UserProfile } from "@/types";
 import { PiUserCircleGearFill } from "react-icons/pi";

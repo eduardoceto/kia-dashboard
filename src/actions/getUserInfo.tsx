@@ -10,17 +10,21 @@ const GetUserInfo = async (): Promise<UserProfile> => {
 
     const supaid = sessionData.user?.id;
 
-    const { data, error } = await supabase.from('users').select('employee_id, email, role, full_name').eq('id', supaid).single();
+    const { data, error } = await supabase.from('users').select('*').eq('id', supaid).single();
 
     if (error) {
         throw new Error("Failed to fetch user profile");
     }
 
-    const userProfile: UserProfile = {
+    const userProfile = {
         employee_id: data.employee_id || null,
         email: data.email,
         full_name: data.full_name || null,
         role: data.role,
+        is_active: data.is_active,
+        created_at: data.created_at,
+        id: data.id,
+        locale: data.locale
     };
 
     return userProfile;

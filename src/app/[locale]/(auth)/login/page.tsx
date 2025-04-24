@@ -10,21 +10,32 @@ import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
+
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsLoading(true)
         try {
-            await login(email, password)
+            const result = await login(email, password)
+            console.log('Login result:', result)
+            if (result.success) {
+                toast.success('Inicio de sesión exitoso')
+                router.push(`/${result.locale}/dashboard`)
+            } else {
+                toast.error('Usuario o contraseña incorrectos')
+            }
         }
         catch (error) {
-            console.error('Error during login:', error)
-            toast.error('Usuario o contraseña incorrectos')
+            console.error('Login error:', error)
+            toast.error('Error al iniciar sesión')
         }
         finally {
             setIsLoading(false)

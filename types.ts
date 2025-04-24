@@ -27,6 +27,7 @@ export interface UserProfile {
   email: string | null
   is_active: boolean
   created_at: string
+  locale: string
 }
 
 export interface LogData {

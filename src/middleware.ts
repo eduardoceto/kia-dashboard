@@ -2,7 +2,6 @@ import createIntlMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/src/utils/supabase/middleware';
-import { cookies } from 'next/headers';
 import { createClient } from './utils/supabase/server';
 
 const handleI18nRouting = createIntlMiddleware(routing);

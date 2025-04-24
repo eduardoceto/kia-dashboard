@@ -1,26 +1,27 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-
 import { createClient } from '@/src/utils/supabase/server'
 
 export async function login(email: string, password: string) {
     const supabase = await createClient()
 
-    const data = {
-        email: email,
-        password: password,
-    }
-
-    const { error } = await supabase.auth.signInWithPassword(data)
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-        // Consider redirecting back to login with an error message
-        // instead of a generic error page
-        redirect('/login?error=Authentication Failed') // Redirect without locale
+        console.error('Login error:', error.message)
+        return { success: false, error: error.message }
     }
 
-    revalidatePath('/', 'layout')
-    redirect('/dashboard') // Redirect to dashboard without locale
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data: userLocale, error: userError } = await supabase
+        .from('users')
+        .select('locale')
+        .eq('id', user?.id)
+        .single()
+    if (userError) {
+        console.error('Error fetching user locale:', userError)
+        return { success: false, error: userError.message }
+    }
+
+    const locale = userLocale?.locale || 'es'
+    return { success: true, locale }
 }
