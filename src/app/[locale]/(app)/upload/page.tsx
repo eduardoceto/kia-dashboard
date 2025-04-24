@@ -42,7 +42,7 @@ export default function Upload() {
           <AccordionItem value="Registro de Salida de Residuos">
             <AccordionTrigger>
                 <div className="flex flex-col items-start text-left">
-                    <h3 className="text-lg font-medium hover:underline hover:cursor-pointer">Registro de Salida de Residuos</h3>
+                    <h3 className="text-lg font-medium hover:cursor-pointer">Registro de Salida de Residuos</h3>
                     <p className="text-sm text-muted-foreground "></p>
                 </div>
             </AccordionTrigger>

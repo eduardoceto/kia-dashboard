@@ -27,10 +27,9 @@ import { use, useEffect, useState } from "react"
 import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"
 import { useTheme } from "next-themes"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 
-import { useTranslations } from "use-intl"
 import { useManager } from "../hooks/useManager"
 
 
@@ -40,6 +39,9 @@ export default function Sidebar() {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const manager = useManager()
+  const router = useRouter()
+  const locale = useLocale()
+  
 
   useEffect(() => {
     setMounted(true)
@@ -51,6 +53,11 @@ export default function Sidebar() {
 
   function handleNavigation() {
     setIsMobileMenuOpen(false)
+  }
+
+  const handleIconClick = () => {
+    const url = `/${locale}/dashboard`
+    router.push(url)
   }
 
   function NavItem({
@@ -107,14 +114,16 @@ export default function Sidebar() {
                 alt="Kia Logo"
                 width={100}
                 height={100}
-                className="flex-shrink-0 hidden dark:block width:auto height:auto"
+                className="flex-shrink-0 hover:cursor-pointer hidden dark:block width:auto height:auto"
+                onClick={handleIconClick}
               />
               <Image
                 src="https://upload.wikimedia.org/wikipedia/commons/b/b6/KIA_logo3.svg"
                 alt="Kia Logo"
                 width={100}
                 height={100}
-                className="flex-shrink-0 block dark:hidden width:auto height:auto"
+                className="flex-shrink-0 hover:cursor-pointer block dark:hidden width:auto height:auto"
+                onClick={handleIconClick}
               />
             </div>
           </div>
