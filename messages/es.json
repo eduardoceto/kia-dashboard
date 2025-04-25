@@ -4,7 +4,14 @@
       "languageSwitcher": {
         "english": "Inglés",
         "spanish": "Español"
-      }
+      },
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "errorLoading": "Error al cargar",
+      "loadingData": "Cargando...",
+      "noItemsAvailable": "No hay elementos disponibles",
+      "kg": "kg"
     },
     "metadata": {
       "title": "Panel de Kia",
@@ -21,6 +28,133 @@
     },
     "top-nav": {
       "title": "Gestión de residuos",
-      "dashboard": "Tablero"
+      "dashboard": "Tablero",
+      "upload": "Subir",
+      "analytics": "Análisis",
+      "permissions": "Permisos",
+      "export": "Exportar",
+      "other": "Otros",
+      "history": "Historial",
+      "settings": "Configuraciones"
+    },
+    "wasteDisposalForm": {
+      "successMessage": "Registro guardado exitosamente",
+      "newRecordButton": "Crear nuevo registro",
+      "dateLabel": "Fecha",
+      "timeLabel": "Hora de Salida",
+      "folioLabel": "Folio",
+      "departmentLabel": "Departamento",
+      "reasonLabel": "Motivo",
+      "selectDriverLabel": "Seleccionar Chofer",
+      "driverNameLabel": "Nombre de Chofer",
+      "companyLabel": "Compañía",
+      "originLabel": "Procedencia",
+      "destinationLabel": "Destino",
+      "platesLabel": "Placas",
+      "economicNumberLabel": "Número Económico",
+      "materialTypeLabel": "Tipo de Material",
+      "wasteLabel": "Residuos",
+      "containerTypeLabel": "Tipo de Contenedor",
+      "authorizingPersonLabel": "Persona que Autoriza",
+      "driverNamePlaceholder": "Nombre del chofer",
+      "companyPlaceholder": "Nombre de la compañía",
+      "originPlaceholder": "Lugar de procedencia",
+      "destinationPlaceholder": "Lugar de destino",
+      "platesPlaceholder": "Número de placas",
+      "economicNumberPlaceholder": "Número económico",
+      "selectMaterialPlaceholder": "Seleccionar tipo de material",
+      "selectWastePlaceholder": "Seleccionar residuos",
+      "searchWastePlaceholder": "Buscar residuo...",
+      "selectContainerPlaceholder": "Seleccionar tipo de contenedor",
+      "authorizingPersonPlaceholder": "Nombre de quien autoriza",
+      "loadingDrivers": "Cargando choferes...",
+      "errorLoadingDrivers": "Error al cargar choferes",
+      "selectDriverPlaceholder": "Seleccionar chofer",
+      "noDriversAvailable": "No hay choferes disponibles",
+      "noWasteFound": "No se encontraron residuos.",
+      "wasteItemsSelected": "{count, plural, =1 {# residuo seleccionado} other {# residuos seleccionados}}",
+      "selectedWasteTitle": "Residuos Seleccionados",
+      "totalWeightLabel": "Peso Total:",
+      "saveButton": "Guardar Registro",
+      "materialTypes": {
+        "organico": "Orgánico",
+        "plastico": "Plástico",
+        "metal": "Metal",
+        "papel": "Papel/Cartón",
+        "vidrio": "Vidrio",
+        "peligroso": "Residuo Peligroso",
+        "electronico": "Electrónico",
+        "otro": "Otro"
+      },
+      "containerTypes": {
+        "bolsa": "Bolsa",
+        "contenedor": "Contenedor",
+        "tambor": "Tambor",
+        "caja": "Caja",
+        "otro": "Otro"
+      },
+      "fixedValues": {
+          "department": "EHS",
+          "reason": "Residuos"
+      }
+    },
+    "logUploadModal": {
+      "title": "Subir Registro de Tarea",
+      "completionDateLabel": "Fecha de Finalización",
+      "completionPercentageLabel": "Porcentaje de Finalización",
+      "notesLabel": "Notas",
+      "attachmentsLabel": "Adjuntos",
+      "notesPlaceholder": "Añada notas relevantes sobre la finalización de la tarea...",
+      "filesSelected": "{count, plural, =1 {# archivo seleccionado} other {# archivos seleccionados}}",
+      "clickToUpload": "Haga clic para subir archivos",
+      "cancelButton": "Cancelar",
+      "submitButton": "Enviar Registro",
+      "taskDetailsTitle": "Detalles de la Tarea"
+    },
+    "permissionsPage": {
+      "title": "Panel de Administración",
+      "description": "Gestionar empleados y choferes"
+    },
+    "analyticsPage": {
+      "title": "Panel de Análisis de Disposición de Residuos",
+      "multiGraphTab": "Vista Multi-Gráfico",
+      "yearComparisonTab": "Comparación Anual"
+    },
+    "exportPage": {
+      "backButton": "Volver al Formulario",
+      "title": "Exportar Registros",
+      "description": "Filtra y exporta los registros de salida de residuos a Excel",
+      "historyButton": "Ver Historial",
+      "filtersTitle": "Filtros",
+      "filtersDescription": "Selecciona el rango de fechas y los tipos de materiales para exportar",
+      "dateRangeTitle": "Rango de Fechas",
+      "startDateLabel": "Fecha Inicial",
+      "endDateLabel": "Fecha Final",
+      "selectDatePlaceholder": "Seleccionar",
+      "materialTypesTitle": "Tipos de Material",
+      "selectAllMaterialsLabel": "Todos los materiales",
+      "exportButton": "Exportar a Excel",
+      "exportingButton": "Exportando...",
+      "previewTitle": "Vista Previa",
+      "recordsFound": "{count, plural, =1 {# registro encontrado} other {# registros encontrados}}",
+      "previewTableHeaders": {
+        "date": "Fecha",
+        "materialType": "Tipo de Material",
+        "waste": "Residuos",
+        "totalWeight": "Peso Total (kg)"
+      },
+      "moreItemsBadge": "+{count} más",
+      "moreRecordsIndicator": "... y {count} registros más",
+      "noRecordsFound": "No se encontraron registros con los filtros seleccionados",
+      "summaryTitle": "Resumen por Tipo de Material",
+      "totalLabel": "Total",
+      "exportSuccessMessage": "Exportación exitosa"
+    },
+    "otherPage": {
+      "title": "Otros",
+      "vehicleProductionTitle": "Producción Mensual de Vehículos",
+      "vehicleProductionDescription": "Ingrese los detalles de producción del mes",
+      "panelProductionTitle": "Producción Mensual de Paneles",
+      "panelProductionDescription": "Ingrese los detalles de producción del mes"
     }
   }

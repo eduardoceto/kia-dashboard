@@ -1,26 +1,160 @@
 {
-    "common": {
-      "loading": "Loading...",
-      "languageSwitcher": {
-        "english": "English",
-        "spanish": "Spanish"
-      }
+  "common": {
+    "loading": "Loading...",
+    "languageSwitcher": {
+      "english": "English",
+      "spanish": "Spanish"
     },
-    "metadata": {
-      "title": "Kia Dashboard",
-      "description": "A modern dashboard for Kia vehicles"
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "errorLoading": "Error loading",
+    "loadingData": "Loading...",
+    "noItemsAvailable": "No items available",
+    "kg": "kg"
+  },
+  "metadata": {
+    "title": "Kia Dashboard",
+    "description": "A modern dashboard for Kia vehicles"
+  },
+  "sidebar": {
+    "title": "Sidebar"
+  },
+  "topNav": {
+    "title": "Top Navigation"
+  },
+  "content": {
+    "title": "Main Content"
+  },
+  "top-nav": {
+    "title": "Waste Management",
+    "dashboard": "Dashboard",
+    "upload": "Upload",
+    "analytics": "Analytics",
+    "permissions": "Permissions",
+    "export": "Export",
+    "other": "Other",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "wasteDisposalForm": {
+    "successMessage": "Record saved successfully",
+    "newRecordButton": "Create new record",
+    "dateLabel": "Date",
+    "timeLabel": "Departure Time",
+    "folioLabel": "Folio",
+    "departmentLabel": "Department",
+    "reasonLabel": "Reason",
+    "selectDriverLabel": "Select Driver",
+    "driverNameLabel": "Driver Name",
+    "companyLabel": "Company",
+    "originLabel": "Origin",
+    "destinationLabel": "Destination",
+    "platesLabel": "Plates",
+    "economicNumberLabel": "Economic Number",
+    "materialTypeLabel": "Material Type",
+    "wasteLabel": "Waste",
+    "containerTypeLabel": "Container Type",
+    "authorizingPersonLabel": "Authorizing Person",
+    "driverNamePlaceholder": "Driver's name",
+    "companyPlaceholder": "Company name",
+    "originPlaceholder": "Place of origin",
+    "destinationPlaceholder": "Place of destination",
+    "platesPlaceholder": "License plate number",
+    "economicNumberPlaceholder": "Economic number",
+    "selectMaterialPlaceholder": "Select material type",
+    "selectWastePlaceholder": "Select waste",
+    "searchWastePlaceholder": "Search waste...",
+    "selectContainerPlaceholder": "Select container type",
+    "authorizingPersonPlaceholder": "Name of authorizing person",
+    "loadingDrivers": "Loading drivers...",
+    "errorLoadingDrivers": "Error loading drivers",
+    "selectDriverPlaceholder": "Select driver",
+    "noDriversAvailable": "No drivers available",
+    "noWasteFound": "No waste found.",
+    "wasteItemsSelected": "{count, plural, =1 {# waste item selected} other {# waste items selected}}",
+    "selectedWasteTitle": "Selected Waste",
+    "totalWeightLabel": "Total Weight:",
+    "saveButton": "Save Record",
+    "materialTypes": {
+      "organico": "Organic",
+      "plastico": "Plastic",
+      "metal": "Metal",
+      "papel": "Paper/Cardboard",
+      "vidrio": "Glass",
+      "peligroso": "Hazardous Waste",
+      "electronico": "Electronic",
+      "otro": "Other"
     },
-    "sidebar": {
-      "title": "Sidebar"
+    "containerTypes": {
+      "bolsa": "Bag",
+      "contenedor": "Container",
+      "tambor": "Drum",
+      "caja": "Box",
+      "otro": "Other"
     },
-    "topNav": {
-      "title": "Top Navigation"
-    },
-    "content": {
-      "title": "Main Content"
-    },
-    "top-nav": {
-      "title": "Waste Management",
-      "dashboard": "Dashboard"
+    "fixedValues": {
+        "department": "EHS",
+        "reason": "Waste"
     }
-  } 
+  },
+  "logUploadModal": {
+    "title": "Upload Task Log",
+    "completionDateLabel": "Completion Date",
+    "completionPercentageLabel": "Completion Percentage",
+    "notesLabel": "Notes",
+    "attachmentsLabel": "Attachments",
+    "notesPlaceholder": "Add any relevant notes about task completion...",
+    "filesSelected": "{count, plural, =1 {# file selected} other {# files selected}}",
+    "clickToUpload": "Click to upload files",
+    "cancelButton": "Cancel",
+    "submitButton": "Submit Log",
+    "taskDetailsTitle": "Task Details"
+  },
+  "permissionsPage": {
+    "title": "Admin Dashboard",
+    "description": "Manage employees and drivers"
+  },
+  "analyticsPage": {
+    "title": "Waste Disposal Analysis Dashboard",
+    "multiGraphTab": "Multi-Graph View",
+    "yearComparisonTab": "Year Comparison"
+  },
+  "exportPage": {
+    "backButton": "Back to Form",
+    "title": "Export Records",
+    "description": "Filter and export waste disposal records to Excel",
+    "historyButton": "View History",
+    "filtersTitle": "Filters",
+    "filtersDescription": "Select the date range and material types to export",
+    "dateRangeTitle": "Date Range",
+    "startDateLabel": "Start Date",
+    "endDateLabel": "End Date",
+    "selectDatePlaceholder": "Select",
+    "materialTypesTitle": "Material Types",
+    "selectAllMaterialsLabel": "All materials",
+    "exportButton": "Export to Excel",
+    "exportingButton": "Exporting...",
+    "previewTitle": "Preview",
+    "recordsFound": "{count, plural, =1 {# record found} other {# records found}}",
+    "previewTableHeaders": {
+      "date": "Date",
+      "materialType": "Material Type",
+      "waste": "Waste",
+      "totalWeight": "Total Weight (kg)"
+    },
+    "moreItemsBadge": "+{count} more",
+    "moreRecordsIndicator": "... and {count} more records",
+    "noRecordsFound": "No records found with the selected filters",
+    "summaryTitle": "Summary by Material Type",
+    "totalLabel": "Total",
+    "exportSuccessMessage": "Export successful"
+  },
+  "otherPage": {
+    "title": "Other",
+    "vehicleProductionTitle": "Monthly Vehicle Production",
+    "vehicleProductionDescription": "Enter production details for the month",
+    "panelProductionTitle": "Monthly Panel Production",
+    "panelProductionDescription": "Enter production details for the month"
+  }
+}
