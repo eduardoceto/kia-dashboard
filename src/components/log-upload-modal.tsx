@@ -1,56 +1,93 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/src/components/ui/dialog"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
-import { Textarea } from "@/src/components/ui/textarea"
 import { Label } from "@/src/components/ui/label"
-import { UploadIcon as FileUpload } from "lucide-react"
-import { LogData } from "@/types"
-import useLogModal from "@/src/hooks/useLogModal"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 
+interface LogData {
+  tipoResiduo: string
+  fecha: string
+  area: string
+  peso: number
+}
 
+interface Task {
+  id: string
+  title: string
+  description: string
+  wasteType: string
+  area: string
+}
 
-export function LogUploadModal() {
-  const { isOpen, onClose, onSubmit, task } = useLogModal()
+interface LogUploadModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (data: LogData) => void
+  task: Task | null
+}
+
+// Simulated logged user data
+const currentUser = {
+  name: "Juan Pérez",
+  area: "Planta 1",
+  role: "Supervisor",
+}
+
+// Types of waste options
+const tiposResiduo = ["Metálico", "Plástico", "Papel/Cartón", "Vidrio", "Orgánico", "Electrónico", "Químico", "Otro"]
+
+// List of areas
+const areas = ["Planta 1", "Planta 2", "Planta 3", "Planta 4", "Planta 5", "Planta 6", "Planta 7"]
+
+export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadModalProps) {
   const [formData, setFormData] = useState<LogData>({
-    notes: "",
-    completionDate: new Date().toISOString().split("T")[0],
-    attachments: [],
-    completionPercentage: 100,
+    tipoResiduo: task?.wasteType || "",
+    fecha: new Date().toISOString().split("T")[0],
+    area: task?.area || currentUser.area,
+    peso: 0,
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Update form data when task changes
+  React.useEffect(() => {
+    if (task) {
+      setFormData((prev) => ({
+        ...prev,
+        tipoResiduo: task.wasteType || prev.tipoResiduo,
+        area: task.area || prev.area,
+      }))
+    }
+  }, [task])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit(formData)
     setFormData({
-      notes: "",
-      completionDate: new Date().toISOString().split("T")[0],
-      attachments: [],
-      completionPercentage: 100,
+      tipoResiduo: "",
+      fecha: new Date().toISOString().split("T")[0],
+      area: currentUser.area,
+      peso: 0,
     })
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const fileNames = Array.from(e.target.files).map((file) => file.name)
-      setFormData((prev) => ({ ...prev, attachments: fileNames }))
-    }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white dark:bg-zinc-900/90 backdrop-blur-sm text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
+      <DialogContent className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Upload Task Log</DialogTitle>
+          <DialogTitle>Registro de Residuos</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -62,70 +99,68 @@ export function LogUploadModal() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="completionDate">Completion Date</Label>
+            <Label htmlFor="tipoResiduo">Tipo de Residuo</Label>
+            <Select
+              value={formData.tipoResiduo}
+              onValueChange={(value) => handleSelectChange("tipoResiduo", value)}
+              required
+            >
+              <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+                <SelectValue placeholder="Seleccionar tipo de residuo" />
+              </SelectTrigger>
+              <SelectContent>
+                {tiposResiduo.map((tipo) => (
+                  <SelectItem key={tipo} value={tipo}>
+                    {tipo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fecha">Fecha</Label>
             <Input
-              id="completionDate"
-              name="completionDate"
+              id="fecha"
+              name="fecha"
               type="date"
-              value={formData.completionDate}
+              value={formData.fecha}
+              onChange={handleChange}
+              className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
+            />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Fecha preestablecida a hoy</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="area">Área</Label>
+            <Select value={formData.area} onValueChange={(value) => handleSelectChange("area", value)} required>
+              <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+                <SelectValue placeholder="Seleccionar área" />
+              </SelectTrigger>
+              <SelectContent>
+                {areas.map((area) => (
+                  <SelectItem key={area} value={area}>
+                    {area}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Área preestablecida según la tarea</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="peso">Peso (kg)</Label>
+            <Input
+              id="peso"
+              name="peso"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.peso || ""}
               onChange={handleChange}
               className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
               required
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="completionPercentage">Completion Percentage</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="completionPercentage"
-                name="completionPercentage"
-                type="number"
-                min="0"
-                max="100"
-                value={formData.completionPercentage}
-                onChange={handleChange}
-                className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
-                required
-              />
-              <span>%</span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 min-h-[100px]"
-              placeholder="Add any relevant notes about task completion..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="attachments">Attachments</Label>
-            <div className="border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-md p-4 text-center">
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <FileUpload className="h-8 w-8 mx-auto mb-2 text-zinc-400" />
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {formData.attachments.length > 0
-                    ? `${formData.attachments.length} file(s) selected`
-                    : "Click to upload files"}
-                </span>
-                <Input id="file-upload" type="file" multiple className="hidden" onChange={handleFileChange} />
-              </label>
-            </div>
-            {formData.attachments.length > 0 && (
-              <ul className="text-sm text-zinc-600 dark:text-zinc-400 pl-4">
-                {formData.attachments.map((file, index) => (
-                  <li key={index} className="truncate">
-                    {file}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           <DialogFooter className="pt-4">
@@ -135,10 +170,10 @@ export function LogUploadModal() {
               onClick={onClose}
               className="border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
             >
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-              Submit Log
+              Registrar
             </Button>
           </DialogFooter>
         </form>

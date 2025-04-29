@@ -10,6 +10,19 @@ export interface Task {
   createdAt: string
   category?: "waste" | "maintenance" | "audit" | "safety"
 }
+export interface TaskCardProps {
+  id: string
+  title: string
+  description: string
+  status: "now" | "pending" | "overdue" | "completed"
+  progress: 0 | 100 // Binary progress - either 0 or 100
+  frequency: "daily" | "weekly" | "monthly"
+  dueDate: string
+  createdAt: string
+  category: "waste" | "maintenance" | "audit" | "safety"
+  wasteType: string
+  area: string
+}
 
 export interface LogData {
   notes: string
@@ -17,6 +30,14 @@ export interface LogData {
   attachments: string[]
   completionPercentage: number
 }
+
+export interface LogDataModalProps {
+  tipoResiduo: string
+  fecha: string
+  area: string
+  peso: number
+}
+
 
 
 export interface UserProfile {

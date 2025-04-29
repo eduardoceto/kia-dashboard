@@ -1,14 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { Trash, Calendar, ArrowRight, Wrench, ClipboardCheck, Shield, Info, Upload } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Trash, Calendar, ArrowRight, Wrench, ClipboardCheck, Shield, Clock, AlertTriangle, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Task } from "@/types"
-import useLogModal from "../hooks/useLogModal"
-import { log } from "console"
+
+interface Task {
+  id: string
+  title: string
+  description: string
+  status: "now" | "pending" | "overdue" | "completed"
+  progress: 0 | 100 // Binary progress - either 0 or 100
+  frequency: "daily" | "weekly" | "monthly"
+  dueDate: string
+  createdAt: string
+  category: "waste" | "maintenance" | "audit" | "safety"
+  wasteType: string
+  area: string
+}
 
 interface TaskCardProps {
   task: Task
+  onUploadLog: () => void
   onDelete: () => void
 }
 
@@ -20,42 +33,43 @@ const iconStyles = {
 }
 
 const statusConfig = {
-  "in-progress": {
+  now: {
     bg: "bg-blue-50 dark:bg-blue-900/20",
     class: "text-blue-600 dark:text-blue-400",
-    icon: Info,
+    icon: Clock,
+    label: "Now",
   },
-  "pending": {
+  pending: {
     bg: "bg-amber-50 dark:bg-amber-900/20",
     class: "text-amber-600 dark:text-amber-400",
-    icon: Info,
+    icon: Clock,
+    label: "Pending",
   },
-  "completed": {
+  overdue: {
+    bg: "bg-red-50 dark:bg-red-900/20",
+    class: "text-red-600 dark:text-red-400",
+    icon: AlertTriangle,
+    label: "Overdue",
+  },
+  completed: {
     bg: "bg-green-50 dark:bg-green-900/20",
     class: "text-green-600 dark:text-green-400",
-    icon: Info,
+    icon: ClipboardCheck,
+    label: "Completed",
   },
 }
 
-export function TaskCard({ task, onDelete }: TaskCardProps) {
+const frequencyLabels = {
+  daily: "Diario",
+  weekly: "Semanal",
+  monthly: "Mensual",
+}
+
+export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
   const [isHovering, setIsHovering] = useState(false)
+  const router = useRouter()
 
-  const logModal = useLogModal();
-
-  const getFrequencyLabel = (frequency: string) => {
-    switch (frequency) {
-      case "daily":
-        return "en el día de hoy"
-      case "weekly":
-        return "en la semana"
-      case "monthly":
-        return "en el mes"
-      default:
-        return ""
-    }
-  }
-
-  const getCategoryIcon = (category?: string) => {
+  const getCategoryIcon = (category: string) => {
     switch (category) {
       case "waste":
         return Trash
@@ -70,9 +84,18 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
     }
   }
 
+  const handleUploadLogClick = () => {
+    // Option 1: Use the modal approach
+    onUploadLog()
+
+    // Option 2: Navigate to the dedicated page
+    // router.push(`/upload-log?taskId=${task.id}`)
+  }
+
   const IconComponent = getCategoryIcon(task.category)
   const status = task.status.toLowerCase() as keyof typeof statusConfig
-  const StatusIcon = statusConfig[status]?.icon || Info
+  const StatusIcon = statusConfig[status]?.icon || Clock
+  const statusLabel = statusConfig[status]?.label || "Pending"
 
   return (
     <div
@@ -105,7 +128,7 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
             )}
           >
             <StatusIcon className="w-3.5 h-3.5" />
-            {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+            {statusLabel}
           </div>
         </div>
 
@@ -117,21 +140,32 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="text-zinc-600 dark:text-zinc-400">Progress</span>
-            <span className="text-zinc-900 dark:text-zinc-100">{task.progress}%</span>
+            <span className="text-zinc-900 dark:text-zinc-100">
+              {task.progress === 100 ? "Completed" : "Not Completed"}
+            </span>
           </div>
           <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full" style={{ width: `${task.progress}%` }} />
+            <div
+              className={cn(
+                "h-full rounded-full",
+                task.progress === 100 ? "bg-green-500 dark:bg-green-400" : "bg-zinc-900 dark:bg-zinc-100",
+              )}
+              style={{ width: `${task.progress}%` }}
+            />
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{task.target}</span>
-          <span className="text-xs text-zinc-600 dark:text-zinc-400">{getFrequencyLabel(task.frequency)} target</span>
-        </div>
-
-        <div className="flex items-center text-xs text-zinc-600 dark:text-zinc-400">
-          <Calendar className="w-3.5 h-3.5 mr-1.5" />
-          <span>Objetivo: {task.dueDate}</span>
+        <div className="flex flex-col gap-1 text-xs text-zinc-600 dark:text-zinc-400">
+          <div className="flex items-center">
+            <Calendar className="w-3.5 h-3.5 mr-1.5" />
+            <span>Vence: {task.dueDate}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs">
+              {frequencyLabels[task.frequency as keyof typeof frequencyLabels]}
+            </span>
+            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs">{task.area}</span>
+          </div>
         </div>
       </div>
 
@@ -145,10 +179,9 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
               "text-blue-600 dark:text-blue-400",
               "hover:text-blue-700 dark:hover:text-blue-300",
               "hover:bg-blue-50 dark:hover:bg-blue-900/20",
-              "hover:cursor-pointer",
               "transition-colors duration-200",
             )}
-            onClick={logModal.onOpen}
+            onClick={handleUploadLogClick}
           >
             Upload Log
             <Upload className="w-3.5 h-3.5" />
@@ -164,6 +197,7 @@ export function TaskCard({ task, onDelete }: TaskCardProps) {
               "hover:bg-zinc-100 dark:hover:bg-zinc-800/50",
               "transition-colors duration-200",
             )}
+            onClick={() => router.push(`/upload-log?taskId=${task.id}`)}
           >
             View Details
             <ArrowRight className="w-3.5 h-3.5" />

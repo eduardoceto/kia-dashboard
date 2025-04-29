@@ -11,7 +11,6 @@ import { Input } from "@/src/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog"
 import { Badge } from "@/src/components/ui/badge"
-import { Card, CardContent } from "@/src/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import {
   Pagination,
@@ -31,7 +30,7 @@ export default function HistoryPage() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const [selectedLog, setSelectedLog] = useState<any | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [materialFilter, setMaterialFilter] = useState<string>("")
+  const [materialFilter, setMaterialFilter] = useState<string>("all") // default to "all"
 
   // Get historical logs
   const logs = getHistoricalLogs()
@@ -47,7 +46,8 @@ export default function HistoryPage() {
       log.personaAutoriza.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.residuos.some((r) => r.nombreResiduo.toLowerCase().includes(searchTerm.toLowerCase()))
 
-    const matchesMaterial = materialFilter ? log.tipoMaterial === materialFilter : true
+    // Fix: "all" means no filter
+    const matchesMaterial = materialFilter === "all" ? true : log.tipoMaterial === materialFilter
 
     return matchesSearch && matchesMaterial
   })
@@ -386,6 +386,7 @@ export default function HistoryPage() {
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
+                  size="sm"
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
@@ -398,6 +399,7 @@ export default function HistoryPage() {
               {Array.from({ length: totalPages }).map((_, index) => (
                 <PaginationItem key={index}>
                   <PaginationLink
+                    size="sm"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
@@ -409,11 +411,12 @@ export default function HistoryPage() {
                   </PaginationLink>
                 </PaginationItem>
               ))}
-
               <PaginationItem>
                 <PaginationNext
+                  size="sm"
                   href="#"
                   onClick={(e) => {
+                    e.preventDefault()
                     e.preventDefault()
                     if (currentPage < totalPages) setCurrentPage(currentPage + 1)
                   }}

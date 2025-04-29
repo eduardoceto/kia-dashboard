@@ -4,23 +4,37 @@ import { useState } from "react"
 import { TaskCard } from "@/src/components/task-card"
 import { LogUploadModal } from "@/src/components/log-upload-modal"
 import { useTasks } from "@/src/hooks/use-tasks"
-import type { Task } from "@/types"
-import type { LogData } from "@/types"
+import type { TaskCardProps } from "@/types"
+import type { LogDataModalProps } from "@/types"
 
 export default function TasksPage() {
   const { tasks, completeTask, deleteTask } = useTasks()
+  const [selectedTask, setSelectedTask] = useState<TaskCardProps | null>(null)
+  const [isLogModalOpen, setIsLogModalOpen] = useState(false)
 
+  const handleUploadLog = (task: TaskCardProps) => {
+    setSelectedTask(task)
+    setIsLogModalOpen(true)
+  }
+
+  const handleLogSubmit = (logData: LogDataModalProps) => {
+    if (selectedTask) {
+      completeTask(selectedTask.id, logData)
+    }
+    setIsLogModalOpen(false)
+    setSelectedTask(null)
+  }
 
   return (
     <div>
-      <div className="max-w-5xl mx-auto ">
-
+      <div className="max-w-5xl mx-auto">
         <div className="w-full overflow-x-auto scrollbar-none">
           <div className="flex gap-3 min-w-full p-1">
             {tasks.map((task) => (
               <TaskCard
-                key={task.id}x
-                task={task as Task}
+                key={task.id}
+                task={task}
+                onUploadLog={() => handleUploadLog(task)}
                 onDelete={() => deleteTask(task.id)}
               />
             ))}
@@ -33,6 +47,13 @@ export default function TasksPage() {
           </div>
         </div>
       </div>
+
+      <LogUploadModal
+        isOpen={isLogModalOpen}
+        onClose={() => setIsLogModalOpen(false)}
+        onSubmit={handleLogSubmit}
+        task={selectedTask}
+      />
     </div>
   )
 }
