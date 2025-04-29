@@ -59,9 +59,7 @@ const initialTasks: Task[] = [
     status: "now", // Today's task
     progress: 0,
     frequency: "daily",
-    dueDate: new Date()
-      .toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" })
-      .replace(/\//g, "/"),
+    dueDate: "05/15/2025",
     createdAt: new Date().toISOString(),
     category: "waste",
     wasteType: "Metálico",
@@ -74,7 +72,7 @@ const initialTasks: Task[] = [
     status: "pending", // Future task
     progress: 0,
     frequency: "weekly",
-    dueDate: "15/05/2025",
+    dueDate: "04/28/2025",
     createdAt: new Date().toISOString(),
     category: "waste",
     wasteType: "Plástico",

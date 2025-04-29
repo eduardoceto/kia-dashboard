@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Trash, Calendar, ArrowRight, Wrench, ClipboardCheck, Shield, Clock, AlertTriangle, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatDistanceToNow, isToday, parseISO, isValid } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface Task {
   id: string
@@ -97,6 +99,40 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
   const StatusIcon = statusConfig[status]?.icon || Clock
   const statusLabel = statusConfig[status]?.label || "Pending"
 
+  // Format due date as relative string in Spanish
+  let dueDateLabel = "-"
+  if (typeof task.dueDate === "string" && task.dueDate.trim() !== "") {
+    let dueDateObj: Date | null = null
+    try {
+      // Attempt to parse as ISO 8601 first
+      let parsedDate = parseISO(task.dueDate)
+      // If parseISO results in an invalid date, try the native Date constructor
+      if (!isValid(parsedDate)) {
+        parsedDate = new Date(task.dueDate)
+      }
+      // Final check if the date is valid
+      if (isValid(parsedDate)) {
+        dueDateObj = parsedDate
+      }
+    } catch {
+      // If any parsing error occurs, dueDateObj remains null
+    }
+
+    if (dueDateObj) {
+      if (isToday(dueDateObj)) {
+        dueDateLabel = "Hoy"
+      } else {
+        try {
+          // Ensure the date object passed to formatDistanceToNow is valid
+          dueDateLabel = formatDistanceToNow(dueDateObj, { locale: es, addSuffix: true })
+        } catch (e) {
+          console.error("Error formatting date:", e, "Original value:", task.dueDate)
+          dueDateLabel = "-" // Fallback on formatting error
+        }
+      }
+    }
+  }
+
   return (
     <div
       className={cn(
@@ -132,16 +168,15 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
           </div>
         </div>
 
-        <div>
+        <div className="">
           <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-1">{task.title}</h3>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">{task.description}</p>
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
             <span className="text-zinc-600 dark:text-zinc-400">Progress</span>
             <span className="text-zinc-900 dark:text-zinc-100">
-              {task.progress === 100 ? "Completed" : "Not Completed"}
+              {task.progress === 100 ? "Completado" : "No Completado"}
             </span>
           </div>
           <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -158,13 +193,9 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
         <div className="flex flex-col gap-1 text-xs text-zinc-600 dark:text-zinc-400">
           <div className="flex items-center">
             <Calendar className="w-3.5 h-3.5 mr-1.5" />
-            <span>Vence: {task.dueDate}</span>
+            <span>Vence: {dueDateLabel}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs">
-              {frequencyLabels[task.frequency as keyof typeof frequencyLabels]}
-            </span>
-            <span className="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs">{task.area}</span>
           </div>
         </div>
       </div>

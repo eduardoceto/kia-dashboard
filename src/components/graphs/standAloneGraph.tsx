@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 
 const mockData = {
@@ -22,14 +21,16 @@ const mockData = {
 }
 
 export function StandaloneGraph() {
-    const [location, setLocation] = useState(mockData.locations[0])
-    const [material, setMaterial] = useState(mockData.materials[0])
-    const [timeRange, setTimeRange] = useState(mockData.timeRanges[0])
+    const [location, setLocation] = useState(mockData.locations[Math.floor(Math.random() * mockData.locations.length)])
+    const [material, setMaterial] = useState(mockData.materials[Math.floor(Math.random() * mockData.materials.length)])
+    const [timeRange, setTimeRange] = useState("Last Month") // Set time range to "Last Month"
   
     const data = mockData.getData(location, material, timeRange)
   
     const colors = ["#ff6b6b", "#4ecdc4", "#45b7d8", "#f9c74f", "#90be6d"]
-    const color = colors[0]
+    // Assign color based on material index for consistency, or keep random if preferred
+    const materialIndex = mockData.materials.indexOf(material);
+    const color = colors[materialIndex % colors.length] || colors[0]; // Use modulo for safety
   
     return (
       <Card className="w-full">
@@ -41,56 +42,6 @@ export function StandaloneGraph() {
           </div>
         </CardHeader>
         <CardContent className="p-4 pt-0">
-          {/* Adjusted grid layout */}
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3 mb-4">
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Location</label>
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockData.locations.map((loc) => (
-                    <SelectItem key={loc} value={loc}>
-                      {loc}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-  
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Material</label>
-              <Select value={material} onValueChange={setMaterial}>
-                <SelectTrigger className="sm: w-[140px] text-sm">
-                  <SelectValue placeholder="Select material" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockData.materials.map((mat) => (
-                    <SelectItem key={mat} value={mat}>
-                      {mat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-  
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Time Range</label>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="text-sm">
-                  <SelectValue placeholder="Select time range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockData.timeRanges.map((range) => (
-                    <SelectItem key={range} value={range}>
-                      {range}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
   
           <div className="w-full h-[300px]">
             <ResponsiveContainer width="100%" height="100%">

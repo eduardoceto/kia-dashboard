@@ -48,7 +48,7 @@ export function MultiGraphPanel() {
             <p className="text-muted-foreground">
               No graphs to display. Add a graph to start analyzing waste disposal data.
             </p>
-            <Button onClick={addGraph} className="mt-4 flex items-center gap-1 mx-auto">
+            <Button onClick={addGraph} className="mt-4 flex items-center gap-1 mx-auto ">
               <PlusCircle className="h-4 w-4 mr-1" />
               Add Graph
             </Button>
