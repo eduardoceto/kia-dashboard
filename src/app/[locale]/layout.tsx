@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import "../globals.css";
-import { ThemeProvider } from "@/src/components/theme-provider";
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from "@/src/i18n/routing";
@@ -33,16 +32,15 @@ export default async function RootLayout({
     }
 
     // Get messages for the current locale
+    // bg-foreground
     const messages = await getMessages({ locale });
 
     return (
         <html lang={locale} suppressHydrationWarning>
         <body className={inter.className}>
             <NextIntlClientProvider locale={locale} messages={messages}>
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-                    <Toaster />
-                    {children}
-                </ThemeProvider>
+                <Toaster />
+                {children}
             </NextIntlClientProvider>
         </body>
         </html>

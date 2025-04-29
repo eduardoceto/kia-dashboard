@@ -85,16 +85,16 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800 sm:max-w-md">
+      <DialogContent className=" sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Registro de Residuos</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           {task && (
-            <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded-md mb-4">
+            <div className=" p-3 rounded-md mb-4">
               <h3 className="font-medium">{task.title}</h3>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">{task.description}</p>
+              <p className="text-sm text-zinc-600">{task.description}</p>
             </div>
           )}
 
@@ -105,7 +105,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
               onValueChange={(value) => handleSelectChange("tipoResiduo", value)}
               required
             >
-              <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+              <SelectTrigger>
                 <SelectValue placeholder="Seleccionar tipo de residuo" />
               </SelectTrigger>
               <SelectContent>
@@ -126,15 +126,15 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
               type="date"
               value={formData.fecha}
               onChange={handleChange}
-              className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
+              className=""
             />
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Fecha preestablecida a hoy</p>
+            <p className="text-xs ">Fecha preestablecida a hoy</p>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="area">Área</Label>
             <Select value={formData.area} onValueChange={(value) => handleSelectChange("area", value)} required>
-              <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+              <SelectTrigger className="">
                 <SelectValue placeholder="Seleccionar área" />
               </SelectTrigger>
               <SelectContent>
@@ -145,7 +145,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Área preestablecida según la tarea</p>
+            <p className="text-xs ">Área preestablecida según la tarea</p>
           </div>
 
           <div className="space-y-2">
@@ -158,7 +158,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
               step="0.01"
               value={formData.peso || ""}
               onChange={handleChange}
-              className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
+              className=""
               required
             />
           </div>
@@ -168,7 +168,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
               type="button"
               variant="outline"
               onClick={onClose}
-              className="border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
+              className=""
             >
               Cancelar
             </Button>

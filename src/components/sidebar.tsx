@@ -78,8 +78,8 @@ export default function Sidebar() {
         href={href}
         onClick={handleNavigation}
         className={`flex items-center px-3 py-2 text-sm rounded-md transition-colors 
-          ${isActive ? "text-dark dark:text-white bg-gray-300/50 dark:bg-[#1F1F23]/50"
-          : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-[#1F1F23]/50"
+          ${isActive ? "text-white KiaSignatureBold"
+          : "text-gray-300 hover:text-white "
         }`}
       >
         <Icon className="h-4 w-4 mr-3 flex-shrink-0" />
@@ -92,37 +92,29 @@ export default function Sidebar() {
     <>
       <button
         type="button"
-        className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg bg-white dark:bg-[#0F0F12] shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-[70] p-2 rounded-lg  shadow-md"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
         <Menu className="h-5 w-5 text-gray-600 dark:text-gray-300" />
       </button>
       <nav
         className={`
-                fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-[#0F0F12] transform transition-transform duration-200 ease-in-out
-                lg:translate-x-0 lg:static lg:w-64 border-r border-gray-200 dark:border-[#1F1F23]
+                fixed inset-y-0 left-0 z-40 w-64  transform transition-transform duration-200 ease-in-out
+                lg:translate-x-0 lg:static lg:w-64 
                 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
             `}
       >
         <div className="h-full flex flex-col">
           
           <div
-            className="h-16 px-6 flex items-center border-b border-gray-200 dark:border-[#1F1F23]">
+            className="h-16 px-6 flex items-center ">
             <div className="flex items-center gap-3">
               <Image
                 src={kiaLogo}
                 alt="Kia Logo"
                 width={100}
                 height={100}
-                className="flex-shrink-0 hover:cursor-pointer hidden dark:block width:auto height:auto"
-                onClick={handleIconClick}
-              />
-              <Image
-                src="https://upload.wikimedia.org/wikipedia/commons/b/b6/KIA_logo3.svg"
-                alt="Kia Logo"
-                width={100}
-                height={100}
-                className="flex-shrink-0 hover:cursor-pointer block dark:hidden width:auto height:auto"
+                className="flex-shrink-0 hover:cursor-pointer width:auto height:auto"
                 onClick={handleIconClick}
               />
             </div>
@@ -133,7 +125,7 @@ export default function Sidebar() {
           <div className="flex-1 overflow-y-auto py-4 px-4">
             <div className="space-y-6">
               <div>
-                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   General
                 </div>
                 <div className="KiaSignature space-y-1">
@@ -149,7 +141,7 @@ export default function Sidebar() {
               </div>
 
               <div>
-                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   Files
                 </div>
                 <div className="KiaSignature space-y-1">
@@ -174,7 +166,7 @@ export default function Sidebar() {
               
 
               <div>
-                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                <div className="Formula1 px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                   User
                 </div>
                 <div className="KiaSignature space-y-1">
@@ -195,7 +187,7 @@ export default function Sidebar() {
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[65] lg:hidden"
+          className="fixed inset-0  z-[65] lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}

@@ -620,7 +620,7 @@ export default function WasteDisposalForm() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isSubmitting || isLoadingDrivers}>
+              <Button type="submit" variant="outline" disabled={isSubmitting || isLoadingDrivers}>
                 {isSubmitting ? "Guardando..." : "Guardar Registro"}
               </Button>
             </form>

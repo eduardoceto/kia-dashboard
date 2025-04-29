@@ -2,8 +2,8 @@ import HeaderSide from "@/src/components/headerSide";
 import type { ReactNode } from "react";
 import { createClient } from "@/src/utils/supabase/server";
 import { redirect } from "next/navigation";
-import getUserInfo from "@/src/actions/getUserInfo";
 import LogUploadProvider from "@/src/providers/LogUploadProvider";
+
 
 import ManagerProvider from "@/src/providers/ManagerProvider";
 import UserProvider from "@/src/providers/UserProvider";

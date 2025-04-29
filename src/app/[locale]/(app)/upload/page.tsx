@@ -19,7 +19,7 @@ export default function Upload() {
           <Link href="/history">
             <Button
               variant="outline"
-              className="flex items-center gap-2 bg-background/10 border-muted hover:bg-muted/20"
+              className="flex items-center gap-2 bg-background/10 border-muted"
             >
               <ClipboardList className="h-4 w-4" />
               Ver Historial
@@ -28,7 +28,7 @@ export default function Upload() {
           <Link href="/export">
             <Button
               variant="outline"
-              className="flex items-center gap-2 bg-background/10 border-muted hover:bg-muted/20"
+              className="flex items-center gap-2 bg-background/10 border-muted"
             >
               <FileSpreadsheet className="h-4 w-4" />
               Exportar
@@ -39,7 +39,7 @@ export default function Upload() {
 
       <Card className="w-full">
         <CardContent>
-        <Accordion type="single" collapsible className="Salida de Residuos">
+        <Accordion type="single" defaultValue="Registro de Residuos" collapsible>
 
         <AccordionItem value="Registro de Residuos">
             <AccordionTrigger>

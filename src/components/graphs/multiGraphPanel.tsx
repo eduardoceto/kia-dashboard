@@ -32,7 +32,7 @@ export function MultiGraphPanel() {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Button onClick={addGraph} className="flex items-center gap-1 ml-auto">
+          <Button variant="outline" onClick={addGraph} className="flex items-center gap-1 ml-auto hover:text-white">
             <PlusCircle className="h-4 w-4" />
           </Button>
         </div>
@@ -48,7 +48,7 @@ export function MultiGraphPanel() {
             <p className="text-muted-foreground">
               No graphs to display. Add a graph to start analyzing waste disposal data.
             </p>
-            <Button onClick={addGraph} className="mt-4 flex items-center gap-1 mx-auto ">
+            <Button onClick={addGraph} className="mt-4 flex items-center gap-1 mx-auto bg-accent hover:cursor-pointer">
               <PlusCircle className="h-4 w-4 mr-1" />
               Add Graph
             </Button>

@@ -1,7 +1,6 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
 import TopNav from "@/src/components/top-nav"
@@ -13,7 +12,6 @@ interface LayoutProps {
 }
 
 export default function HeaderSide({ children }: LayoutProps) { // Destructure userProfile
-    const { theme } = useTheme()
     const [mounted, setMounted] = useState(false)
     const { profile: userProfile, loading } = useUser()
 
@@ -27,9 +25,9 @@ export default function HeaderSide({ children }: LayoutProps) { // Destructure u
     
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-screen">
+            <div className="flex flex-col items-center justify-center h-screen bg-white text-[#05141F]">
                 
-                <LoaderCircle className="h-12 w-12 animate-spin" />
+                <LoaderCircle className="h-12 w-12 animate-spin mb-4" />
                 <p className="text-lg font-medium">Cargando...</p>
                 <p className="text-sm text-muted-foreground">Por favor espera un momento.</p>
             </div>
@@ -37,11 +35,11 @@ export default function HeaderSide({ children }: LayoutProps) { // Destructure u
     }
 
     return (
-        <div className={`flex h-screen ${theme === "dark" ? "dark" : ""}`}>
+        <div className={`flex h-screen bg-[#05141F]`}>
             <Sidebar />
             <div className="KiaSignature w-full flex flex-1 flex-col">
                 <TopNav userProfile={userProfile} />
-                <main className="flex-1 overflow-auto p-6 bg-white dark:bg-[#0F0F12]">
+                <main className="flex-1 overflow-auto p-6 bg-[#f2f2f2]">
                     {children}
                 </main>
             </div>

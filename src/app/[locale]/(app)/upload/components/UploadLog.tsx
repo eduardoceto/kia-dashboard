@@ -98,14 +98,14 @@ export default function UploadLogPage() {
 
   return (
 
-        <Card className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 border-zinc-200 dark:border-zinc-800">
+        <Card>
 
           <CardContent>
             <form id="log-form" onSubmit={handleSubmit} className="space-y-6">
               {task && (
-                <div className="bg-zinc-100 dark:bg-zinc-800 p-4 rounded-md mb-6">
+                <div className=" p-4 rounded-md mb-6">
                   <h3 className="font-medium">{task.title}</h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">{task.description}</p>
+                  <p className="text-sm text-foreground">{task.description}</p>
                 </div>
               )}
 
@@ -117,7 +117,7 @@ export default function UploadLogPage() {
                   required
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+                  <SelectTrigger>
                     <SelectValue placeholder="Seleccionar tipo de residuo" />
                   </SelectTrigger>
                   <SelectContent>
@@ -138,10 +138,9 @@ export default function UploadLogPage() {
                   type="date"
                   value={formData.fecha}
                   onChange={handleChange}
-                  className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
                   disabled={isSubmitting}
                 />
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">Fecha preestablecida a hoy</p>
+                <p className="text-xs text-zinc-500">Fecha preestablecida a hoy</p>
               </div>
 
               <div className="space-y-2">
@@ -152,7 +151,7 @@ export default function UploadLogPage() {
                   required
                   disabled={isSubmitting}
                 >
-                  <SelectTrigger className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700">
+                  <SelectTrigger>
                     <SelectValue placeholder="Seleccionar área" />
                   </SelectTrigger>
                   <SelectContent>
@@ -163,7 +162,7 @@ export default function UploadLogPage() {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="text-xs text-zinc-500">
                   {task
                     ? "Área preestablecida según la tarea"
                     : `Área preestablecida según usuario: ${currentUser.name}`}
@@ -180,14 +179,13 @@ export default function UploadLogPage() {
                   step="0.01"
                   value={formData.peso || ""}
                   onChange={handleChange}
-                  className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
                   required
                   disabled={isSubmitting}
                 />
               </div>
 
               {successMessage && (
-                <div className="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-3 rounded-md">
+                <div className="bg-green-50 text-green-600 p-3 rounded-md">
                   {successMessage}
                 </div>
               )}
@@ -199,7 +197,6 @@ export default function UploadLogPage() {
               type="button"
               variant="outline"
               onClick={() => router.push("/")}
-              className="border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300"
               disabled={isSubmitting}
             >
               Cancelar

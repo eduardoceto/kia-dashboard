@@ -191,7 +191,7 @@ export default function ExportPage() {
 
           <div className="flex items-center gap-2">
             <Link href="/history">
-              <Button variant="outline" className="bg-background/10 border-muted hover:bg-muted/20">
+              <Button variant="outline" className="bg-background/10 border-muted">
                 {t('historyButton')}
               </Button>
             </Link>
@@ -262,7 +262,7 @@ export default function ExportPage() {
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox id="select-all" checked={selectAllMaterials} onCheckedChange={handleSelectAllMaterials} />
-                    <Label htmlFor="select-all" className="font-medium">
+                    <Label htmlFor="select-all" className="KiaSignature">
                       {t('selectAllMaterialsLabel')}
                     </Label>
                   </div>
@@ -286,7 +286,7 @@ export default function ExportPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={exportToExcel} disabled={isExporting || filteredLogs.length === 0} className="w-full">
+              <Button variant="secondary" onClick={exportToExcel} disabled={isExporting || filteredLogs.length === 0} className="w-full">
                 {isExporting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

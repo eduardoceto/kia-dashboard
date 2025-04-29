@@ -37,7 +37,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
   const data = mockData.getData(location, material, timeRange)
 
   // Generate a unique color for this graph
-  const colors = ["#ff6b6b", "#4ecdc4", "#45b7d8", "#f9c74f", "#90be6d"]
+  const colors = ["#e63946", "#2a9d8f", "#1d3557", "#f4a261", "#e76f51"]
   const color = colors[id % colors.length]
 
   // Determine graph height based on total number of graphs
@@ -49,10 +49,10 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border-foreground">
       <CardHeader className={totalGraphs > 4 ? "p-3" : "pb-1 pt-3 px-4"}>
         <div className="flex items-center justify-between">
-          <CardTitle className={`${totalGraphs > 6 ? "text-sm" : "text-md"} truncate pr-2`}>
+          <CardTitle className={`${totalGraphs > 6 ? "text-sm" : "text-md"} truncate pr-2 KiaSignatureBold`}>
             {location} - {material} - {timeRange}
           </CardTitle>
           <Button variant="ghost" size="icon" onClick={() => onRemove(id)} className="h-7 w-7 flex-shrink-0">
@@ -68,7 +68,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
               <SelectTrigger className={totalGraphs > 6 ? "h-8 text-xs" : ""}>
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-background">
                 {mockData.locations.map((loc) => (
                   <SelectItem key={loc} value={loc}>
                     {loc}

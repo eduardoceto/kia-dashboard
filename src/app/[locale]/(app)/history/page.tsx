@@ -165,7 +165,7 @@ export default function HistoryPage() {
             </Select>
 
             <Link href="/export">
-              <Button variant="outline" className="w-full md:w-auto bg-background/5 border-muted hover:bg-muted/20">
+              <Button variant="outline" className="w-full md:w-auto bg-background/5 border-muted">
                 <FileSpreadsheet className="h-4 w-4 mr-2" />
                 Exportar
               </Button>
