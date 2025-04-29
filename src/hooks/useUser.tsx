@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect } from "react"; // Import React
 import { createClient } from "@/src/utils/supabase/client"; 
 
@@ -22,13 +24,11 @@ export const UserContextProvider = (props: UserProviderProps) => {
     const { children } = props; // Destructure children
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true); // Keep loading state
-    // const { theme } = useTheme(); // Remove if not used elsewhere in this component
     const supabase = createClient();
 
 
     useEffect(() => {
         const checkUser = async () => {
-            // No need to setLoading(true) here if it starts as true
             try {
                 const { data: { user } } = await supabase.auth.getUser();
 

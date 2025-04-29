@@ -35,7 +35,7 @@ export default function () {
       <Divider variant="middle" className="text-foreground"/>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="rounded-xl p-6 flex flex-col overflow-auto">
+        <div className="rounded-md p-6 flex flex-col overflow-auto">
           <h2 className="KiaSignatureBold text-lg font-bold text-foreground mb-4 text-left flex items-center gap-2 ">
             <VscGraph className="w-3.5 h-3.5 text-foreground" />
             Monthly
@@ -46,7 +46,7 @@ export default function () {
           </div>
         </div>
 
-        <div className="rounded-xl p-6 flex flex-col  overflow-auto">
+        <div className="rounded-md p-6 flex flex-col  overflow-auto">
           <h2 className="KiaSignatureBold text-lg font-bold text-foreground mb-4 text-left flex items-center gap-2">
             <SlGraph className="w-3.5 h-3.5 text-foreground" />
             Yearly

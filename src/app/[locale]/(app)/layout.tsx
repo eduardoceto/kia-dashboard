@@ -6,7 +6,6 @@ import LogUploadProvider from "@/src/providers/LogUploadProvider";
 
 
 import ManagerProvider from "@/src/providers/ManagerProvider";
-import UserProvider from "@/src/providers/UserProvider";
 
 
 
@@ -22,12 +21,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     return(
         <>
             <ManagerProvider>
-            <UserProvider>
                 <LogUploadProvider />
                 <HeaderSide>
                     {children}
                 </HeaderSide>
-            </UserProvider>
             </ManagerProvider>
         </>
     );

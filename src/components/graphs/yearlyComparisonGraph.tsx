@@ -28,7 +28,7 @@ function CombinedChart({
     
   
     return (
-      <Card className="w-full">
+      <Card className="w-full rounded-md">
         <CardHeader className="pb-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <CardTitle>{selectedMaterial}</CardTitle>

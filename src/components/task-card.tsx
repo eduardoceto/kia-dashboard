@@ -139,7 +139,7 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
         "flex flex-col",
         "w-[280px] shrink-0",
         "bg-primary/75",
-        "rounded-xl",
+        "rounded-md",
         "border border-tertiarty ",
         "hover:border-foreground",
         "transition-all duration-200",

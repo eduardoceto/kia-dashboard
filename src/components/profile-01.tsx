@@ -11,6 +11,7 @@ import { FaUserClock } from "react-icons/fa"
 import { FaCircleUser } from "react-icons/fa6"
 import { PiUserCircleGearFill } from "react-icons/pi";
 import { useManager } from "../hooks/useManager"
+import { toast } from "sonner"
 
 interface MenuItem {
     label: string
@@ -48,6 +49,7 @@ export default function Profile01({ name, role }: Profile01Props) {
             // Optionally show an error message to the user
         } else {
             console.log("User signed out successfully");
+            toast.success("Logout successful");
             // Redirect to login page after logout
             router.push('/login'); // Adjust path if needed (locale might be handled by middleware)
             router.refresh(); // Refresh server components
