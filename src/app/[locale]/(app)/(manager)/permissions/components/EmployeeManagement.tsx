@@ -241,7 +241,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
           {/* Add Employee Dialog */}
           <Dialog open={isAddEmployeeDialogOpen} onOpenChange={setIsAddEmployeeDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-1">
+              <Button variant="outline"className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
                 Add Employee
               </Button>

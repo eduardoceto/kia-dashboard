@@ -3,17 +3,17 @@
 @plugin "tailwindcss-radix";
 
 @theme {
-  --radius-default: 0.625rem;
+  --radius-default: 0.25rem;
   --color-background: #f2f2f2; /* #f2f2f2 */
   --color-foreground: #05141F; /* #05141F */
   --color-primary-foreground: #f2f2f2; /* #f2f2f2 */
   --color-color-card: #ffffff; /* #ffffff */
   --color-vcard-foreground: #05141F; /* #05141F */
-  --color-popover: #f2f2f2; /* #ffffff */
-  --color-popover-foreground: #05141F; /* #05141F */
+  --color-popover: #f2f2f2; 
+  --color-popover-foreground: #05141F; 
   --color-color-primary: #1f2c35;
-  --color-primary: #1f2c35; /* #1f2c35 */
-  --color-secondary: #37434d; /* #37434d */
+  --color-primary: #1f2c35; 
+  --color-secondary: #37434d; 
   --color-tertiarty: #697279;
   --color-secondary-foreground: #f2f2f2; /* #f2f2f2 */
   --color-muted: #e5e5e5; /* #e5e5e5 */

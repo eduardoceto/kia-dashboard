@@ -248,7 +248,7 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
           {/* Add Driver Dialog */}
           <Dialog open={isAddDriverDialogOpen} onOpenChange={setIsAddDriverDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
                 Add Driver
               </Button>
