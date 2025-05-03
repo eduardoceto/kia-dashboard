@@ -86,22 +86,20 @@ const wasteItems = [
 const sortedWasteItems = [...wasteItems].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
 const materialTypes = [
-  { value: "organico", label: "Orgánico" },
-  { value: "plastico", label: "Plástico" },
-  { value: "metal", label: "Metal" },
-  { value: "papel", label: "Papel/Cartón" },
-  { value: "vidrio", label: "Vidrio" },
-  { value: "peligroso", label: "Residuo Peligroso" },
-  { value: "electronico", label: "Electrónico" },
-  { value: "otro", label: "Otro" },
+  { value: "metal", label: "Metal/no Metal" },
+  { value: "destruidas", label: "Uretano/Vidrio/Autopartes Destruidas" },
+  { value: "lodos", label: "Lodos" },
+  { value: "otros", label: "Otros Reciclables" },
 ]
 
 const containerTypes = [
-  { value: "bolsa", label: "Bolsa" },
+  { value: "cajaSeca", label: "Caja Seca" },
   { value: "contenedor", label: "Contenedor" },
-  { value: "tambor", label: "Tambor" },
-  { value: "caja", label: "Caja" },
-  { value: "otro", label: "Otro" },
+  { value: "contenedorAbierto", label: "Contenedor Abierto" },
+  { value: "plataforma", label: "Plataforma" },
+  { value: "jaulas", label: "Jaulas" },
+  { value: "pickup", label: "PickUp" },
+  { value: "camion3.5", label: "Camion 3.5" },
 ]
 
 // Updated schema to use waste item IDs instead of manual entries
@@ -470,7 +468,7 @@ export default function WasteDisposalForm() {
                 name="tipoMaterial"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo de Material</FormLabel>
+                    <FormLabel><h1>Tipo de Material</h1><p className="text-xs text-muted-foreground/60">Dependiendo del formulario</p></FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>

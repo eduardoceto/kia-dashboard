@@ -24,7 +24,8 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 // Define Employee type
 type Employee = {
   id: string; // This is the auth.users.id (UUID)
-  full_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
   email: string | null;
   role: string | null;
   is_active: boolean;
@@ -53,7 +54,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   const [isEditEmployeeDialogOpen, setIsEditEmployeeDialogOpen] = useState(false)
   const [isSubmittingEmployee, setIsSubmittingEmployee] = useState(false);
   const [pendingDeleteEmployee, setPendingDeleteEmployee] = useState<Employee | null>(null);
-  const [pendingToggleEmployee, setPendingToggleEmployee] = useState<{id: string, currentStatus: boolean, name: string} | null>(null);
+  const [pendingToggleEmployee, setPendingToggleEmployee] = useState<{id: string, currentStatus: boolean, first_name: string, last_name: string} | null>(null);
 
   // --- Fetch Function ---
   const fetchEmployees = useCallback(async () => {
@@ -62,7 +63,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
     // Ensure your 'users' table has an 'id' column that is a foreign key to 'auth.users.id'
     const { data, error } = await supabase
       .from('users') // Your profile table
-      .select('id, employee_id, full_name, email, role, is_active'); // Select columns from your profile table
+      .select('id, employee_id, first_name, last_name, email, role, is_active'); // Select columns from your profile table
 
     if (error) {
       console.error("Error fetching employees:", error);
@@ -74,7 +75,9 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
         id: emp.id, // Ensure 'id' from your 'users' table is selected
         email: emp.email ?? '', // Assuming email is also stored in 'users' table
         employee_id: emp.employee_id ?? '',
-        full_name: emp.full_name ?? 'N/A',
+        first_name: emp.first_name ?? 'N/A',
+        last_name: emp.last_name ?? 'N/A',
+        full_name: emp.first_name && emp.last_name ? `${emp.first_name} ${emp.last_name}` : 'N/A',
         role: emp.role ?? 'N/A',
         is_active: emp.is_active ?? false
       })) || [];
@@ -91,7 +94,8 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   // --- Filtered Data ---
   const filteredEmployees = employees.filter(
     (employee) =>
-      employee.full_name?.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
+      employee.first_name?.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
+      employee.last_name?.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
       employee.email?.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
       employee.employee_id?.toLowerCase().includes(employeeSearchTerm.toLowerCase()), // Added null check for employee_id
   );
@@ -142,7 +146,8 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
         const { error: updateError } = await supabase
             .from('users') // Your profile table
             .update({
-                full_name: editingEmployee.full_name,
+                first_name: editingEmployee.first_name,
+                last_name: editingEmployee.last_name,
                 employee_id: editingEmployee.employee_id || null,
                 email: editingEmployee.email, // Usually email shouldn't be updated here directly, handle via auth update if needed
                 role: editingEmployee.role,
@@ -196,8 +201,8 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
       }
   };
 
-  const handleToggleEmployeeActive = (id: string, currentStatus: boolean, name: string) => {
-    setPendingToggleEmployee({ id, currentStatus, name });
+  const handleToggleEmployeeActive = (id: string, currentStatus: boolean, first_name: string, last_name: string) => {
+    setPendingToggleEmployee({ id, currentStatus, first_name, last_name });
   };
 
   const confirmToggleEmployeeActive = async () => {
@@ -311,12 +316,12 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                 filteredEmployees.map((employee) => (
                   <TableRow key={employee.id}>
                     <TableCell className="font-medium truncate max-w-[100px]" title={employee.employee_id}>{employee.employee_id || 'N/A'}</TableCell>
-                    <TableCell>{employee.full_name}</TableCell>
+                    <TableCell>{employee.first_name} {employee.last_name}</TableCell>
                     <TableCell>{employee.email}</TableCell>
                     <TableCell>{employee.role}</TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
-                        <Switch id={`active-emp-${employee.id}`} checked={employee.is_active} onCheckedChange={() => handleToggleEmployeeActive(employee.id, employee.is_active, employee.full_name || employee.email || employee.id)} />
+                        <Switch id={`active-emp-${employee.id}`} checked={employee.is_active} onCheckedChange={() => handleToggleEmployeeActive(employee.id, employee.is_active, employee.first_name ?? '', employee.last_name || employee.email || employee.id)} />
                         <Label htmlFor={`active-emp-${employee.id}`} className="text-sm">{employee.is_active ? "Active" : "Inactive"}</Label>
                       </div>
                     </TableCell>
@@ -343,7 +348,8 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                               </DialogHeader>
                               <div className="grid gap-4 py-4">
                                 <div className="grid gap-2"><Label htmlFor="edit-id">Auth ID</Label><Input id="edit-id" value={editingEmployee.id} disabled /></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-name">Full Name</Label><Input id="edit-name" value={editingEmployee.full_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, full_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-first-name">First Name</Label><Input id="edit-first-name" value={editingEmployee.first_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, first_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-last-name">Last Name</Label><Input id="edit-last-name" value={editingEmployee.last_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, last_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
                                 <div className="grid gap-2"><Label htmlFor="edit-employee-id">Employee ID</Label><Input id="edit-employee-id" value={editingEmployee.employee_id ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, employee_id: e.target.value })} disabled={isSubmittingEmployee}/></div>
                                 <div className="grid gap-2"><Label htmlFor="edit-email">Email (Read-only)</Label><Input id="edit-email" type="email" value={editingEmployee.email ?? ''} disabled title="Email cannot be changed here."/></div>
                                 <div className="grid gap-2"><Label htmlFor="edit-role">Role</Label><Input id="edit-role" value={editingEmployee.role ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })} disabled={isSubmittingEmployee}/></div>
@@ -370,7 +376,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                             <AlertDialogHeader>
                               <AlertDialogTitle>Deactivate Employee</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to deactivate {pendingDeleteEmployee?.full_name}? This will prevent them from logging in.
+                                Are you sure you want to deactivate {pendingDeleteEmployee?.first_name} {pendingDeleteEmployee?.last_name}? This will prevent them from logging in.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -393,7 +399,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
           <AlertDialogHeader>
             <AlertDialogTitle>{pendingToggleEmployee?.currentStatus ? 'Deactivate' : 'Activate'} Employee</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {pendingToggleEmployee?.currentStatus ? 'deactivate' : 'activate'} {pendingToggleEmployee?.name}? This action can be undone.
+              Are you sure you want to {pendingToggleEmployee?.currentStatus ? 'deactivate' : 'activate'} {pendingToggleEmployee?.first_name} {pendingDeleteEmployee?.last_name}? This action can be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

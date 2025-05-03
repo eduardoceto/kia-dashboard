@@ -1,5 +1,5 @@
 import Link from "next/link"
-import WasteDisposalForm from "@/src/components/waste-disposal-form"
+import WasteDisposalForm from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form"
 import { Button } from "@/src/components/ui/button"
 import { ClipboardList } from "lucide-react"
 import { FileSpreadsheet } from "lucide-react"
@@ -41,7 +41,7 @@ export default function Upload() {
         <CardContent>
         <Accordion type="single" defaultValue="Registro de Residuos" collapsible>
 
-        <AccordionItem value="Registro de Residuos">
+        {/* <AccordionItem value="Registro de Residuos">
             <AccordionTrigger>
                 <div className="flex flex-col items-start text-left p-1">
                     <h3 className="text-lg font-medium hover:cursor-pointer">Registro de Residuos</h3>
@@ -51,7 +51,7 @@ export default function Upload() {
             <AccordionContent className="w-full">
               <UploadLogPage />
             </AccordionContent>
-          </AccordionItem>
+          </AccordionItem> */}
 
           <AccordionItem value="Registro de Salida de Residuos">
             <AccordionTrigger>
