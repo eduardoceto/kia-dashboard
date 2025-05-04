@@ -6,10 +6,19 @@ import { createClient } from "@/src/utils/supabase/client"
 import EmployeeManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/EmployeeManagement" // Import new component
 import DriverManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/DriverManagement" // Import new component
 import { useTranslations } from "next-intl"; // Import useTranslations
+import { useUser } from "@/src/hooks/useUser";
+import { redirect } from "next/navigation";
 
 export default function AdminPage() {
   const supabase = createClient() // Create Supabase client instance here
   const t = useTranslations('permissionsPage'); // Initialize translations
+  const isManager = useUser().isManager; 
+  
+  if (!isManager) {
+    // Redirect or show an access denied message
+    redirect('/'); // Replace '/access-denied' with your actual redirection ur
+    return null;
+  }
 
   // Removed all state and effect logic previously here
 

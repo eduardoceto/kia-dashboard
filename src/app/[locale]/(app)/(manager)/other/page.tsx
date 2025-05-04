@@ -1,3 +1,4 @@
+"use client";
 import { Accordion,
     AccordionContent,
     AccordionItem,
@@ -6,9 +7,18 @@ import { Card, CardContent } from "@/src/components/ui/card"
 import VehicleProductionForm  from "./components/VehicleProductionForm";
 import PanelProductionForm from "./components/PanelProductionForm";
 import { useTranslations } from "next-intl"; // Import useTranslations
+import { useUser } from "@/src/hooks/useUser";
+import { redirect } from "next/navigation";
 
 export default function Other() {
     const t = useTranslations('otherPage'); // Initialize translations
+    const isManager = useUser().isManager; 
+  
+    if (!isManager) {
+        // Redirect or show an access denied message
+        redirect('/'); // Replace '/access-denied' with your actual redirection ur
+        return null;
+    }
 
     return (
         <main className="mx-auto py-10 px-4">

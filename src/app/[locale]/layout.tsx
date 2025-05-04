@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { routing } from "@/src/i18n/routing";
 import { getMessages, getTranslations } from "next-intl/server";
 import { Toaster } from "@/src/components/ui/sonner";
-import UserProvider from "@/src/providers/UserProvider";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,13 +38,12 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} suppressHydrationWarning>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <body className={inter.className}>
-            <UserProvider>
                 <NextIntlClientProvider locale={locale} messages={messages}>
                     <Toaster />
                         {children}
                 </NextIntlClientProvider>
-            </UserProvider>
         </body>
         </html>
     );

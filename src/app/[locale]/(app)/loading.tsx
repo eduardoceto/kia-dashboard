@@ -1,12 +1,14 @@
-import { PuffLoader } from "react-spinners";
+import { ScaleLoader } from "react-spinners";
 
 
 export default function Loading() {
     return (
         <div className="flex items-center justify-center h-screen">
-            <PuffLoader
+            <ScaleLoader
             color={"#05141F"}
-            size={30}
+            height={30}
+            width={30}
+            barCount={5}
             />
         </div>
     )

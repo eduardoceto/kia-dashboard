@@ -1,20 +1,37 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react"; // Import React
-import { createClient } from "@/src/utils/supabase/client"; 
+import { createClient } from "@/src/utils/supabase/client";
+import { AuthSessionMissingError } from "@supabase/supabase-js"; // Import the specific error type if available
 
+// Define a more specific type for the profile if possible
+// For now, using 'any' but adding 'role' for clarity
+type UserProfile = {
+    id: string
+    employee_id: string
+    role: string | null
+    first_name: string
+    last_name: string
+    email: string | null
+    is_active: boolean
+    created_at: string
+    locale: string
+    area_id: string
+} | null;
 
 
 type UserContextType = {
-    profile: any;
+    profile: UserProfile; // Use the specific type
     loading: boolean;
+    isManager: boolean; // Add isManager flag
 };
 
 export const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export interface UserProviderProps {
-    [propName: string]: any;
-}
+// No need for duplicate interface definition
+// export interface UserProviderProps {
+//     [propName: string]: any;
+// }
 
 export interface UserProviderProps {
     children: React.ReactNode; // Explicitly type children
@@ -22,64 +39,123 @@ export interface UserProviderProps {
 
 export const UserContextProvider = (props: UserProviderProps) => {
     const { children } = props; // Destructure children
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfile>(null);
+    const [isManager, setIsManager] = useState<boolean>(false); // Add isManager state
     const [loading, setLoading] = useState(true); // Keep loading state
     const supabase = createClient();
 
 
     useEffect(() => {
-        const checkUser = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
+        const checkUserAndRole = async () => { // Renamed function for clarity
+            setIsManager(false); // Reset manager status
+            setProfile(null); // Reset profile
+            setLoading(true); // Start loading indicator here
 
-                if (!user) {
-                    setProfile(null);
-                    return;
+            let sessionData = null;
+            let authError = null;
+
+            try {
+                // Wrap getUser in its own try-catch
+                try {
+                    const { data, error } = await supabase.auth.getUser();
+                    sessionData = data;
+                    authError = error;
+                } catch (getUserError) {
+                    // Catch errors thrown directly by getUser, including AuthSessionMissingError
+                    console.warn("Error calling supabase.auth.getUser():", getUserError);
+                    authError = getUserError; // Assign the caught error
                 }
 
+                // Check for errors OR if user is null in the session data
+                if (authError || !sessionData?.user) {
+                    // No user logged in or error fetching user.
+                    // State is already reset (profile=null, isManager=false).
+                    setLoading(false); // Stop loading
+                    return; // Exit early
+                }
+
+                // If we reach here, sessionData.user exists
+                const user = sessionData.user;
+
+                // Fetch profile data
                 const { data: userProfile, error: profileError } = await supabase
                     .from('users')
-                    .select('*')
+                    .select('*') // Select all fields
                     .eq('id', user.id)
                     .single();
 
                 if (profileError) {
                     console.error('Error fetching user profile:', profileError);
-                    setProfile(null);
-                    return;
+                    // Keep state reset (profile=null, isManager=false)
+                } else {
+                    // Set profile and check role
+                    setProfile(userProfile);
+                    // Assuming 'admin' role means manager in your context
+                    if (userProfile?.role === 'admin') {
+                        setIsManager(true);
+                    }
                 }
 
-                setProfile(userProfile);
-
             } catch (error) {
-                console.error("Error in checkManagerRole:", error);
+                // Catch potential errors from profile fetching or other logic
+                console.error("Error in checkUserAndRole (outer catch):", error);
+                // Ensure state is reset in case of unexpected errors
                 setProfile(null);
+                setIsManager(false);
             } finally {
                 setLoading(false); // Stop loading regardless of outcome
             }
         };
 
+        // Initial check on mount
+        checkUserAndRole();
 
-        if (loading) {
-             checkUser();
-        }
-    }, [supabase, loading]); // Keep supabase dependency, loading might be added if needed for re-fetch logic
+        // Add listener for auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+             console.log("Auth state changed:", event, session);
+             if (event === 'SIGNED_OUT') {
+                 // User logged out, directly reset state
+                 setProfile(null);
+                 setIsManager(false);
+                 setLoading(false); // Ensure loading is false on logout
+             } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                 // User logged in, token refreshed, or user data updated
+                 // Re-check user and role
+                 checkUserAndRole();
+             }
+             // Handle other events if necessary
+        });
+
+        // Cleanup subscription on unmount
+        return () => {
+            subscription?.unsubscribe();
+        };
+
+    }, [supabase]); // Dependency array only includes supabase client instance
 
     const value = {
         profile,
-        loading, // Pass loading state in the context value
+        loading,
+        isManager, // Pass isManager state in the context value
     };
+
+    // Optional: Render children only when initial loading is done,
+    // or let consuming components handle the loading state.
+    // if (loading && profile === null) { // Example: Show loading only on initial load
+    //     return <div>Loading user...</div>;
+    // }
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 
 
 };
 
+// useUser hook remains the same, but the returned context now includes isManager
 export const useUser  = () => {
     const context = useContext(UserContext);
     if (context === undefined) {
         throw new Error("useUser must be used within a UserProvider");
     }
-    return context;
+    return context; // Returns { profile, loading, isManager }
 
 };

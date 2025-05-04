@@ -17,10 +17,19 @@ import { Calendar as CalendarComponent } from "@/src/components/ui/calendar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
 import { getHistoricalLogs } from "@/src/components/testData/data"
+import { useUser } from "@/src/hooks/useUser";
+import { redirect } from "next/navigation";
 
 export default function ExportPage() {
   const t = useTranslations('exportPage'); // Initialize translations
   const tCommon = useTranslations('common'); // Initialize common translations
+  const isManager = useUser().isManager; 
+  
+  if (!isManager) {
+    // Redirect or show an access denied message
+    redirect('/'); // Replace '/access-denied' with your actual redirection ur
+    return null;
+  }
 
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)

@@ -10,8 +10,8 @@ import { IconType } from "react-icons/lib"
 import { FaUserClock } from "react-icons/fa"
 import { FaCircleUser } from "react-icons/fa6"
 import { PiUserCircleGearFill } from "react-icons/pi";
-import { useManager } from "../hooks/useManager"
 import { toast } from "sonner"
+import { useUser } from "../hooks/useUser";
 
 interface MenuItem {
     label: string
@@ -30,7 +30,7 @@ interface Profile01Props {
 export default function Profile01({ name, role }: Profile01Props) { 
     const router = useRouter(); 
     const supabase = createClient(); 
-    const manager = useManager().isManager; // Use the custom hook to get manager data
+    const manager = useUser().isManager; // Use the custom hook to get manager data
 
 
 

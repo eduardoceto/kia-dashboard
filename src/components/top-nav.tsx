@@ -9,9 +9,9 @@ import { useTranslations } from 'next-intl';
 import { FaCircleUser } from "react-icons/fa6"; // Import the icon here
 import { UserProfile } from "@/types";
 import { PiUserCircleGearFill } from "react-icons/pi";
-import { useManager } from "@/src/hooks/useManager"
 import { usePathname } from "next/navigation"
 import { routing } from "@/src/i18n/routing"; // Import routing from the correct file
+import { useUser } from "@/src/hooks/useUser";
 
 
 interface BreadcrumbItem {
@@ -21,13 +21,13 @@ interface BreadcrumbItem {
 
 type Props = {
     children?: React.ReactNode;
-    userProfile: UserProfile; // Add userProfile prop
+    userProfile?: UserProfile; // Add userProfile prop
 }
 
 // Make sure TopNav accepts props
 export default function TopNav({ children, userProfile }: Props) {
     const t = useTranslations('top-nav');
-    const manager = useManager().isManager;
+    const manager = useUser().isManager;
     const pathname = usePathname();
 
     // Helper to format path segments (no longer needs to handle locales)
@@ -61,7 +61,7 @@ export default function TopNav({ children, userProfile }: Props) {
     ];
 
 
-    const profileName = userProfile?.full_name || "User";
+    const profileName = userProfile?.first_name + " " + userProfile?.last_name || "User";
     const profileRole = userProfile?.role || "User";
 
     return (

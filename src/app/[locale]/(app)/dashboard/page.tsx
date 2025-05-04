@@ -1,3 +1,5 @@
+"use client";
+
 import { Calendar, CreditCard, Wallet } from "lucide-react"
 import DashCard from "./components/dash-card"
 import { VscGraph } from "react-icons/vsc";
@@ -11,7 +13,8 @@ import Divider from '@mui/material/Divider';
 
 
 
-export default function () {
+
+export default function Dashboard () { 
   return (
     <div className="space-y-4 bg-background">
 

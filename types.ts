@@ -44,11 +44,13 @@ export interface UserProfile {
   id: string
   employee_id: string
   role: string | null
-  full_name: string | null
+  first_name: string
+  last_name: string
   email: string | null
   is_active: boolean
   created_at: string
   locale: string
+  area_id: string
 }
 
 export interface LogData {

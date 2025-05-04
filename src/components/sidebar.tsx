@@ -2,17 +2,7 @@
 
 import {
   BarChart2,
-  Receipt,
-  Building2,
-  CreditCard,
-  Folder,
-  Wallet,
   Users2,
-  Shield,
-  MessagesSquare,
-  Video,
-  Settings,
-  HelpCircle,
   Menu,
 } from "lucide-react"
 import { RiFolderHistoryFill } from "react-icons/ri";
@@ -23,22 +13,20 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { Home } from "lucide-react"
 import Link from "next/link"
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"
-import { useTheme } from "next-themes"
 import { usePathname, useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
 
-import { useManager } from "../hooks/useManager"
+import { useUser } from "@/src/hooks/useUser"
 
 
 
 export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const manager = useManager()
+  const manager = useUser().isManager
   const router = useRouter()
   const locale = useLocale()
   
@@ -132,7 +120,7 @@ export default function Sidebar() {
                   <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
-                  {manager.isManager && (
+                  {manager && (
                     <NavItem href="/analytics" icon={BarChart2}>
                       Analytics
                     </NavItem>
@@ -151,12 +139,12 @@ export default function Sidebar() {
                   <NavItem href="/history" icon={RiFolderHistoryFill}>
                     History
                   </NavItem>
-                  {manager.isManager && (
+                  {manager && (
                     <NavItem href="/export" icon={FaFileExport}>
                       Export Report
                     </NavItem>
                   )}
-                  {manager.isManager && (
+                  {manager && (
                     <NavItem href="/other" icon={BsThreeDotsVertical}>
                       Other
                     </NavItem>
@@ -173,7 +161,7 @@ export default function Sidebar() {
                   <NavItem href="/settings" icon={IoMdSettings}>
                     Settings
                   </NavItem>
-                  {manager.isManager && (
+                  {manager && (
                     <NavItem href="/permissions" icon={Users2}>
                       User Permissions
                     </NavItem>
