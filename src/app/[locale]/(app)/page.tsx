@@ -1,8 +1,12 @@
 import { redirect } from "next/navigation";
 
-// Add params to the function signature to access the locale
-export default function Home({ params }: { params: { locale: string } }) {
-  // Use the locale from params in the redirect path
-  redirect(`/${params.locale}/dashboard`);
-  return null; // Keep returning null as redirect throws an error
+// Make the component async
+export default async function Home({ params }: { params: { locale: string } }) {
+  // Await the params object to access its properties
+  const { locale } = await params;
+  // Use the awaited locale in the redirect path
+  redirect(`/${locale}/dashboard`);
+  // This return statement will likely not be reached due to redirect,
+  // but it's good practice to keep it for type safety if redirect logic changes.
+  return null;
 }

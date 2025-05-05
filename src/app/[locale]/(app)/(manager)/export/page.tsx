@@ -4,9 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowLeft, Calendar, Check, FileSpreadsheet, Loader2 } from "lucide-react"
+import { ArrowLeft, Calendar, Check, Download, FileSpreadsheet, Loader2 } from "lucide-react"
 import * as XLSX from "xlsx"
-import { useTranslations } from "next-intl"; // Import useTranslations
 
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -16,30 +15,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/pop
 import { Calendar as CalendarComponent } from "@/src/components/ui/calendar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { Badge } from "@/src/components/ui/badge"
-import { getHistoricalLogs } from "@/src/components/testData/data"
-import { useUser } from "@/src/hooks/useUser";
-import { redirect } from "next/navigation";
+import { Alert, AlertTitle, AlertDescription } from "@/src/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { getHistoricalLogs } from "@/src/components/testData/dataLogs"
+import {
+  type LogEntry,
+  formatTableDate,
+  getResidueName,
+  calculateTotalWeight,
+  calculateTotalWeightByMaterial,
+  exportLogsToExcel,
+} from "@/src/utils/log/log-utils"
 
 export default function ExportPage() {
-  const t = useTranslations('exportPage'); // Initialize translations
-  const tCommon = useTranslations('common'); // Initialize common translations
-  const isManager = useUser().isManager; 
-  
-  if (!isManager) {
-    // Redirect or show an access denied message
-    redirect('/'); // Replace '/access-denied' with your actual redirection ur
-    return null;
-  }
-
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([])
   const [selectAllMaterials, setSelectAllMaterials] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
   const [exportSuccess, setExportSuccess] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>("all")
 
   // Get all logs
-  const logs = getHistoricalLogs()
+  const logs: LogEntry[] = getHistoricalLogs()
 
   // Get unique material types
   const materialTypes = Array.from(new Set(logs.map((log) => log.tipoMaterial)))
@@ -77,7 +76,10 @@ export default function ExportPage() {
     // Filter by material type if any are selected
     const materialMatches = selectAllMaterials || selectedMaterials.includes(log.tipoMaterial)
 
-    return dateInRange && materialMatches
+    // Filter by active tab
+    const tabMatches = activeTab === "all" || log.tipoMaterial === activeTab
+
+    return dateInRange && materialMatches && tabMatches
   })
 
   // Format date for display
@@ -86,61 +88,15 @@ export default function ExportPage() {
     return format(date, "dd/MM/yyyy", { locale: es })
   }
 
-  // Calculate total weight by material type
-  const calculateTotalWeightByMaterial = () => {
-    const totals: Record<string, number> = {}
-
-    filteredLogs.forEach((log) => {
-      const materialType = log.tipoMaterial
-      const weight = Number.parseFloat(log.pesoTotal)
-
-      if (!totals[materialType]) {
-        totals[materialType] = 0
-      }
-
-      totals[materialType] += weight
-    })
-
-    return totals
-  }
-
-  // Calculate total weight
-  const calculateTotalWeight = () => {
-    return filteredLogs.reduce((total, log) => total + Number.parseFloat(log.pesoTotal), 0).toFixed(2)
-  }
-
   // Export to Excel
   const exportToExcel = async () => {
     setIsExporting(true)
     setExportSuccess(false)
+    setExportError(null)
 
     try {
-      // Prepare data for export with translated headers
-      const exportData = filteredLogs.map((log) => ({
-        [t('previewTableHeaders.date')]: format(new Date(log.fecha), "dd/MM/yyyy"),
-        [t('wasteDisposalForm.folioLabel')]: log.folio, // Reuse existing key
-        [t('wasteDisposalForm.timeLabel')]: log.horaSalida, // Reuse existing key
-        [t('wasteDisposalForm.departmentLabel')]: log.departamento, // Reuse existing key
-        [t('wasteDisposalForm.reasonLabel')]: log.motivo, // Reuse existing key
-        [t('wasteDisposalForm.driverNameLabel')]: log.nombreChofer, // Reuse existing key
-        [t('wasteDisposalForm.companyLabel')]: log.compania, // Reuse existing key
-        [t('wasteDisposalForm.originLabel')]: log.procedencia, // Reuse existing key
-        [t('wasteDisposalForm.destinationLabel')]: log.destino, // Reuse existing key
-        [t('wasteDisposalForm.platesLabel')]: log.placas, // Reuse existing key
-        [t('wasteDisposalForm.economicNumberLabel')]: log.numeroEconomico, // Reuse existing key
-        [t('previewTableHeaders.materialType')]: log.tipoMaterial,
-        [t('previewTableHeaders.waste')]: log.residuos.map((r: any) => `${r.nombreResiduo} (${r.peso} ${tCommon('kg')})`).join(", "),
-        [`${t('previewTableHeaders.totalWeight')}`]: log.pesoTotal, // Template literal for key name
-        [t('wasteDisposalForm.containerTypeLabel')]: log.tipoContenedor, // Reuse existing key
-        [t('wasteDisposalForm.authorizingPersonLabel')]: log.personaAutoriza, // Reuse existing key
-      }))
-
-      // Create worksheet
-      const worksheet = XLSX.utils.json_to_sheet(exportData)
-
-      // Create workbook
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Registros")
+      // Get workbook with formatted data based on material types
+      const workbook = exportLogsToExcel(filteredLogs, activeTab !== "all" ? activeTab : undefined)
 
       // Generate Excel file
       const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
@@ -155,9 +111,23 @@ export default function ExportPage() {
       const link = document.createElement("a")
       link.href = url
 
-      // Generate filename with current date
+      // Generate filename with current date and date range if applicable
       const today = format(new Date(), "dd-MM-yyyy")
-      link.download = `Registros_Residuos_${today}.xlsx`
+      let filename = `Registros_Residuos_${today}`
+
+      // Add material type to filename if specific type is selected
+      if (activeTab !== "all") {
+        filename = `${filename}_${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
+      }
+
+      // Add date range to filename if available
+      if (startDate && endDate) {
+        const startDateStr = format(startDate, "dd-MM-yyyy")
+        const endDateStr = format(endDate, "dd-MM-yyyy")
+        filename = `${filename}_${startDateStr}_a_${endDateStr}`
+      }
+
+      link.download = `${filename}.xlsx`
 
       // Trigger download
       document.body.appendChild(link)
@@ -168,68 +138,99 @@ export default function ExportPage() {
       URL.revokeObjectURL(url)
 
       setExportSuccess(true)
-    } catch (error) {
-      console.error("Error exporting to Excel:", error)
-    } finally {
-      setIsExporting(false)
 
       // Reset success message after 3 seconds
-      if (exportSuccess) {
-        setTimeout(() => setExportSuccess(false), 3000)
-      }
+      setTimeout(() => setExportSuccess(false), 3000)
+    } catch (error) {
+      console.error("Error exporting to Excel:", error)
+      setExportError("Ocurrió un error al exportar los datos. Por favor, inténtelo de nuevo.")
+
+      // Reset error message after 5 seconds
+      setTimeout(() => setExportError(null), 5000)
+    } finally {
+      setIsExporting(false)
     }
   }
 
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-6">
-        <div className="flex items-center mb-4">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('backButton')}
-            </Button>
-          </Link>
-        </div>
 
         <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-6">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
-            <p className="text-muted-foreground">{t('description')}</p>
+            <h1 className="text-3xl font-bold mb-2">Exportar Registros</h1>
+            <p className="text-muted-foreground">Filtra y exporta los registros de residuos a Excel</p>
           </div>
 
           <div className="flex items-center gap-2">
             <Link href="/history">
-              <Button variant="outline" className="bg-background/10 border-muted">
-                {t('historyButton')}
+              <Button variant="outline" className="flex items-center gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Ver Historial
               </Button>
             </Link>
           </div>
         </div>
 
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid grid-cols-5 w-full">
+            <TabsTrigger value="all">Todos</TabsTrigger>
+            <TabsTrigger value="metal">Metal/No Metal</TabsTrigger>
+            <TabsTrigger value="otros">Otros Reciclables</TabsTrigger>
+            <TabsTrigger value="lodos">Lodos</TabsTrigger>
+            <TabsTrigger value="destruidas">Uretano/Vidrio/Autopartes</TabsTrigger>
+          </TabsList>
+          <TabsContent value="all" className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Mostrando todos los tipos de residuos. Cada tipo se exportará en su formato específico.
+            </p>
+          </TabsContent>
+          <TabsContent value="metal" className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Formato de exportación para chatarra, incluye columnas para tipo de residuo, empresa transportista,
+              empresa compradora, item, cantidad, unidad y remisión.
+            </p>
+          </TabsContent>
+          <TabsContent value="otros" className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Formato de exportación para reciclables (cartón, plástico, madera), incluye columnas específicas para
+              estos materiales.
+            </p>
+          </TabsContent>
+          <TabsContent value="lodos" className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Formato de exportación para lodos y residuos de manejo especial, incluye columnas para manifiestos y áreas
+              específicas.
+            </p>
+          </TabsContent>
+          <TabsContent value="destruidas" className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              Formato de exportación para sellos de uretano y materiales destruidos, con formato específico para este
+              tipo de residuo.
+            </p>
+          </TabsContent>
+        </Tabs>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Filter Card */}
-          <Card className="bg-background/5 border-muted md:col-span-1">
+          <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>{t('filtersTitle')}</CardTitle>
-              <CardDescription>{t('filtersDescription')}</CardDescription>
+              <CardTitle>Filtros</CardTitle>
+              <CardDescription>Define los parámetros para la exportación</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Date Range */}
               <div className="space-y-4">
-                <h3 className="font-medium">{t('dateRangeTitle')}</h3>
+                <h3 className="font-medium">Rango de Fechas</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="start-date">{t('startDateLabel')}</Label>
+                    <Label htmlFor="start-date">Fecha Inicio</Label>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal bg-background/5 border-muted"
-                        >
-                          <Calendar className="h-4 w-4 mr-2" /> {/* Added margin */}
-                          {startDate ? formatDate(startDate) : t('selectDatePlaceholder')}
+                        <Button variant="outline" className="w-full justify-start text-left font-normal">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          {startDate ? formatDate(startDate) : "Seleccionar"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -239,15 +240,12 @@ export default function ExportPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="end-date">{t('endDateLabel')}</Label>
+                    <Label htmlFor="end-date">Fecha Fin</Label>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal bg-background/5 border-muted"
-                        >
-                          <Calendar className="h-4 w-4 mr-2" /> {/* Added margin */}
-                          {endDate ? formatDate(endDate) : t('selectDatePlaceholder')}
+                        <Button variant="outline" className="w-full justify-start text-left font-normal">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          {endDate ? formatDate(endDate) : "Seleccionar"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -264,47 +262,70 @@ export default function ExportPage() {
                 </div>
               </div>
 
-              {/* Material Types */}
-              <div className="space-y-4">
-                <h3 className="font-medium">{t('materialTypesTitle')}</h3>
+              {/* Material Types - Only show if "all" tab is selected */}
+              {activeTab === "all" && (
+                <div className="space-y-4">
+                  <h3 className="font-medium">Tipos de Material</h3>
 
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox id="select-all" checked={selectAllMaterials} onCheckedChange={handleSelectAllMaterials} />
-                    <Label htmlFor="select-all" className="KiaSignature">
-                      {t('selectAllMaterialsLabel')}
-                    </Label>
-                  </div>
-
-                  {!selectAllMaterials && (
-                    <div className="space-y-2 mt-2 pl-6">
-                      {materialTypes.map((material) => (
-                        <div key={material} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`material-${material}`}
-                            checked={selectedMaterials.includes(material)}
-                            onCheckedChange={() => handleMaterialChange(material)}
-                          />
-                          {/* Assuming material names themselves don't need translation, or use a mapping if they do */}
-                          <Label htmlFor={`material-${material}`}>{material}</Label>
-                        </div>
-                      ))}
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="select-all"
+                        checked={selectAllMaterials}
+                        onCheckedChange={handleSelectAllMaterials}
+                      />
+                      <Label htmlFor="select-all">Todos los Materiales</Label>
                     </div>
-                  )}
+
+                    {!selectAllMaterials && (
+                      <div className="space-y-2 mt-2 pl-6">
+                        {materialTypes.map((material) => (
+                          <div key={material} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`material-${material}`}
+                              checked={selectedMaterials.includes(material)}
+                              onCheckedChange={() => handleMaterialChange(material)}
+                            />
+                            <Label htmlFor={`material-${material}`} className="capitalize">
+                              {material}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
+              )}
+
+              {/* Export Format Info */}
+              <div className="space-y-2 border-t pt-4">
+                <h3 className="font-medium">Formato de Exportación</h3>
+                <p className="text-sm text-muted-foreground">
+                  {activeTab === "all"
+                    ? "Se crearán hojas separadas para cada tipo de material con su formato específico."
+                    : `Se exportará en el formato específico para ${
+                        activeTab === "metal"
+                          ? "chatarra"
+                          : activeTab === "otros"
+                            ? "reciclables"
+                            : activeTab === "lodos"
+                              ? "lodos"
+                              : "sellos"
+                      }`}
+                </p>
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="secondary" onClick={exportToExcel} disabled={isExporting || filteredLogs.length === 0} className="w-full">
+              <Button className="w-full" onClick={exportToExcel} disabled={isExporting || filteredLogs.length === 0}>
                 {isExporting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('exportingButton')}
+                    Exportando...
                   </>
                 ) : (
                   <>
-                    <FileSpreadsheet className="mr-2 h-4 w-4" />
-                    {t('exportButton')}
+                    <Download className="mr-2 h-4 w-4" />
+                    Exportar a Excel
                   </>
                 )}
               </Button>
@@ -312,11 +333,11 @@ export default function ExportPage() {
           </Card>
 
           {/* Preview Card */}
-          <Card className="bg-background/5 border-muted md:col-span-2">
+          <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>{t('previewTitle')}</CardTitle>
+              <CardTitle>Vista Previa</CardTitle>
               <CardDescription>
-                {t('recordsFound', { count: filteredLogs.length })}
+                {filteredLogs.length} {filteredLogs.length === 1 ? "registro encontrado" : "registros encontrados"}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -324,44 +345,36 @@ export default function ExportPage() {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow className="hover:bg-muted/10">
-                        <TableHead className="w-[100px]">{t('previewTableHeaders.date')}</TableHead>
-                        <TableHead>{t('previewTableHeaders.materialType')}</TableHead>
-                        <TableHead>{t('previewTableHeaders.waste')}</TableHead>
-                        <TableHead className="text-right">{t('previewTableHeaders.totalWeight')}</TableHead>
+                      <TableRow className="bg-muted/30 hover:bg-muted/40">
+                        <TableHead className="w-[100px]">Fecha</TableHead>
+                        <TableHead>Tipo Material</TableHead>
+                        <TableHead>Residuo/Desecho</TableHead>
+                        <TableHead className="text-right">Peso Total</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredLogs.slice(0, 5).map((log) => (
                         <TableRow key={log.folio} className="hover:bg-muted/10">
-                          <TableCell>{formatDate(new Date(log.fecha))}</TableCell>
-                          <TableCell>{log.tipoMaterial}</TableCell>
+                          <TableCell>{formatTableDate(log.fecha)}</TableCell>
                           <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {log.residuos.slice(0, 2).map((residuo: any, index: number) => (
-                                <Badge
-                                  key={index}
-                                  variant="outline"
-                                  className="bg-background/10 text-foreground border-muted"
-                                >
-                                  {residuo.nombreResiduo}
-                                </Badge>
-                              ))}
-                              {log.residuos.length > 2 && (
-                                <Badge variant="outline" className="bg-background/10 text-foreground border-muted">
-                                  {t('moreItemsBadge', { count: log.residuos.length - 2 })}
-                                </Badge>
-                              )}
-                            </div>
+                            <Badge variant="outline" className="capitalize">
+                              {log.tipoMaterial}
+                            </Badge>
                           </TableCell>
-                          <TableCell className="text-right font-medium">{log.pesoTotal}</TableCell>
+                          <TableCell>{getResidueName(log)}</TableCell>
+                          <TableCell className="text-right font-medium">
+                            {log.pesoTotal}{" "}
+                            {log.tipoMaterial === "otros" || log.tipoMaterial === "metal"
+                              ? (log.residuos as any)?.unidad || "KG"
+                              : "KG"}
+                          </TableCell>
                         </TableRow>
                       ))}
 
                       {filteredLogs.length > 5 && (
                         <TableRow>
                           <TableCell colSpan={4} className="text-center py-2 text-muted-foreground">
-                            {t('moreRecordsIndicator', { count: filteredLogs.length - 5 })}
+                            {filteredLogs.length - 5} registros más no mostrados en la vista previa
                           </TableCell>
                         </TableRow>
                       )}
@@ -370,26 +383,25 @@ export default function ExportPage() {
                 </div>
               ) : (
                 <div className="py-8 text-center text-muted-foreground">
-                  {t('noRecordsFound')}
+                  No se encontraron registros con los filtros seleccionados
                 </div>
               )}
             </CardContent>
 
             {filteredLogs.length > 0 && (
-              <CardFooter className="flex flex-col items-stretch"> {/* Changed to items-stretch */}
+              <CardFooter className="flex flex-col items-stretch">
                 <div className="w-full border-t border-muted pt-4 mt-2">
-                  <h3 className="font-medium mb-2">{t('summaryTitle')}</h3>
+                  <h3 className="font-medium mb-2">Resumen</h3>
                   <div className="space-y-2">
-                    {Object.entries(calculateTotalWeightByMaterial()).map(([material, weight]) => (
+                    {Object.entries(calculateTotalWeightByMaterial(filteredLogs)).map(([material, weight]) => (
                       <div key={material} className="flex justify-between">
-                        {/* Assuming material names don't need translation */}
-                        <span>{material}</span>
-                        <span className="font-medium">{weight.toFixed(2)} {tCommon('kg')}</span>
+                        <span className="capitalize">{material}</span>
+                        <span className="font-medium">{weight.toFixed(2)} kg</span>
                       </div>
                     ))}
                     <div className="flex justify-between pt-2 border-t border-muted">
-                      <span className="font-bold">{t('totalLabel')}</span>
-                      <span className="font-bold">{calculateTotalWeight()} {tCommon('kg')}</span>
+                      <span className="font-bold">Total</span>
+                      <span className="font-bold">{calculateTotalWeight(filteredLogs)} kg</span>
                     </div>
                   </div>
                 </div>
@@ -397,8 +409,15 @@ export default function ExportPage() {
                 {exportSuccess && (
                   <div className="flex items-center gap-2 text-green-500 mt-4 self-end">
                     <Check className="h-4 w-4" />
-                    <span>{t('exportSuccessMessage')}</span>
+                    <span>Exportación exitosa</span>
                   </div>
+                )}
+
+                {exportError && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{exportError}</AlertDescription>
+                  </Alert>
                 )}
               </CardFooter>
             )}

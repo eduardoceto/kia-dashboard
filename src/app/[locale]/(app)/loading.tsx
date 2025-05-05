@@ -6,9 +6,10 @@ export default function Loading() {
         <div className="flex items-center justify-center h-screen">
             <ScaleLoader
             color={"#05141F"}
-            height={30}
-            width={30}
-            barCount={5}
+            height={18}
+            width={10}
+            margin={5}
+            barCount={14}
             />
         </div>
     )

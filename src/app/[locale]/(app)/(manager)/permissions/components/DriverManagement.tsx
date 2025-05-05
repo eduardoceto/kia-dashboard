@@ -281,7 +281,7 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddDriverDialogOpen(false)} disabled={isSubmittingDriver}>Cancel</Button>
-                <Button onClick={handleAddDriver} disabled={isSubmittingDriver}>
+                <Button variant="default" onClick={handleAddDriver} disabled={isSubmittingDriver}>
                    {isSubmittingDriver ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                    {isSubmittingDriver ? 'Adding...' : 'Add Driver'}
                 </Button>

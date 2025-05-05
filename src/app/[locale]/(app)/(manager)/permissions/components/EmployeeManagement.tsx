@@ -285,7 +285,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsAddEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>Cancel</Button>
-                <Button onClick={handleAddEmployee} disabled={isSubmittingEmployee}>
+                <Button variant="default" onClick={handleAddEmployee} disabled={isSubmittingEmployee}>
                    {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                    {isSubmittingEmployee ? 'Adding...' : 'Add Employee'}
                 </Button>

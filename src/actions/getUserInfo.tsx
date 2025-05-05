@@ -19,12 +19,14 @@ const GetUserInfo = async (): Promise<UserProfile> => {
     const userProfile = {
         employee_id: data.employee_id || null,
         email: data.email,
-        full_name: data.full_name || null,
+        first_name: data.first_name || null,
+        last_name: data.last_name || null,
         role: data.role,
         is_active: data.is_active,
         created_at: data.created_at,
         id: data.id,
-        locale: data.locale
+        locale: data.locale,
+        area_id: data.area_id
     };
 
     return userProfile;

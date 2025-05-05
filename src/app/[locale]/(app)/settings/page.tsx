@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { useTheme } from "next-themes"
-import { ArrowLeft, Moon, Sun, Languages } from "lucide-react"
+import { ArrowLeft, Languages } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Label } from "@/src/components/ui/label"
@@ -13,7 +12,6 @@ import { useLocale } from "next-intl"
 import { createClient } from "@/src/utils/supabase/client"
 
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme()
   const currentUser = useUser().profile
   const router = useRouter()
   const pathname = usePathname()
@@ -61,34 +59,34 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">Name:</p>
-                <p className="col-span-2 text-sm">{currentUser.full_name}</p>
+                <p className="col-span-2 text-sm">{currentUser?.first_name} {currentUser?.last_name}</p>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">Email:</p>
-                <p className="col-span-2 text-sm">{currentUser.email}</p>
+                <p className="col-span-2 text-sm">{currentUser?.email}</p>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">ID Number:</p>
-                <p className="col-span-2 text-sm">{currentUser.employee_id}</p>
+                <p className="col-span-2 text-sm">{currentUser?.employee_id}</p>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">Role:</p>
-                <p className="col-span-2 text-sm">{currentUser.role}</p>
+                <p className="col-span-2 text-sm">{currentUser?.role}</p>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">Status:</p>
                 <p className="col-span-2 text-sm">
                   <span
-                    className={`inline-block h-2 w-2 rounded-full ${currentUser.is_active ? "bg-green-500" : "bg-red-500"} mr-2`}
+                    className={`inline-block h-2 w-2 rounded-full ${currentUser?.is_active ? "bg-green-500" : "bg-red-500"} mr-2`}
                   ></span>
-                  {currentUser.is_active ? "Active" : "Inactive"}
+                  {currentUser?.is_active ? "Active" : "Inactive"}
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 <p className="text-sm font-medium text-muted-foreground">Join Date:</p>
                 {/* Format the date and time */}
                 <p className="col-span-2 text-sm">
-                  {currentUser.created_at ? new Date(currentUser.created_at).toLocaleString() : 'N/A'}
+                  {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleString() : 'N/A'}
                 </p>
               </div>
             </div>

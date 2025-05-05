@@ -6,7 +6,7 @@ export default function Loading() {
         <div className="flex items-center justify-center h-screen">
             <PuffLoader
             color={"#05141F"}
-            size={30}
+            size={60}
             />
         </div>
     )
