@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowLeft, Calendar, Check, Download, FileSpreadsheet, Loader2 } from "lucide-react"
-import * as XLSX from "xlsx"
+import { Calendar, Check, Download, FileSpreadsheet, Loader2 } from "lucide-react"
+import ExcelJS from "exceljs"
 
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -17,6 +17,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/src/components/ui/badge"
 import { Alert, AlertTitle, AlertDescription } from "@/src/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
+
 import { getHistoricalLogs } from "@/src/components/testData/dataLogs"
 import {
   type LogEntry,
@@ -24,7 +26,13 @@ import {
   getResidueName,
   calculateTotalWeight,
   calculateTotalWeightByMaterial,
-  exportLogsToExcel,
+  getResidueItem,
+  getResidueQuantity,
+  getResidueUnit,
+  getResidueRemision,
+  getResidueManifestNo,
+  getResidueTransport,
+  getResidueArea,
 } from "@/src/utils/log/log-utils"
 
 export default function ExportPage() {
@@ -62,25 +70,161 @@ export default function ExportPage() {
     }
   }
 
-  // Filter logs based on selected date range and materials
+  // State for additional filters
+  const [selectedWasteType, setSelectedWasteType] = useState<string>("all");
+  const [selectedItem, setSelectedItem] = useState<string>("all");
+
+  // Reset additional filters when tab changes
+  useEffect(() => {
+    setSelectedWasteType("all");
+    setSelectedItem("all");
+  }, [activeTab]);
+
+  // In your filtering logic, update the wasteTypeMatches condition
+  const getWasteTypeMatches = (log: LogEntry) => {
+    if (activeTab === "all" || selectedWasteType === "all") {
+      return true;
+    }
+
+    switch (log.tipoMaterial) {
+      case "metal":
+        return (log.residuos as any).tipoResiduo === selectedWasteType;
+      case "otros":
+        return (log.residuos as any).tipoDesecho === selectedWasteType;
+      case "lodos":
+        return (log.residuos as any).nombreResiduo === selectedWasteType;
+      case "destruidas":
+        return (log.residuos as any).residuos === selectedWasteType;
+      default:
+        return true;
+    }
+  }
+
+  const getItemMatches = (log: LogEntry) => {
+    if (activeTab === "all" || selectedItem === "all") {
+      return true;
+    }
+
+    switch (log.tipoMaterial) {
+      case "metal":
+      case "otros":
+        return (log.residuos as any).item === selectedItem;
+      case "lodos":
+      case "destruidas":
+        return (log.residuos as any).area === selectedItem;
+      default:
+        return true;
+    }
+  }
+
+const getLogMatches = (log: LogEntry) => {
+  return {
+    wasteTypeMatches: getWasteTypeMatches(log),
+    itemMatches: getItemMatches(log)
+  };
+};
+
+  // Get unique waste types and items
+  const getWasteTypes = () => {
+    const types = logs
+      .filter((log) => log.tipoMaterial === activeTab)
+      .map((log) => {
+        switch (log.tipoMaterial) {
+          case "metal":
+            return (log.residuos as any).tipoResiduo;
+          case "otros":
+            return (log.residuos as any).tipoDesecho;
+          case "lodos":
+            return (log.residuos as any).nombreResiduo;
+          case "destruidas":
+            return (log.residuos as any).residuos;
+          default:
+            return null;
+        }
+      })
+      .filter((type): type is string => type !== null);
+    return Array.from(new Set(types));
+  };
+
+  const getItems = () => {
+    const items = logs
+      .filter((log) => log.tipoMaterial === activeTab)
+      .map((log) => {
+        switch (log.tipoMaterial) {
+          case "metal":
+          case "otros":
+            return (log.residuos as any).item;
+          case "lodos":
+            return (log.residuos as any).area;
+          case "destruidas":
+            return (log.residuos as any).area;
+          default:
+            return null;
+        }
+      })
+      .filter((item): item is string => item !== null);
+    return Array.from(new Set(items));
+  };
+
+  // Reset additional filters when tab changes
+  useEffect(() => {
+    setSelectedWasteType("");
+    setSelectedItem("");
+  }, [activeTab]);
+
+  // Filter logs based on all criteria
   const filteredLogs = logs.filter((log) => {
-    const logDate = new Date(log.fecha)
+    const logDate = new Date(log.fecha);
 
     // Filter by date range if both dates are selected
     const dateInRange =
       !startDate ||
       !endDate ||
       ((isAfter(logDate, startDate) || isEqual(logDate, startDate)) &&
-        (isBefore(logDate, endDate) || isEqual(logDate, endDate)))
+        (isBefore(logDate, endDate) || isEqual(logDate, endDate)));
 
     // Filter by material type if any are selected
-    const materialMatches = selectAllMaterials || selectedMaterials.includes(log.tipoMaterial)
+    const materialMatches = selectAllMaterials || selectedMaterials.includes(log.tipoMaterial);
 
     // Filter by active tab
-    const tabMatches = activeTab === "all" || log.tipoMaterial === activeTab
+    const tabMatches = activeTab === "all" || log.tipoMaterial === activeTab;
 
-    return dateInRange && materialMatches && tabMatches
-  })
+    // Filter by waste type
+    let wasteTypeMatches = true;
+    if (activeTab !== "all" && selectedWasteType !== "all") {
+      switch (log.tipoMaterial) {
+        case "metal":
+          wasteTypeMatches = (log.residuos as any).tipoResiduo === selectedWasteType;
+          break;
+        case "otros":
+          wasteTypeMatches = (log.residuos as any).tipoDesecho === selectedWasteType;
+          break;
+        case "lodos":
+          wasteTypeMatches = (log.residuos as any).nombreResiduo === selectedWasteType;
+          break;
+        case "destruidas":
+          wasteTypeMatches = (log.residuos as any).residuos === selectedWasteType;
+          break;
+      }
+    }
+
+    // Filter by item/area
+    let itemMatches = true;
+    if (activeTab !== "all" && selectedItem !== "all") {
+      switch (log.tipoMaterial) {
+        case "metal":
+        case "otros":
+          itemMatches = (log.residuos as any).item === selectedItem;
+          break;
+        case "lodos":
+        case "destruidas":
+          itemMatches = (log.residuos as any).area === selectedItem;
+          break;
+      }
+    }
+
+    return dateInRange && materialMatches && tabMatches && wasteTypeMatches && itemMatches;
+  });
 
   // Format date for display
   const formatDate = (date: Date | undefined) => {
@@ -88,18 +232,123 @@ export default function ExportPage() {
     return format(date, "dd/MM/yyyy", { locale: es })
   }
 
-  // Export to Excel
+  // Export to Excel using exceljs and templates
   const exportToExcel = async () => {
+    if (activeTab === "all") {
+      setExportError("Please select a specific material type tab to export.")
+      setTimeout(() => setExportError(null), 5000)
+      return
+    }
+
     setIsExporting(true)
     setExportSuccess(false)
     setExportError(null)
 
     try {
-      // Get workbook with formatted data based on material types
-      const workbook = exportLogsToExcel(filteredLogs, activeTab !== "all" ? activeTab : undefined)
+      let templatePath = ""
+      switch (activeTab) {
+        case "lodos":
+          templatePath = "/TemplateLodos.xlsx"
+          break
+        case "metal":
+          templatePath = "/TemplateMetal.xlsx"
+          break
+        case "otros":
+          templatePath = "/TemplateOthers.xlsx"
+          break
+        case "destruidas": // Assuming this corresponds to Uretano/Vidrio/Autopartes
+          templatePath = "/TempleteUretano.xlsx" // Note the typo in the actual filename
+          break
+        default:
+          setExportError("Invalid material type selected.")
+          setIsExporting(false)
+          return
+      }
 
-      // Generate Excel file
-      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" })
+      // Fetch the template file
+      const response = await fetch(templatePath)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch template: ${response.statusText}`)
+      }
+      const templateBuffer = await response.arrayBuffer()
+
+      // Load the workbook from the template
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(templateBuffer)
+
+      // Assume data goes into the first worksheet
+      const worksheet = workbook.worksheets[0]
+      if (!worksheet) {
+        throw new Error("Template worksheet not found.")
+      }
+
+      // --- Data Population Logic --- 
+      // This part needs to be adapted based on the *actual* structure of each template.
+      // The following is a placeholder/example assuming row 2 is the start.
+      let startRow = 0
+      if (activeTab === "metal") {
+        startRow = 5
+      }
+      else if (activeTab === "otros") {
+        startRow = 5
+      }
+      else if (activeTab === "lodos") {
+        startRow = 8
+      }
+      else if (activeTab === "destruidas") {
+        startRow = 7
+      }
+
+
+      filteredLogs.forEach((log) => {
+        
+
+        if (activeTab === "metal") {
+          worksheet.getCell(`B${startRow}`).value = formatTableDate(log.fecha)
+          worksheet.getCell(`C${startRow}`).value = getResidueName(log)
+          worksheet.getCell(`D${startRow}`).value = log.compania
+          worksheet.getCell(`E${startRow}`).value = "Hyundai Materials México S. DE R.L DE C.V"
+          worksheet.getCell(`F${startRow}`).value = getResidueItem(log)
+          worksheet.getCell(`G${startRow}`).value = getResidueQuantity(log)
+          worksheet.getCell(`H${startRow}`).value = getResidueUnit(log)
+          worksheet.getCell(`I${startRow}`).value = getResidueRemision(log)
+        }
+        else if (activeTab === "otros") {
+          worksheet.getCell(`B${startRow}`).value = formatTableDate(log.fecha)
+          worksheet.getCell(`C${startRow}`).value = getResidueName(log)
+          worksheet.getCell(`D${startRow}`).value = log.compania
+          worksheet.getCell(`E${startRow}`).value = "Hyundai Materials México S. DE R.L DE C.V"
+          worksheet.getCell(`F${startRow}`).value = getResidueItem(log)
+          worksheet.getCell(`G${startRow}`).value = getResidueQuantity(log)
+          worksheet.getCell(`H${startRow}`).value = getResidueUnit(log)
+          worksheet.getCell(`I${startRow}`).value = getResidueRemision(log)
+        }
+        else if (activeTab === "lodos") {
+          worksheet.getCell(`B${startRow}`).value = formatTableDate(log.fecha)
+          worksheet.getCell(`C${startRow}`).value = getResidueName(log)
+          worksheet.getCell(`D${startRow}`).value = log.compania
+          worksheet.getCell(`E${startRow}`).value = log.destino
+          worksheet.getCell(`F8`).value = getResidueItem(log)
+          worksheet.getCell(`G8`).value = getResidueManifestNo(log)
+          worksheet.getCell(`H8`).value = getResidueArea(log)
+          worksheet.getCell(`I8`).value = getResidueTransport(log)
+          worksheet.getCell(`J8`).value = getResidueQuantity(log)
+        }
+        else if (activeTab === "destruidas") {
+          worksheet.getCell(`B${startRow}`).value = formatTableDate(log.fecha)
+          worksheet.getCell(`C${startRow}`).value = "RME"
+          worksheet.getCell(`D${startRow}`).value = log.compania
+          worksheet.getCell(`E${startRow}`).value = log.destino
+          worksheet.getCell(`F${startRow}`).value = getResidueItem(log)
+          worksheet.getCell(`G${startRow}`).value = getResidueManifestNo(log)
+          worksheet.getCell(`H${startRow}`).value = getResidueQuantity(log)
+        }
+        startRow++
+      })
+      // --- End Data Population Logic ---
+
+      // Generate Excel file buffer
+      const excelBuffer = await workbook.xlsx.writeBuffer()
 
       // Create Blob and download
       const blob = new Blob([excelBuffer], {
@@ -111,22 +360,14 @@ export default function ExportPage() {
       const link = document.createElement("a")
       link.href = url
 
-      // Generate filename with current date and date range if applicable
+      // Generate filename
       const today = format(new Date(), "dd-MM-yyyy")
-      let filename = `Registros_Residuos_${today}`
-
-      // Add material type to filename if specific type is selected
-      if (activeTab !== "all") {
-        filename = `${filename}_${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`
-      }
-
-      // Add date range to filename if available
+      let filename = `Registros_${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}_${today}`
       if (startDate && endDate) {
         const startDateStr = format(startDate, "dd-MM-yyyy")
         const endDateStr = format(endDate, "dd-MM-yyyy")
         filename = `${filename}_${startDateStr}_a_${endDateStr}`
       }
-
       link.download = `${filename}.xlsx`
 
       // Trigger download
@@ -138,14 +379,10 @@ export default function ExportPage() {
       URL.revokeObjectURL(url)
 
       setExportSuccess(true)
-
-      // Reset success message after 3 seconds
       setTimeout(() => setExportSuccess(false), 3000)
     } catch (error) {
       console.error("Error exporting to Excel:", error)
-      setExportError("Ocurrió un error al exportar los datos. Por favor, inténtelo de nuevo.")
-
-      // Reset error message after 5 seconds
+      setExportError(`Export failed: ${error instanceof Error ? error.message : String(error)}`)
       setTimeout(() => setExportError(null), 5000)
     } finally {
       setIsExporting(false)
@@ -293,6 +530,59 @@ export default function ExportPage() {
                         ))}
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Additional Filters - Only show if a specific tab is selected */}
+              {activeTab !== "all" && (
+                <div className="space-y-4">
+                  <h3 className="font-medium">Filtros Adicionales</h3>
+
+                  <div className="space-y-4">
+                    {/* Waste Type Filter */}
+                    <div className="space-y-2">
+                      <Label htmlFor="waste-type">
+                        {activeTab === "metal" && "Tipo de Residuo"}
+                        {activeTab === "otros" && "Tipo de Desecho"}
+                        {activeTab === "lodos" && "Nombre de Residuo"}
+                        {activeTab === "destruidas" && "Residuos"}
+                      </Label>
+                      <Select value={selectedWasteType} onValueChange={setSelectedWasteType}>
+                        <SelectTrigger id="waste-type">
+                          <SelectValue placeholder="Seleccionar tipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          {getWasteTypes().map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Item/Area Filter */}
+                    <div className="space-y-2">
+                      <Label htmlFor="item">
+                        {(activeTab === "metal" || activeTab === "otros") && "Item"}
+                        {(activeTab === "lodos" || activeTab === "destruidas") && "Área"}
+                      </Label>
+                      <Select value={selectedItem} onValueChange={setSelectedItem}>
+                        <SelectTrigger id="item">
+                          <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          {getItems().map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               )}

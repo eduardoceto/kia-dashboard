@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowLeft, Calendar, ChevronDown, ChevronUp, FileSpreadsheet, Filter, Info, Search } from "lucide-react"
+import { ArrowLeft, Calendar, ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search } from "lucide-react"
 
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -33,7 +33,17 @@ import {
   type DestruidasResiduo,
   formatDate,
   formatShortDate,
+  formatTableDate,
+  getResidueName,
+  getResidueItem, // Import getResidueItem
+  getResidueQuantity,
+  getResidueArea,
+  getResidueTransport,
+  getResidueUnit,
+  getResidueRemision,
+  getResidueManifestNo,
 } from "@/src/utils/log/log-utils"
+import { generatePdf } from "@/src/actions/generatePdf"
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -507,6 +517,10 @@ export default function HistoryPage() {
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <DialogTitle>Detalles del Registro</DialogTitle>
+              
+            </div>
                                 <DialogHeader>
                                   <DialogTitle>Detalles del Registro #{selectedLog?.folio}</DialogTitle>
                                 </DialogHeader>
@@ -743,7 +757,17 @@ export default function HistoryPage() {
                                     </div>
                                   </div>
                                 )}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="flex items-center gap-2"
+                                    onClick={() => selectedLog && generatePdf(selectedLog)}
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    Descargar PDF
+                                  </Button>
                               </DialogContent>
+                              
                             </Dialog>
                           </TableCell>
                         </TableRow>
@@ -813,3 +837,6 @@ export default function HistoryPage() {
     </div>
   )
 }
+
+
+   

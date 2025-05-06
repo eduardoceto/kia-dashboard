@@ -4,9 +4,7 @@ import { useForm, UseFormReturn } from "react-hook-form"; // Import UseFormRetur
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
+import { generatePdf } from '@/src/actions/generatePdf';
 import { Button } from "@/src/components/ui/button";
 import { Form } from "@/src/components/ui/form";
 import { Card, CardContent } from "@/src/components/ui/card";
@@ -212,43 +210,7 @@ export default function WasteDisposalForm() {
     // setDriverPopoverOpen(false);
   };
 
-  // PDF Generation Function
-  const generatePdf = (data: any) => {
-    const doc = new jsPDF();
-    doc.text("Waste Disposal Log", 14, 16);
-    const tableColumn = ["Field", "Value"];
-    const tableRows: (string | number)[][] = []; // Type the array
-
-    // Add general info
-    tableRows.push(["Folio", data.folio]);
-    tableRows.push(["Fecha", data.fecha]);
-    tableRows.push(["Hora Salida", data.horaSalida]);
-    tableRows.push(["Departamento", data.departamento]);
-    tableRows.push(["Motivo", data.motivo]);
-    tableRows.push(["Nombre Chofer", data.nombreChofer]);
-    tableRows.push(["Compañía", data.compania]);
-    tableRows.push(["Procedencia", data.procedencia]);
-    tableRows.push(["Destino", data.destino]);
-    tableRows.push(["Placas", data.placas]);
-    tableRows.push(["Número Económico", data.numeroEconomico]);
-    tableRows.push(["Tipo Material", data.tipoMaterial]);
-    tableRows.push(["Tipo Contenedor", data.tipoContenedor]);
-    tableRows.push(["Persona Autoriza", data.personaAutoriza]);
-    tableRows.push(["Peso Total (kg)", data.pesoTotal]);
-
-    // Add waste-specific details
-    if (data.residuos && Object.keys(data.residuos).length > 0) {
-        tableRows.push(["-- Detalles Material --", "--"]);
-        Object.entries(data.residuos).forEach(([key, value]) => {
-            // Simple formatting for keys
-            const formattedKey = key.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            tableRows.push([formattedKey, String(value)]);
-        });
-    }
-
-    autoTable(doc, { head: [tableColumn], body: tableRows, startY: 25 });
-    doc.save(`waste_disposal_${data.folio}.pdf`);
-  };
+  // Import the generatePdf function
 
   // Form Submission Handler
   async function onSubmit(values: WasteDisposalFormValues) {
