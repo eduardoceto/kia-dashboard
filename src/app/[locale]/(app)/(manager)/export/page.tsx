@@ -168,8 +168,8 @@ const getLogMatches = (log: LogEntry) => {
 
   // Reset additional filters when tab changes
   useEffect(() => {
-    setSelectedWasteType("");
-    setSelectedItem("");
+    setSelectedWasteType("all");
+    setSelectedItem("all");
   }, [activeTab]);
 
   // Filter logs based on all criteria
@@ -410,7 +410,7 @@ const getLogMatches = (log: LogEntry) => {
         </div>
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-5 w-full bg-popover">
             <TabsTrigger value="all">Todos</TabsTrigger>
             <TabsTrigger value="metal">Metal/No Metal</TabsTrigger>
             <TabsTrigger value="otros">Otros Reciclables</TabsTrigger>
@@ -548,19 +548,20 @@ const getLogMatches = (log: LogEntry) => {
                         {activeTab === "lodos" && "Nombre de Residuo"}
                         {activeTab === "destruidas" && "Residuos"}
                       </Label>
-                      <Select value={selectedWasteType} onValueChange={setSelectedWasteType}>
+                        <Select 
+                        value={selectedWasteType} onValueChange={setSelectedWasteType}>
                         <SelectTrigger id="waste-type">
                           <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Todos</SelectItem>
                           {getWasteTypes().map((type) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
-                            </SelectItem>
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
                           ))}
                         </SelectContent>
-                      </Select>
+                        </Select>
                     </div>
 
                     {/* Item/Area Filter */}

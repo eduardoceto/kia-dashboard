@@ -1,8 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react"; // Import React
-import { createClient } from "@/src/utils/supabase/client";
-import { AuthSessionMissingError } from "@supabase/supabase-js"; // Import the specific error type if available
+import { createClient } from "@/src/utils/supabase/client"; // Import the specific error type if available
 
 // Define a more specific type for the profile if possible
 // For now, using 'any' but adding 'role' for clarity

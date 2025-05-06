@@ -32,16 +32,7 @@ import {
   type OtrosResiduo,
   type DestruidasResiduo,
   formatDate,
-  formatShortDate,
-  formatTableDate,
-  getResidueName,
-  getResidueItem, // Import getResidueItem
-  getResidueQuantity,
-  getResidueArea,
-  getResidueTransport,
-  getResidueUnit,
-  getResidueRemision,
-  getResidueManifestNo,
+  formatShortDate
 } from "@/src/utils/log/log-utils"
 import { generatePdf } from "@/src/actions/generatePdf"
 

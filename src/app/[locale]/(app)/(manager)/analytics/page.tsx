@@ -28,17 +28,17 @@ export default function UnifiedWasteDashboard() {
       </div>
 
       <Tabs defaultValue="multi-graph" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4 bg-accent-foreground">
+        <TabsList className="grid w-full grid-cols-2 mb-4 bg-popover">
           <TabsTrigger
             value="multi-graph"
-            className="flex items-center gap-2 bg-accent-foreground text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-foreground"
+            className="flex items-center gap-2"
           >
             <BarChart4 className="h-4 w-4" />
             <span>{t('multiGraphTab')}</span>
           </TabsTrigger>
           <TabsTrigger
             value="year-comparison"
-            className="flex items-center gap-2 text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-foreground"
+            className="flex items-center gap-2"
           >
             <LineChart className="h-4 w-4" />
             <span>{t('yearComparisonTab')}</span>

@@ -29,7 +29,7 @@ export default function HeaderSide({ children }: LayoutProps) { // Destructure u
             <Sidebar />
             <div className="KiaSignature w-full flex flex-1 flex-col">
                 <TopNav userProfile={userProfile ?? undefined} />
-                <main className="flex-1 overflow-auto p-6 bg-[#f2f2f2]">
+                <main className="flex-1 overflow-auto p-6 bg-background">
                     {children}
                 </main>
             </div>

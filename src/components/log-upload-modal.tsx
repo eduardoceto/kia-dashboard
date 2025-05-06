@@ -85,7 +85,7 @@ export function LogUploadModal({ isOpen, onClose, onSubmit, task }: LogUploadMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className=" sm:max-w-md">
+      <DialogContent className=" sm:max-w-md bg-popover">
         <DialogHeader>
           <DialogTitle>Registro de Residuos</DialogTitle>
         </DialogHeader>

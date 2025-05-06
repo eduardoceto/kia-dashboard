@@ -33,7 +33,7 @@ export function StandaloneGraph() {
     const color = colors[materialIndex % colors.length] || colors[0]; // Use modulo for safety
   
     return (
-      <Card className="w-full rounded-md">
+      <Card className="w-full rounded-md bg-[#fbfbfb] shadow-md">
         <CardHeader className="pb-1 pt-3 px-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-md truncate pr-2">

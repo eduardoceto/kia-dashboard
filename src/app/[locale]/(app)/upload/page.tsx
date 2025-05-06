@@ -39,7 +39,7 @@ export default function Upload() {
 
       <Card className="w-full">
         <CardContent>
-        <Accordion type="single" defaultValue="Registro de Residuos" collapsible>
+        <Accordion type="single" defaultValue="Registro de Salida de Residuos" collapsible>
 
         {/* <AccordionItem value="Registro de Residuos">
             <AccordionTrigger>
