@@ -65,31 +65,29 @@ export const UserContextProvider = (props: UserProviderProps) => {
                     authError = getUserError; // Assign the caught error
                 }
 
-                // Check for errors OR if user is null in the session data
+                
                 if (authError || !sessionData?.user) {
-                    // No user logged in or error fetching user.
-                    // State is already reset (profile=null, isManager=false).
-                    setLoading(false); // Stop loading
-                    return; // Exit early
+                    setLoading(false); 
+                    return; 
                 }
 
-                // If we reach here, sessionData.user exists
+               
                 const user = sessionData.user;
 
-                // Fetch profile data
+               
                 const { data: userProfile, error: profileError } = await supabase
                     .from('users')
-                    .select('*') // Select all fields
+                    .select('*') 
                     .eq('id', user.id)
                     .single();
 
                 if (profileError) {
                     console.error('Error fetching user profile:', profileError);
-                    // Keep state reset (profile=null, isManager=false)
+                    
                 } else {
-                    // Set profile and check role
+                    
                     setProfile(userProfile);
-                    // Assuming 'admin' role means manager in your context
+                    
                     if (userProfile?.role === 'admin') {
                         setIsManager(true);
                     }
@@ -140,9 +138,9 @@ export const UserContextProvider = (props: UserProviderProps) => {
 
     // Optional: Render children only when initial loading is done,
     // or let consuming components handle the loading state.
-    // if (loading && profile === null) { // Example: Show loading only on initial load
-    //     return <div>Loading user...</div>;
-    // }
+    if (loading && profile === null) { // Example: Show loading only on initial load
+        return <div>Loading user...</div>;
+    }
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 

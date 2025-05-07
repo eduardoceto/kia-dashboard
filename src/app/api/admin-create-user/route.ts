@@ -10,9 +10,9 @@ const supabaseAdmin = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password, full_name, employee_id, role, is_active } = body;
+    const { email, password, first_name, last_name, employee_id, role, is_active } = body;
 
-    if (!email || !password || !full_name) {
+    if (!email || !password || !first_name || !last_name) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
     if (!email.includes('@kia.com')) {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name },
+      user_metadata: { first_name, last_name },
     });
     if (userError || !userData?.user) {
       return NextResponse.json({ error: userError?.message || 'Failed to create user.' }, { status: 500 });
@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
 
     const { error: profileError } = await supabaseAdmin.from('users').update({
       id: userData.user.id,
-      full_name,
+      first_name: first_name,
+      last_name: last_name,
       employee_id: employee_id || null,
       email,
       role: role || 'user',

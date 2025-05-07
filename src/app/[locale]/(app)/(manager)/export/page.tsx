@@ -62,7 +62,6 @@ export default function ExportPage() {
     }
   }
 
-  // Handle select all materials
   const handleSelectAllMaterials = () => {
     setSelectAllMaterials(!selectAllMaterials)
     if (!selectAllMaterials) {

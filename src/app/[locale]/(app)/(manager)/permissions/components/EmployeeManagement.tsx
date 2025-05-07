@@ -42,7 +42,8 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   const [loadingEmployees, setLoadingEmployees] = useState(true)
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState("")
   const [newEmployee, setNewEmployee] = useState({
-    full_name: "",
+    first_name: "",
+    last_name: "",
     employee_id: "",
     email: "",
     password: "",
@@ -103,7 +104,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   // --- Employee CRUD Operations ---
 
   const handleAddEmployee = async () => {
-    if (!newEmployee.email || !newEmployee.password || !newEmployee.full_name) {
+    if (!newEmployee.email || !newEmployee.password || !newEmployee.first_name || !newEmployee.last_name) {
       toast.error("Please fill in Email, Password, and Full Name.");
       return;
     }
@@ -115,6 +116,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
 
     try {
       // Call the secure API route instead of client-side signUp
+      console.log("Creating new employee:", newEmployee);
       const response = await fetch("/api/admin-create-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -126,7 +128,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
         return;
       }
       toast.success("Employee added successfully!");
-      setNewEmployee({ full_name: "", employee_id: "", email: "", password: "", role: "user", is_active: true });
+      setNewEmployee({ first_name: "", last_name:"", employee_id: "", email: "", password: "", role: "user", is_active: true });
       setIsAddEmployeeDialogOpen(false);
       fetchEmployees();
     } catch (error: any) {
@@ -149,11 +151,10 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                 first_name: editingEmployee.first_name,
                 last_name: editingEmployee.last_name,
                 employee_id: editingEmployee.employee_id || null,
-                email: editingEmployee.email, // Usually email shouldn't be updated here directly, handle via auth update if needed
                 role: editingEmployee.role,
                 is_active: editingEmployee.is_active,
             })
-            .eq('id', editingEmployee.id); // Match by the user's ID (which is the auth ID)
+            .eq('id', editingEmployee.id); 
 
         if (updateError) throw updateError;
 
@@ -258,8 +259,12 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Full Name *</Label>
-                  <Input id="name" value={newEmployee.full_name} onChange={(e) => setNewEmployee({ ...newEmployee, full_name: e.target.value })} disabled={isSubmittingEmployee}/>
+                  <Label htmlFor="name">First Name *</Label>
+                  <Input id="name" value={newEmployee.first_name} onChange={(e) => setNewEmployee({ ...newEmployee, first_name: e.target.value })} disabled={isSubmittingEmployee}/>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Last Name *</Label>
+                  <Input id="name" value={newEmployee.last_name} onChange={(e) => setNewEmployee({ ...newEmployee, last_name: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="employee_id">Employee ID</Label>

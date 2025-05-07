@@ -56,7 +56,7 @@ export default function LoginForm() {
                             placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full rounded-b-sm h-12 px-4 focus:bg-foreground/20 focus:text-[#05141F] transition-colors duration-400"
+                            className="w-full rounded-b-sm h-12 px-4 bg-accent-foreground/60 focus:bg-tertiarty/20 transition-colors duration-400"
                             required
                             disabled={isLoading}
                         />
@@ -69,7 +69,7 @@ export default function LoginForm() {
                             placeholder="Contraseña"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full  rounded-b-sm h-12 px-4 focus:bg-foreground/20 focus:text-[#05141F] transition-colors duration-400"
+                            className="w-full rounded-b-sm h-12 px-4 bg-accent-foreground/60  focus:bg-tertiarty/20 transition-colors duration-400"
                             required
                             disabled={isLoading}
                         />
@@ -77,7 +77,7 @@ export default function LoginForm() {
                         <div className="pt-2">
                         <Button
                             type="submit"
-                            className="w-full bg-white text-[#05141F] rounded-b-sm border border-#05141F hover:bg-[#1f2c35] hover:text-white transition-colors duration-500 h-12 font-medium"
+                            className="w-full bg-card text-[#05141F] rounded-b-sm border border-#05141F hover:bg-[#1f2c35] hover:text-white transition-colors duration-500 h-12 font-medium"
                             disabled={isLoading}
                         >
                             {isLoading ? (
