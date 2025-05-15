@@ -75,7 +75,7 @@ export default function UploadLogPage() {
 
     // Submit the log data
     if (taskId && task) {
-      completeTask(taskId, formData)
+      completeTask(taskId)
       setSuccessMessage("Registro completado con éxito")
 
       // Redirect after a short delay
