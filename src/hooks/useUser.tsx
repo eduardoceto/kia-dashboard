@@ -109,7 +109,7 @@ export const UserContextProvider = (props: UserProviderProps) => {
         checkUserAndRole();
 
         // Add listener for auth state changes
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
              console.log("Auth state changed:", event);
              if (event === 'SIGNED_OUT') {
                  // User logged out, directly reset state
