@@ -5,7 +5,6 @@ import { TaskCard } from "@/src/components/task-card"
 import { LogUploadModal } from "@/src/components/log-upload-modal"
 import { useTasks } from "@/src/hooks/use-tasks"
 import type { TaskCardProps } from "@/types"
-import type { LogDataModalProps } from "@/types"
 
 export default function TasksPage() {
   const { tasks, completeTask, deleteTask } = useTasks()
