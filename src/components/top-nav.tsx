@@ -21,12 +21,11 @@ interface BreadcrumbItem {
 }
 
 type Props = {
-    children?: React.ReactNode;
     userProfile?: UserProfile; // Add userProfile prop
 }
 
 // Make sure TopNav accepts props
-export default function TopNav({ children, userProfile }: Props) {
+export default function TopNav({ userProfile }: Props) {
     const t = useTranslations('top-nav');
     const manager = useUser().isManager;
     const pathname = usePathname();
@@ -47,7 +46,7 @@ export default function TopNav({ children, userProfile }: Props) {
     // Build breadcrumbs from pathname, handling locale prefix
     const rawSegments = pathname.split("/").filter(Boolean);
     // Check against the imported 'locales' array from routing object
-    const localeSegment = routing.locales.includes(rawSegments[0] as any) ? rawSegments[0] : null;
+    const localeSegment = (rawSegments[0] === 'en' || rawSegments[0] === 'es') ? rawSegments[0] : null;
     const displaySegments = localeSegment ? rawSegments.slice(1) : rawSegments;
     const baseHref = localeSegment ? `/${localeSegment}` : '/';
 

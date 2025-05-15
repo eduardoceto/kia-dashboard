@@ -379,11 +379,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="nombreChofer"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Nombre de Chofer</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nombre del chofer" {...field} />
+                        <Input placeholder="Nombre del chofer" {...form.register("nombreChofer")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -393,11 +393,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="compania"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Compañía</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nombre de la compañía" {...field} />
+                        <Input placeholder="Nombre de la compañía" {...form.register("compania")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -409,11 +409,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="procedencia"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Procedencia</FormLabel>
                       <FormControl>
-                        <Input placeholder="Lugar de procedencia" {...field} />
+                        <Input placeholder="Lugar de procedencia" {...form.register("procedencia")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -423,11 +423,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="destino"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Destino</FormLabel>
                       <FormControl>
-                        <Input placeholder="Lugar de destino" {...field} />
+                        <Input placeholder="Lugar de destino" {...form.register("destino")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -439,11 +439,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="placas"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Placas</FormLabel>
                       <FormControl>
-                        <Input placeholder="Número de placas" {...field} />
+                        <Input placeholder="Número de placas" {...form.register("placas")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -453,11 +453,11 @@ export default function WasteDisposalForm() {
                 <FormField
                   control={form.control}
                   name="numeroEconomico"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
                       <FormLabel>Número Económico</FormLabel>
                       <FormControl>
-                        <Input placeholder="Número económico" {...field} />
+                        <Input placeholder="Número económico" {...form.register("numeroEconomico")} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -468,10 +468,10 @@ export default function WasteDisposalForm() {
               <FormField
                 control={form.control}
                 name="tipoMaterial"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel><h1>Tipo de Material</h1><p className="text-xs text-muted-foreground/60">Dependiendo del formulario</p></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select {...form.register("tipoMaterial")}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar tipo de material" />
@@ -494,7 +494,7 @@ export default function WasteDisposalForm() {
               <FormField
                 control={form.control}
                 name="residuosSeleccionados"
-                render={({ field }) => (
+                render={() => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Residuos</FormLabel>
                     <Popover open={wasteCommandOpen} onOpenChange={setWasteCommandOpen}>
@@ -584,10 +584,10 @@ export default function WasteDisposalForm() {
               <FormField
                 control={form.control}
                 name="tipoContenedor"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Tipo de Contenedor</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select {...form.register("tipoContenedor")}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar tipo de contenedor" />
@@ -609,11 +609,11 @@ export default function WasteDisposalForm() {
               <FormField
                 control={form.control}
                 name="personaAutoriza"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Persona que Autoriza</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre de quien autoriza" {...field} />
+                      <Input placeholder="Nombre de quien autoriza" {...form.register("personaAutoriza")} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
