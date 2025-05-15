@@ -19,7 +19,7 @@ export default function TasksPage() {
 
   const handleLogSubmit = (logData: LogDataModalProps) => {
     if (selectedTask) {
-      completeTask(selectedTask.id, logData)
+      completeTask(selectedTask.id)
     }
     setIsLogModalOpen(false)
     setSelectedTask(null)
