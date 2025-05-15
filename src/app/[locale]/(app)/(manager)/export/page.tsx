@@ -83,43 +83,6 @@ export default function ExportPage() {
     setSelectedItem("all");
   }, [activeTab]);
 
-  // In your filtering logic, update the wasteTypeMatches condition
-  const getWasteTypeMatches = (log: LogEntry) => {
-    if (activeTab === "all" || selectedWasteType === "all") {
-      return true;
-    }
-
-    switch (log.tipoMaterial) {
-      case "metal":
-        return (log.residuos as MetalResiduo).tipoResiduo === selectedWasteType;
-      case "otros":
-        return (log.residuos as OtrosResiduo).tipoDesecho === selectedWasteType;
-      case "lodos":
-        return (log.residuos as LodosResiduo).nombreResiduo === selectedWasteType;
-      case "destruidas":
-        return (log.residuos as DestruidasResiduo).residuos === selectedWasteType;
-      default:
-        return true;
-    }
-  }
-
-  const getItemMatches = (log: LogEntry) => {
-    if (activeTab === "all" || selectedItem === "all") {
-      return true;
-    }
-
-    switch (log.tipoMaterial) {
-      case "metal":
-      case "otros":
-        return (log.residuos as MetalResiduo | OtrosResiduo).item === selectedItem;
-      case "lodos":
-      case "destruidas":
-        return (log.residuos as LodosResiduo | DestruidasResiduo).area === selectedItem;
-      default:
-        return true;
-    }
-  }
-
   // Get unique waste types and items
   const getWasteTypes = () => {
     const types = logs
@@ -161,12 +124,6 @@ export default function ExportPage() {
       .filter((item): item is string => item !== null);
     return Array.from(new Set(items));
   };
-
-  // Reset additional filters when tab changes
-  useEffect(() => {
-    setSelectedWasteType("all");
-    setSelectedItem("all");
-  }, [activeTab]);
 
   // Filter logs based on all criteria
   const filteredLogs = logs.filter((log) => {

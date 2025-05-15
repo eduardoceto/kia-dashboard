@@ -61,12 +61,6 @@ const statusConfig = {
   },
 }
 
-const frequencyLabels = {
-  daily: "Diario",
-  weekly: "Semanal",
-  monthly: "Mensual",
-}
-
 export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
   const [isHovering, setIsHovering] = useState(false)
   const router = useRouter()

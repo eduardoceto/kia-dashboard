@@ -153,7 +153,7 @@ export default function WasteDisposalForm() {
         // Log the full error object for more details
         console.error("Error fetching drivers:", error)
         let message = 'Detalles no disponibles';
-        if (error && typeof error === 'object' && 'message' in error && typeof (error as any).message === 'string') {
+        if (error && typeof error === 'object' && 'message' in error && typeof (error as { message?: unknown }).message === 'string') {
           message = (error as { message: string }).message;
         }
         setDriverError(`Error al cargar los choferes: ${message}. Intente de nuevo.`)

@@ -12,7 +12,6 @@ import { PiUserCircleGearFill } from "react-icons/pi";
 import { usePathname } from "next/navigation"
 import { routing } from "@/src/i18n/routing"; // Import routing from the correct file
 import { useUser } from "@/src/hooks/useUser";
-import { useEffect, useState } from "react";
 import formatUserName from "@/src/utils/formatUserName";
 
 

@@ -3,7 +3,6 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
-import { useUser } from "../hooks/useUser"
 
 interface LayoutProps {
     children: ReactNode;

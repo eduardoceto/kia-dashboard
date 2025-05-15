@@ -17,14 +17,6 @@ interface Task {
   area: string
 }
 
-// Define the LogData type
-interface LogData {
-  tipoResiduo: string
-  fecha: string
-  area: string
-  peso: number
-}
-
 // Helper function to check if a date is in the past
 const isDatePast = (dateString: string) => {
   // Parse the date string (assuming format DD/MM/YYYY)

@@ -1,7 +1,6 @@
 "use client";
 
-import { Calendar } from "lucide-react"
-import { FaBarsProgress, FaChartBar } from "react-icons/fa6";
+import { FaChartBar } from "react-icons/fa6";
 import { FaWeight } from "react-icons/fa";
 import { ChevronRight } from "lucide-react";
 import { useUser } from "@/src/hooks/useUser";
@@ -15,18 +14,13 @@ import { DashboardCard } from "@/src/components/ui/dashboard-card";
 import { getHistoricalLogs } from "@/src/components/testData/dataLogs";
 import type { LogEntry, LodosResiduo, MetalResiduo, OtrosResiduo, DestruidasResiduo } from "@/src/utils/log/log-utils";
 import {
-  getTotalWasteForYear,
   getWasteByType,
   getRecentLogs,
   getMonthlyWasteByType,
   getContainerTypeBreakdown,
   getLogCountForYear,
   getLogCountForMonth,
-  getAverageWastePerLog,
-  getLogsForLastNDays,
   getAverageWastePerLogByMaterial,
-  getTopCompanyForMonth,
-  getWasteByDepartmentForMonth,
   getMostActiveDriverForMonth,
 } from "@/src/utils/log/dashboard-utils";
 import { Progress } from "@/src/components/ui/progress";
@@ -133,15 +127,11 @@ export default function Dashboard() {
   const logCountYear = useMemo(() => getLogCountForYear(logs, year), [logs, year]);
   const logCountMonth = useMemo(() => getLogCountForMonth(logs, year, month), [logs, year, month]);
   const avgWastePerLog = useMemo(() => getAverageWastePerLogByMaterial(logs, year, selectedAvgType), [logs, year, selectedAvgType]);
-  const logsLast7Days = useMemo(() => getLogsForLastNDays(logs, 7, today), [logs, today]);
-  const topCompany = useMemo(() => getTopCompanyForMonth(logs, year, month), [logs, year, month]);
-  const wasteByDept = useMemo(() => getWasteByDepartmentForMonth(logs, year, month), [logs, year, month]);
   const mostActiveDriver = useMemo(() => getMostActiveDriverForMonth(logs, year, month), [logs, year, month]);
   const wasteByMaterialMonth = useMemo(() => getWasteByMaterialForMonth(logs, year, month), [logs, year, month]);
 
   // Pie chart data
   const pieData = Object.entries(wasteByType).map(([type, value]) => ({ name: type, value }));
-  const containerPieData = Object.entries(containerTypeBreakdown).map(([type, value]) => ({ name: type, value }));
 
   // Monthly progress
   const monthlyTotal = logs.filter(log => {
