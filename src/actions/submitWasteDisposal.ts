@@ -1,8 +1,10 @@
 "use server"
 
+import type { WasteDisposalFormValues } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form";
+
 // This is a server action that would handle the form submission
 // In a real application, this would connect to a database
-export async function submitWasteDisposal(formData: any) {
+export async function submitWasteDisposal(formData: WasteDisposalFormValues) {
   // Simulate a delay to mimic database operation
   await new Promise((resolve) => setTimeout(resolve, 1000))
 

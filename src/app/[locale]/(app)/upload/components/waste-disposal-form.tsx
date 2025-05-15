@@ -14,9 +14,9 @@ import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
 // Import new sub-components
 import AutomaticInfo from './waste-disposal-form/AutomaticInfo';
 import DriverInfo, { Driver } from './waste-disposal-form/DriverInfo'; // Assuming Driver interface is moved or exported
-import MaterialTypeSelection, { materialTypes } from './waste-disposal-form/MaterialTypeSelection'; // Assuming constants are moved/exported
-import WasteDetailsSection, { metalUnits } from './waste-disposal-form/WasteDetailsSection'; // Assuming constants are moved/exported
-import ContainerSelection, { containerTypes } from './waste-disposal-form/ContainerSelection'; // Assuming constants are moved/exported
+import MaterialTypeSelection from './waste-disposal-form/MaterialTypeSelection';
+import WasteDetailsSection from './waste-disposal-form/WasteDetailsSection';
+import ContainerSelection from './waste-disposal-form/ContainerSelection';
 import AuthorizingPersonInput from './waste-disposal-form/AuthorizingPersonInput';
 import DownloadConfirmationDialog from './waste-disposal-form/DownloadConfirmationDialog';
 
@@ -105,6 +105,17 @@ const formSchema = z.object({
 // Define the type for the form values based on the schema
 export type WasteDisposalFormValues = z.infer<typeof formSchema>;
 
+// New: Define the type for the full log entry (for PDF and submission)
+export type WasteDisposalLogEntry = WasteDisposalFormValues & {
+  fecha: string;
+  horaSalida: string;
+  folio: string;
+  departamento: string;
+  motivo: string;
+  residuos: any;
+  pesoTotal: string;
+};
+
 export default function WasteDisposalForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -113,7 +124,7 @@ export default function WasteDisposalForm() {
   const [isLoadingDrivers, setIsLoadingDrivers] = useState(true);
   const [driverError, setDriverError] = useState<string | null>(null);
   const [showDownloadAlert, setShowDownloadAlert] = useState(false);
-  const [pdfData, setPdfData] = useState<any>(null);
+  const [pdfData, setPdfData] = useState<WasteDisposalLogEntry | null>(null);
 
   const supabase = createClient();
 
@@ -130,9 +141,9 @@ export default function WasteDisposalForm() {
         if (error) throw error;
         if (data) setDrivers(data as Driver[]);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error fetching drivers:", error);
-        setDriverError(`Error al cargar los choferes: ${error?.message || 'Detalles no disponibles'}. Intente de nuevo.`);
+        setDriverError(`Error al cargar los choferes: ${error instanceof Error ? error.message : 'Detalles no disponibles'}. Intente de nuevo.`);
       } finally {
         setIsLoadingDrivers(false);
       }
@@ -258,17 +269,8 @@ export default function WasteDisposalForm() {
         totalWeight = wasteDetails.peso;
       }
 
-      const formData = {
-        // Map form values to the structure expected by submitWasteDisposal
-        nombreChofer: values.nombreChofer,
-        compania: values.compania,
-        procedencia: values.procedencia,
-        destino: values.destino,
-        placas: values.placas,
-        numeroEconomico: values.numeroEconomico,
-        tipoMaterial: values.tipoMaterial,
-        tipoContenedor: values.tipoContenedor,
-        personaAutoriza: values.personaAutoriza,
+      const formData: WasteDisposalLogEntry = {
+        ...values,
         fecha: currentDate,
         horaSalida: currentTime,
         folio: generatedNumber,
@@ -282,12 +284,12 @@ export default function WasteDisposalForm() {
       await submitWasteDisposal(formData);
 
       setSubmitSuccess(true);
-      setPdfData(formData); // Store data for PDF
+      setPdfData(formData);
       setShowDownloadAlert(true); // Show download prompt
       form.reset(); // Reset form fields
       setSelectedDriverId(""); // Reset driver selection
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error submitting form:", error);
       // Consider adding user-facing error feedback here
     } finally {

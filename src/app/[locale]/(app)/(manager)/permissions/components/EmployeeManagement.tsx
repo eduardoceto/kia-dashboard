@@ -131,9 +131,10 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
       setNewEmployee({ first_name: "", last_name:"", employee_id: "", email: "", password: "", role: "user", is_active: true });
       setIsAddEmployeeDialogOpen(false);
       fetchEmployees();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       console.error("Error adding employee:", error);
-      toast.error(`Failed to add employee: ${error.message}`);
+      toast.error(`Failed to add employee: ${errMsg}`);
     } finally {
       setIsSubmittingEmployee(false);
     }
@@ -162,9 +163,10 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
         setEditingEmployee(null);
         setIsEditEmployeeDialogOpen(false);
         fetchEmployees();
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error updating employee:", error);
-        toast.error(`Failed to update employee: ${error.message}`);
+        toast.error(`Failed to update employee: ${errMsg}`);
     } finally {
         setIsSubmittingEmployee(false);
     }
@@ -193,9 +195,10 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
 
           setEmployees(employees.map((emp) => (emp.id === pendingDeleteEmployee.id ? { ...emp, is_active: false } : emp)));
           toast.success("Employee deactivated successfully!");
-      } catch (error: any) {
+      } catch (error: unknown) {
+          const errMsg = error instanceof Error ? error.message : String(error);
           console.error("Error deactivating employee:", error);
-          toast.error(`Failed to deactivate employee: ${error.message}`);
+          toast.error(`Failed to deactivate employee: ${errMsg}`);
       } finally {
           setIsSubmittingEmployee(false);
           setPendingDeleteEmployee(null);
@@ -219,9 +222,10 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
       if (error) throw error;
       toast.success(`Employee ${action}d successfully!`);
       setEmployees(employees.map((emp) => (emp.id === id ? { ...emp, is_active: !currentStatus } : emp)));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       console.error(`Error toggling employee status (${action}):`, error);
-      toast.error(`Failed to ${action} employee: ${error.message}`);
+      toast.error(`Failed to ${action} employee: ${errMsg}`);
     } finally {
       setIsSubmittingEmployee(false);
       setPendingToggleEmployee(null);

@@ -20,7 +20,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner"
 import type { SupabaseClient } from '@supabase/supabase-js' // Import SupabaseClient type
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/src/components/ui/alert-dialog"
-import VehicleProductionForm from "../../other/components/VehicleProductionForm"
 
 // Define Driver type
 type Driver = {
@@ -138,9 +137,10 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
         setNewDriver({ first_name: "", last_name: "", company: "", origin: "", destination: "", vehicle_plates: "", economic_number: "", is_active: true });
         setIsAddDriverDialogOpen(false);
         fetchDrivers(); // Refresh the list
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error adding driver:", error);
-        toast.error(`Failed to add driver: ${error.message}`);
+        toast.error(`Failed to add driver: ${errMsg}`);
     } finally {
         setIsSubmittingDriver(false);
     }
@@ -171,9 +171,10 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
       setEditingDriver(null);
       setIsEditDriverDialogOpen(false);
       fetchDrivers(); // Refresh list
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       console.error("Error updating driver:", error);
-      toast.error(`Failed to update driver: ${error.message}`);
+      toast.error(`Failed to update driver: ${errMsg}`);
     } finally {
         setIsSubmittingDriver(false);
     }
@@ -202,9 +203,10 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
 
           setDrivers(drivers.map((drv) => (drv.id === pendingDeleteDriver.id ? { ...drv, is_active: false } : drv)));
           toast.success("Driver deactivated successfully!");
-      } catch (error: any) {
+      } catch (error: unknown) {
+          const errMsg = error instanceof Error ? error.message : String(error);
           console.error("Error deactivating driver:", error);
-          toast.error(`Failed to deactivate driver: ${error.message}`);
+          toast.error(`Failed to deactivate driver: ${errMsg}`);
       } finally {
           setIsSubmittingDriver(false);
           setPendingDeleteDriver(null);
@@ -228,9 +230,10 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
       if (error) throw error;
       toast.success(`Driver ${action}d successfully!`);
       setDrivers(drivers.map((drv) => (drv.id === id ? { ...drv, is_active: !currentStatus } : drv)));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
       console.error(`Error toggling driver status (${action}):`, error);
-      toast.error(`Failed to ${action} driver: ${error.message}`);
+      toast.error(`Failed to ${action} driver: ${errMsg}`);
     } finally {
       setIsSubmittingDriver(false);
       setPendingToggleDriver(null);

@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { LogEntry } from '@/src/utils/log/log-utils';
+import type { LogEntry, ResiduoDetails, LodosResiduo, MetalResiduo, OtrosResiduo, DestruidasResiduo } from '@/src/utils/log/log-utils';
 
 export function generatePdf(data: LogEntry) {
   const doc = new jsPDF();
@@ -35,38 +35,35 @@ export function generatePdf(data: LogEntry) {
   // Add waste-specific details based on material type
   if (data.residuos) {
     tableRows.push(['-- Detalles del Material --', '']);
-    
-    if (data.tipoMaterial === 'lodos') {
-      const residuos = data.residuos as any;
-      tableRows.push(['Nombre del Residuo', residuos.nombreResiduo || '']);
-      tableRows.push(['Manifiesto No.', residuos.manifiestoNo || '']);
-      tableRows.push(['Área', residuos.area || '']);
-      tableRows.push(['Transporte No. Servicios', residuos.transporteNoServicios || '']);
-      tableRows.push(['Peso (kg)', residuos.pesoKg || '']);
-    } 
-    else if (data.tipoMaterial === 'metal') {
-      const residuos = data.residuos as any;
-      tableRows.push(['Tipo de Residuo', residuos.tipoResiduo || '']);
-      tableRows.push(['Item', residuos.item || '']);
-      tableRows.push(['Cantidad', residuos.cantidad || '']);
-      tableRows.push(['Unidad', residuos.unidad || '']);
-      tableRows.push(['Remisión HMMX', residuos.remisionHMMX || '']);
-      tableRows.push(['Remisión Kia', residuos.remisionKia || '']);
-    } 
-    else if (data.tipoMaterial === 'otros') {
-      const residuos = data.residuos as any;
-      tableRows.push(['Tipo de Desecho', residuos.tipoDesecho || '']);
-      tableRows.push(['Item', residuos.item || '']);
-      tableRows.push(['Cantidad', residuos.cantidad || '']);
-      tableRows.push(['Unidad', residuos.unidad || '']);
-      tableRows.push(['Remisión HMMX', residuos.remisionHMMX || '']);
-      tableRows.push(['Remisión Kia', residuos.remisionKia || '']);
-    } 
-    else if (data.tipoMaterial === 'destruidas') {
-      const residuos = data.residuos as any;
-      tableRows.push(['Residuos', residuos.residuos || '']);
-      tableRows.push(['Área', residuos.area || '']);
-      tableRows.push(['Peso', residuos.peso || '']);
+    const residuos = data.residuos as ResiduoDetails;
+    if (data.tipoMaterial === 'lodos' && 'nombreResiduo' in residuos) {
+      const lodos = residuos as LodosResiduo;
+      tableRows.push(['Nombre del Residuo', lodos.nombreResiduo || '']);
+      tableRows.push(['Manifiesto No.', lodos.manifiestoNo || '']);
+      tableRows.push(['Área', lodos.area || '']);
+      tableRows.push(['Transporte No. Servicios', lodos.transporteNoServicios || '']);
+      tableRows.push(['Peso (kg)', lodos.pesoKg || '']);
+    } else if (data.tipoMaterial === 'metal' && 'tipoResiduo' in residuos) {
+      const metal = residuos as MetalResiduo;
+      tableRows.push(['Tipo de Residuo', metal.tipoResiduo || '']);
+      tableRows.push(['Item', metal.item || '']);
+      tableRows.push(['Cantidad', metal.cantidad || '']);
+      tableRows.push(['Unidad', metal.unidad || '']);
+      tableRows.push(['Remisión HMMX', metal.remisionHMMX || '']);
+      tableRows.push(['Remisión Kia', metal.remisionKia || '']);
+    } else if (data.tipoMaterial === 'otros' && 'tipoDesecho' in residuos) {
+      const otros = residuos as OtrosResiduo;
+      tableRows.push(['Tipo de Desecho', otros.tipoDesecho || '']);
+      tableRows.push(['Item', otros.item || '']);
+      tableRows.push(['Cantidad', otros.cantidad || '']);
+      tableRows.push(['Unidad', otros.unidad || '']);
+      tableRows.push(['Remisión HMMX', otros.remisionHMMX || '']);
+      tableRows.push(['Remisión Kia', otros.remisionKia || '']);
+    } else if (data.tipoMaterial === 'destruidas' && 'residuos' in residuos) {
+      const destruidas = residuos as DestruidasResiduo;
+      tableRows.push(['Residuos', destruidas.residuos || '']);
+      tableRows.push(['Área', destruidas.area || '']);
+      tableRows.push(['Peso', destruidas.peso || '']);
     }
   }
 
@@ -89,7 +86,7 @@ export function generatePdf(data: LogEntry) {
   });
 
   // Add signature lines at the bottom
-  const finalY = (doc as any).lastAutoTable.finalY || 200;
+  const finalY = (doc as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY ?? 200;
   doc.setFontSize(10);
   
   const signatureY = finalY + 30;

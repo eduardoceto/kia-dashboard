@@ -388,7 +388,7 @@ export default function HistoryPage() {
             {filteredLogs.length} {filteredLogs.length === 1 ? "registro encontrado" : "registros encontrados"}
             {searchTerm && (
               <span className="ml-1">
-                para "<span className="font-medium">{searchTerm}</span>"
+                para &quot;<span className="font-medium">{searchTerm}</span>&quot;
               </span>
             )}
           </CardDescription>
@@ -484,7 +484,9 @@ export default function HistoryPage() {
                           <TableCell className="text-right font-medium">
                             {log.pesoTotal}{" "}
                             {log.tipoMaterial === "otros" || log.tipoMaterial === "metal"
-                              ? (log.residuos as any)?.unidad || "KG"
+                              ? "unidad" in log.residuos
+                                ? log.residuos.unidad || "KG"
+                                : "KG"
                               : "KG"}
                           </TableCell>
                           <TableCell className="text-right">
@@ -590,7 +592,9 @@ export default function HistoryPage() {
                                         <p>
                                           {selectedLog.pesoTotal}{" "}
                                           {selectedLog.tipoMaterial === "otros" || selectedLog.tipoMaterial === "metal"
-                                            ? (selectedLog.residuos as any)?.unidad || "KG"
+                                            ? "unidad" in selectedLog.residuos
+                                              ? selectedLog.residuos.unidad || "KG"
+                                              : "KG"
                                             : "KG"}
                                         </p>
                                       </div>
