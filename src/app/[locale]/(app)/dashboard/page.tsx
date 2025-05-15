@@ -116,14 +116,12 @@ export default function Dashboard() {
   const logs = useMemo(() => getHistoricalLogs(), []);
   const year = 2025; // Today is 11 May 2025
   const month = 4; // May (0-indexed)
-  const today = useMemo(() => new Date("2025-05-11"), []);
 
   // Aggregated data
   const wasteByType = useMemo(() => getWasteByType(logs, year), [logs, year]);
   const [selectedType, setSelectedType] = useState<string>(Object.keys(wasteByType)[0] || "metal");
   const [selectedAvgType, setSelectedAvgType] = useState<string>(Object.keys(wasteByType)[0] || "metal");
   const monthlyWaste = useMemo(() => getMonthlyWasteByType(logs, year, selectedType), [logs, year, selectedType]);
-  const containerTypeBreakdown = useMemo(() => getContainerTypeBreakdown(logs, year), [logs, year]);
   const logCountYear = useMemo(() => getLogCountForYear(logs, year), [logs, year]);
   const logCountMonth = useMemo(() => getLogCountForMonth(logs, year, month), [logs, year, month]);
   const avgWastePerLog = useMemo(() => getAverageWastePerLogByMaterial(logs, year, selectedAvgType), [logs, year, selectedAvgType]);

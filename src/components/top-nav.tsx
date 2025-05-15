@@ -10,7 +10,6 @@ import { FaCircleUser } from "react-icons/fa6"; // Import the icon here
 import { UserProfile } from "@/types";
 import { PiUserCircleGearFill } from "react-icons/pi";
 import { usePathname } from "next/navigation"
-import { routing } from "@/src/i18n/routing"; // Import routing from the correct file
 import { useUser } from "@/src/hooks/useUser";
 import formatUserName from "@/src/utils/formatUserName";
 
