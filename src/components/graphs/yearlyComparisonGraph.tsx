@@ -14,7 +14,7 @@ function CombinedChart({
   }: { title: string; data?: typeof mockCombinedData; height?: string }) {
     const [showComparison, setShowComparison] = useState<boolean>(true)
 
-    const [selectedMaterial, setSelectedMaterial] = useState(mockData.materials[0])
+    const [selectedMaterial] = useState(mockData.materials[0])
 
     // Calculate max values for y-axis scaling
     const maxKg = Math.max(
@@ -40,7 +40,7 @@ function CombinedChart({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Material:</span>
-              <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
+              <Select value={selectedMaterial}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select material" />
                 </SelectTrigger>
@@ -157,7 +157,7 @@ function CombinedChart({
   
   // Year-over-year comparison dashboard
 export function YearComparisonGraph() {
-  const [selectedMaterial, setSelectedMaterial] = useState(mockData.materials[0])
+  const [selectedMaterial] = useState(mockData.materials[0])
     return (
       <div className="space-y-6">
         

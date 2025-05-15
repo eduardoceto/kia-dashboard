@@ -143,7 +143,7 @@ export function useTasks() {
   }, [])
 
   // Complete a task with log data
-  const completeTask = (taskId: string, _logData: LogData) => {
+  const completeTask = (taskId: string) => {
     setTasks((prevTasks) => {
       return prevTasks.map((task) => {
         if (task.id === taskId) {

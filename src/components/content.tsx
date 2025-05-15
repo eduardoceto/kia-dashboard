@@ -1,9 +1,8 @@
 import { Calendar, CreditCard, Wallet } from "lucide-react"
 import List01 from "./list-01"
 import List02 from "./list-02"
-import List03 from "./list-03"
 
-export default function () {
+function Content() {
   return (
     <div className="space-y-4">
       <div className="bg-white dark:bg-[#0F0F12] rounded-xl p-6 flex flex-col items-start justify-start border border-gray-200 dark:border-[#1F1F23]">
@@ -11,7 +10,6 @@ export default function () {
           <Calendar className="KiaSignature w-3.5 h-3.5 text-zinc-900 dark:text-zinc-50" />
           Upcoming Events
         </h2>
-        <List03 />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -39,3 +37,5 @@ export default function () {
     </div>
   )
 }
+
+export default Content;

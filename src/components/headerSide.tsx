@@ -4,15 +4,13 @@ import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
 import { useUser } from "../hooks/useUser"
-import { LoaderCircle } from "lucide-react"
 
 interface LayoutProps {
     children: ReactNode;
 }
 
-export default function HeaderSide({ children }: LayoutProps) { // Destructure userProfile
+export default function HeaderSide({ children }: LayoutProps) {
     const [mounted, setMounted] = useState(false)
-    const { profile: userProfile } = useUser()
 
     useEffect(() => {
         setMounted(true)

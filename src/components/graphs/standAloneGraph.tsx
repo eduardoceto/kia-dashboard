@@ -21,9 +21,9 @@ const mockData = {
 }
 
 export function StandaloneGraph() {
-    const [location, setLocation] = useState(mockData.locations[Math.floor(Math.random() * mockData.locations.length)])
-    const [material, setMaterial] = useState(mockData.materials[Math.floor(Math.random() * mockData.materials.length)])
-    const [timeRange, setTimeRange] = useState("Last Month") // Set time range to "Last Month"
+    const [location] = useState(mockData.locations[Math.floor(Math.random() * mockData.locations.length)])
+    const [material] = useState(mockData.materials[Math.floor(Math.random() * mockData.materials.length)])
+    const [timeRange] = useState("Last Month") // Set time range to "Last Month"
   
     const data = mockData.getData(location, material, timeRange)
   

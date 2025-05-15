@@ -33,6 +33,10 @@ import {
   getResidueManifestNo,
   getResidueTransport,
   getResidueArea,
+  type MetalResiduo,
+  type OtrosResiduo,
+  type LodosResiduo,
+  type DestruidasResiduo,
 } from "@/src/utils/log/log-utils"
 
 export default function ExportPage() {
@@ -87,13 +91,13 @@ export default function ExportPage() {
 
     switch (log.tipoMaterial) {
       case "metal":
-        return (log.residuos as any).tipoResiduo === selectedWasteType;
+        return (log.residuos as MetalResiduo).tipoResiduo === selectedWasteType;
       case "otros":
-        return (log.residuos as any).tipoDesecho === selectedWasteType;
+        return (log.residuos as OtrosResiduo).tipoDesecho === selectedWasteType;
       case "lodos":
-        return (log.residuos as any).nombreResiduo === selectedWasteType;
+        return (log.residuos as LodosResiduo).nombreResiduo === selectedWasteType;
       case "destruidas":
-        return (log.residuos as any).residuos === selectedWasteType;
+        return (log.residuos as DestruidasResiduo).residuos === selectedWasteType;
       default:
         return true;
     }
@@ -107,21 +111,14 @@ export default function ExportPage() {
     switch (log.tipoMaterial) {
       case "metal":
       case "otros":
-        return (log.residuos as any).item === selectedItem;
+        return (log.residuos as MetalResiduo | OtrosResiduo).item === selectedItem;
       case "lodos":
       case "destruidas":
-        return (log.residuos as any).area === selectedItem;
+        return (log.residuos as LodosResiduo | DestruidasResiduo).area === selectedItem;
       default:
         return true;
     }
   }
-
-const getLogMatches = (log: LogEntry) => {
-  return {
-    wasteTypeMatches: getWasteTypeMatches(log),
-    itemMatches: getItemMatches(log)
-  };
-};
 
   // Get unique waste types and items
   const getWasteTypes = () => {
@@ -130,13 +127,13 @@ const getLogMatches = (log: LogEntry) => {
       .map((log) => {
         switch (log.tipoMaterial) {
           case "metal":
-            return (log.residuos as any).tipoResiduo;
+            return (log.residuos as MetalResiduo).tipoResiduo;
           case "otros":
-            return (log.residuos as any).tipoDesecho;
+            return (log.residuos as OtrosResiduo).tipoDesecho;
           case "lodos":
-            return (log.residuos as any).nombreResiduo;
+            return (log.residuos as LodosResiduo).nombreResiduo;
           case "destruidas":
-            return (log.residuos as any).residuos;
+            return (log.residuos as DestruidasResiduo).residuos;
           default:
             return null;
         }
@@ -152,11 +149,11 @@ const getLogMatches = (log: LogEntry) => {
         switch (log.tipoMaterial) {
           case "metal":
           case "otros":
-            return (log.residuos as any).item;
+            return (log.residuos as MetalResiduo | OtrosResiduo).item;
           case "lodos":
-            return (log.residuos as any).area;
+            return (log.residuos as LodosResiduo).area;
           case "destruidas":
-            return (log.residuos as any).area;
+            return (log.residuos as DestruidasResiduo).area;
           default:
             return null;
         }
@@ -193,16 +190,16 @@ const getLogMatches = (log: LogEntry) => {
     if (activeTab !== "all" && selectedWasteType !== "all") {
       switch (log.tipoMaterial) {
         case "metal":
-          wasteTypeMatches = (log.residuos as any).tipoResiduo === selectedWasteType;
+          wasteTypeMatches = (log.residuos as MetalResiduo).tipoResiduo === selectedWasteType;
           break;
         case "otros":
-          wasteTypeMatches = (log.residuos as any).tipoDesecho === selectedWasteType;
+          wasteTypeMatches = (log.residuos as OtrosResiduo).tipoDesecho === selectedWasteType;
           break;
         case "lodos":
-          wasteTypeMatches = (log.residuos as any).nombreResiduo === selectedWasteType;
+          wasteTypeMatches = (log.residuos as LodosResiduo).nombreResiduo === selectedWasteType;
           break;
         case "destruidas":
-          wasteTypeMatches = (log.residuos as any).residuos === selectedWasteType;
+          wasteTypeMatches = (log.residuos as DestruidasResiduo).residuos === selectedWasteType;
           break;
       }
     }
@@ -213,11 +210,11 @@ const getLogMatches = (log: LogEntry) => {
       switch (log.tipoMaterial) {
         case "metal":
         case "otros":
-          itemMatches = (log.residuos as any).item === selectedItem;
+          itemMatches = (log.residuos as MetalResiduo | OtrosResiduo).item === selectedItem;
           break;
         case "lodos":
         case "destruidas":
-          itemMatches = (log.residuos as any).area === selectedItem;
+          itemMatches = (log.residuos as LodosResiduo | DestruidasResiduo).area === selectedItem;
           break;
       }
     }
@@ -655,7 +652,7 @@ const getLogMatches = (log: LogEntry) => {
                           <TableCell className="text-right font-medium">
                             {log.pesoTotal}{" "}
                             {log.tipoMaterial === "otros" || log.tipoMaterial === "metal"
-                              ? (log.residuos as any)?.unidad || "KG"
+                              ? ((log.residuos as MetalResiduo | OtrosResiduo)?.unidad || "KG")
                               : "KG"}
                           </TableCell>
                         </TableRow>

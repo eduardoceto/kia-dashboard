@@ -149,12 +149,14 @@ export default function WasteDisposalForm() {
           // Ensure the fetched data matches the Driver interface
           setDrivers(data as Driver[])
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Log the full error object for more details
         console.error("Error fetching drivers:", error)
-        // Optionally, try stringifying if the object is complex or doesn't log well
-        // console.error("Error fetching drivers (stringified):", JSON.stringify(error, null, 2));
-        setDriverError(`Error al cargar los choferes: ${error?.message || 'Detalles no disponibles'}. Intente de nuevo.`)
+        let message = 'Detalles no disponibles';
+        if (error && typeof error === 'object' && 'message' in error && typeof (error as any).message === 'string') {
+          message = (error as { message: string }).message;
+        }
+        setDriverError(`Error al cargar los choferes: ${message}. Intente de nuevo.`)
       } finally {
         setIsLoadingDrivers(false)
       }

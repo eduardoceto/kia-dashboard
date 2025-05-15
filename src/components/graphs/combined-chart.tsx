@@ -107,7 +107,6 @@ interface CombinedChartProps {
 }
 
 export function CombinedChart({ title, data = mockCombinedData, height = "h-[500px]" }: CombinedChartProps) {
-  const [year, setYear] = useState<"2023" | "2024">("2024")
   const [showComparison, setShowComparison] = useState<boolean>(true)
 
   // Calculate max values for y-axis scaling
@@ -169,7 +168,7 @@ export function CombinedChart({ title, data = mockCombinedData, height = "h-[500
               />
               <Tooltip
                 formatter={(value, name) => {
-                  if (name.includes("Vehicle")) {
+                  if (typeof name === 'string' && name.includes("Vehicle")) {
                     return [`${value} kg/vehicle`, name]
                   }
                   return [`${value.toLocaleString()} kg`, name]

@@ -7,8 +7,7 @@ import { Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger } from "@/src/components/ui/accordion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import UploadLogPage from "./components/UploadLog"
+import { Card, CardContent } from "@/src/components/ui/card"
 
 export default function Upload() {
   return (
@@ -40,18 +39,6 @@ export default function Upload() {
       <Card className="w-full">
         <CardContent>
         <Accordion type="single" defaultValue="Registro de Salida de Residuos" collapsible>
-
-        {/* <AccordionItem value="Registro de Residuos">
-            <AccordionTrigger>
-                <div className="flex flex-col items-start text-left p-1">
-                    <h3 className="text-lg font-medium hover:cursor-pointer">Registro de Residuos</h3>
-                    <p className="text-sm text-muted-foreground ">Ingresar los residuos generados por planta</p>
-                </div>
-            </AccordionTrigger>
-            <AccordionContent className="w-full">
-              <UploadLogPage />
-            </AccordionContent>
-          </AccordionItem> */}
 
           <AccordionItem value="Registro de Salida de Residuos">
             <AccordionTrigger>

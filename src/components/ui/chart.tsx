@@ -1,41 +1,30 @@
 import type React from "react"
 
-export const AreaChart = ({ children, data, margin }: { children: React.ReactNode; data: any[]; margin: any }) => {
+export const AreaChart = ({ children }: { children: React.ReactNode }) => {
   return <svg>{children}</svg>
 }
 
-export const Area = ({
-  type,
-  dataKey,
-  stroke,
-  fill,
-  fillOpacity,
-  name,
-}: { type: string; dataKey: string; stroke: string; fill: string; fillOpacity: number; name: string }) => {
+export const Area = ({ children }: { children?: React.ReactNode }) => {
+  return <g>{children}</g>
+}
+
+export const XAxis = () => {
   return <g />
 }
 
-export const XAxis = ({ dataKey, label }: { dataKey: string; label: any }) => {
+export const YAxis = () => {
   return <g />
 }
 
-export const YAxis = ({ label }: { label: any }) => {
+export const CartesianGrid = () => {
   return <g />
 }
 
-export const CartesianGrid = ({ strokeDasharray }: { strokeDasharray: string }) => {
+export const Tooltip = () => {
   return <g />
 }
 
-export const Tooltip = ({ formatter, labelFormatter }: { formatter: any; labelFormatter: any }) => {
-  return <g />
-}
-
-export const ResponsiveContainer = ({
-  children,
-  width,
-  height,
-}: { children: React.ReactNode; width: string; height: string }) => {
+export const ResponsiveContainer = ({ children }: { children: React.ReactNode }) => {
   return <div>{children}</div>
 }
 

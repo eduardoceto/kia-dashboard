@@ -10,6 +10,7 @@ import { Form } from "@/src/components/ui/form";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { createClient } from "@/src/utils/supabase/client";
 import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
+import type { ResiduoDetails } from "@/src/utils/log/log-utils";
 
 // Import new sub-components
 import AutomaticInfo from './waste-disposal-form/AutomaticInfo';
@@ -112,7 +113,7 @@ export type WasteDisposalLogEntry = WasteDisposalFormValues & {
   folio: string;
   departamento: string;
   motivo: string;
-  residuos: any;
+  residuos: ResiduoDetails;
   pesoTotal: string;
 };
 
@@ -227,7 +228,7 @@ export default function WasteDisposalForm() {
   async function onSubmit(values: WasteDisposalFormValues) {
     setIsSubmitting(true);
     try {
-      let wasteDetails: any = {};
+      let wasteDetails: ResiduoDetails = {};
       let totalWeight: string | number = 0;
 
       // Calculate wasteDetails and totalWeight based on tipoMaterial
@@ -237,36 +238,36 @@ export default function WasteDisposalForm() {
           manifiestoNo: values.lodos_manifiestoNo,
           area: values.lodos_area,
           transporteNoServicios: values.lodos_transporteNoServicios,
-          pesoKg: parseFloat(values.lodos_pesoKg || "0"),
+          pesoKg: parseFloat(values.lodos_pesoKg || "0") || 0,
         };
-        totalWeight = wasteDetails.pesoKg;
+        totalWeight = wasteDetails.pesoKg ?? 0;
       } else if (values.tipoMaterial === "metal") {
         wasteDetails = {
           tipoResiduo: values.metal_tipoResiduo,
           item: values.metal_item,
-          cantidad: parseFloat(values.metal_cantidad || "0"),
+          cantidad: parseFloat(values.metal_cantidad || "0") || 0,
           unidad: values.metal_unidad,
           remisionHMMX: values.metal_remisionHMMX,
           remisionKia: values.metal_remisionKia,
         };
-        totalWeight = values.metal_unidad === 'kg' ? wasteDetails.cantidad : 0;
+        totalWeight = values.metal_unidad === 'kg' ? (wasteDetails.cantidad ?? 0) : 0;
       } else if (values.tipoMaterial === "otros") {
         wasteDetails = {
           tipoDesecho: values.otros_tipoDesecho,
           item: values.otros_item,
-          cantidad: parseFloat(values.otros_cantidad || "0"),
+          cantidad: parseFloat(values.otros_cantidad || "0") || 0,
           unidad: values.otros_unidad,
           remisionHMMX: values.otros_remisionHMMX,
           remisionKia: values.otros_remisionKia,
         };
-        totalWeight = values.otros_unidad === 'kg' ? wasteDetails.cantidad : 0;
+        totalWeight = values.otros_unidad === 'kg' ? (wasteDetails.cantidad ?? 0) : 0;
       } else if (values.tipoMaterial === "destruidas") {
         wasteDetails = {
           residuos: values.destruidas_residuos,
           area: values.destruidas_area,
-          peso: parseFloat(values.destruidas_peso || "0"),
+          peso: parseFloat(values.destruidas_peso || "0") || 0,
         };
-        totalWeight = wasteDetails.peso;
+        totalWeight = wasteDetails.peso ?? 0;
       }
 
       const formData: WasteDisposalLogEntry = {

@@ -1,10 +1,9 @@
 "use client";
 
 import { Calendar } from "lucide-react"
-import DashCard from "./components/dash-card"
-import { FaBarsProgress, FaIndustry, FaChartBar, FaBuilding } from "react-icons/fa6";
+import { FaBarsProgress, FaChartBar } from "react-icons/fa6";
 import { FaWeight } from "react-icons/fa";
-import { ChevronRight, Plus, X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useUser } from "@/src/hooks/useUser";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
@@ -36,7 +35,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/src/components/ui/button";
 import { Download } from "lucide-react";
 import { generatePdf } from "@/src/actions/generatePdf";
-import { formatDate, formatShortDate } from "@/src/utils/log/log-utils";
+import { formatDate } from "@/src/utils/log/log-utils";
 
 
 function DashboardHeader() {
@@ -54,7 +53,7 @@ function DashboardHeader() {
     return segment.replace(/[-_]/g, " ").replace(/\b\w/g, l => l.toUpperCase());
   }
   const rawSegments = pathname.split("/").filter(Boolean);
-  const localeSegment = routing.locales.includes(rawSegments[0] as any) ? rawSegments[0] : null;
+  const localeSegment = routing.locales.includes(rawSegments[0] as (typeof routing.locales)[number]) ? rawSegments[0] : null;
   const displaySegments = localeSegment ? rawSegments.slice(1) : rawSegments;
   const baseHref = localeSegment ? `/${localeSegment}` : '/';
   const breadcrumbs = [
@@ -103,12 +102,6 @@ function DashboardHeader() {
   );
 }
 
-const ALL_CARDS = [
-  { id: "progress", label: "Progress", icon: <FaBarsProgress className="w-3.5 h-3.5 text-foreground" /> },
-  { id: "tasks", label: "My Tasks", icon: <Calendar className="w-3.5 h-3.5 text-foreground" /> },
-];
-
-const WASTE_TARGET = 100000; // yearly target in kg
 const MONTHLY_TARGET = 10000; // monthly target in kg
 const COLORS = ["#2563eb", "#22c55e", "#f59e42", "#ef4444"];
 
@@ -129,12 +122,10 @@ export default function Dashboard() {
   const logs = useMemo(() => getHistoricalLogs(), []);
   const year = 2025; // Today is 11 May 2025
   const month = 4; // May (0-indexed)
-  const today = new Date("2025-05-11");
+  const today = useMemo(() => new Date("2025-05-11"), []);
 
   // Aggregated data
-  const totalWaste = useMemo(() => getTotalWasteForYear(logs, year), [logs, year]);
   const wasteByType = useMemo(() => getWasteByType(logs, year), [logs, year]);
-  const recentLogs = useMemo(() => getRecentLogs(logs, 5), [logs]);
   const [selectedType, setSelectedType] = useState<string>(Object.keys(wasteByType)[0] || "metal");
   const [selectedAvgType, setSelectedAvgType] = useState<string>(Object.keys(wasteByType)[0] || "metal");
   const monthlyWaste = useMemo(() => getMonthlyWasteByType(logs, year, selectedType), [logs, year, selectedType]);
@@ -161,6 +152,8 @@ export default function Dashboard() {
 
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const recentLogs = useMemo<LogEntry[]>(() => getRecentLogs(logs, 5), [logs]);
 
   return (
     <div className="space-y-8 bg-[#f6f7fb] min-h-screen p-6">
@@ -240,7 +233,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Recent Waste Logs Table (redesigned, wide) */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaIndustry className="text-gray-500" />Recent Waste Logs</span>} className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md p-6 col-span-2 flex flex-col justify-between h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-gray-500" />Recent Waste Logs</span>} className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md p-6 col-span-2 flex flex-col justify-between h-full min-h-[260px]">
           <div className="overflow-x-auto">
             <table className="min-w-full text-xs border-separate border-spacing-y-2">
               <thead>
@@ -255,7 +248,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentLogs.map((log, idx) => {
+                {recentLogs.map((log: LogEntry, idx: number) => {
                   // Color by waste type
                   const typeColor = {
                     metal: "bg-blue-500",
@@ -366,7 +359,7 @@ export default function Dashboard() {
                                   <div>
                                     <h3 className="text-sm font-medium text-muted-foreground">Total Weight</h3>
                                     <p>
-                                      {selectedLog.pesoTotal} {selectedLog.tipoMaterial === "otros" || selectedLog.tipoMaterial === "metal" ? (selectedLog.residuos as any)?.unidad || "KG" : "KG"}
+                                      {selectedLog.pesoTotal} {selectedLog.tipoMaterial === "otros" || selectedLog.tipoMaterial === "metal" ? ((selectedLog.residuos as MetalResiduo | OtrosResiduo)?.unidad || "KG") : "KG"}
                                     </p>
                                   </div>
                                 </div>

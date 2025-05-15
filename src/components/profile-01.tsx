@@ -1,13 +1,10 @@
 // filepath: /Users/eduardo/Library/CloudStorage/OneDrive-Personal/Programacion/Clases/DesarrolloWeb/Dashboard/kia-dashboard/src/components/profile-01.tsx
 "use client" // Add "use client" directive
 
-import { Icon, LogOut, MoveUpRight, Settings } from "lucide-react"
-import Image from "next/image"
+import { LogOut, MoveUpRight, Settings } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "../utils/supabase/client" // Use client Supabase client
 import { useRouter } from 'next/navigation' // Import useRouter for redirection
-import { IconType } from "react-icons/lib"
-import { FaUserClock } from "react-icons/fa"
 import { FaCircleUser } from "react-icons/fa6"
 import { PiUserCircleGearFill } from "react-icons/pi";
 import { toast } from "sonner"
