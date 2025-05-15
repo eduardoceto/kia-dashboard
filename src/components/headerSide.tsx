@@ -3,7 +3,6 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import Sidebar from "@/src/components/sidebar"
-import TopNav from "@/src/components/top-nav"
 import { useUser } from "../hooks/useUser"
 import { LoaderCircle } from "lucide-react"
 
@@ -28,7 +27,6 @@ export default function HeaderSide({ children }: LayoutProps) { // Destructure u
         <div className={`flex h-screen bg-[#05141F]`}>
             <Sidebar />
             <div className="KiaSignature w-full flex flex-1 flex-col">
-                <TopNav userProfile={userProfile ?? undefined} />
                 <main className="flex-1 overflow-auto p-6 bg-background">
                     {children}
                 </main>

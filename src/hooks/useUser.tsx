@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react"; // Import React
 import { createClient } from "@/src/utils/supabase/client"; // Import the specific error type if available
+import { Loader2 } from "lucide-react";
 
 // Define a more specific type for the profile if possible
 // For now, using 'any' but adding 'role' for clarity
@@ -139,7 +140,15 @@ export const UserContextProvider = (props: UserProviderProps) => {
     // Optional: Render children only when initial loading is done,
     // or let consuming components handle the loading state.
     if (loading && profile === null) { // Example: Show loading only on initial load
-        return <div>Loading user...</div>;
+        return (
+            <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+                <div className="flex flex-col items-center space-y-4 text-[#05141F]">
+                    <Loader2 className="h-12 w-12 animate-spin" />
+                    <p className="text-lg font-medium">Cargando usuario...</p>
+                    <p className="text-sm text-muted-foreground">Por favor espera un momento.</p>
+                </div>
+            </main>
+        );
     }
 
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
