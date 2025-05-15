@@ -17,7 +17,6 @@ import {
   getWasteByType,
   getRecentLogs,
   getMonthlyWasteByType,
-  getContainerTypeBreakdown,
   getLogCountForYear,
   getLogCountForMonth,
   getAverageWastePerLogByMaterial,
