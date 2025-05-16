@@ -13,7 +13,12 @@ const LogUploadProvider = () => {
     if (!isOpen) return null;
 
     return (
-            <LogUploadModal />
+        <LogUploadModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onSubmit={() => {}}
+            task={null}
+        />
     )
 }
 
