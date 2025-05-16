@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
 @plugin "tailwindcss-radix";
 
 @theme {
@@ -87,5 +88,4 @@
       display:none;
   }
 }
-
 
