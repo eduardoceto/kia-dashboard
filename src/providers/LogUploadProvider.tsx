@@ -7,7 +7,7 @@ const LogUploadProvider = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        setIsOpen(true);
+        setIsOpen(false);
     }, []);
 
     if (!isOpen) return null;
@@ -23,3 +23,4 @@ const LogUploadProvider = () => {
 }
 
 export default LogUploadProvider;
+
