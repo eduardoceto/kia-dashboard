@@ -268,9 +268,9 @@ export default function Dashboard() {
                       <td className="px-2 py-2">
                         <Dialog open={isDialogOpen && selectedLog?.folio === log.folio} onOpenChange={(open) => { if (!open) setSelectedLog(null); setIsDialogOpen(open); }}>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={() => { setSelectedLog(log); setIsDialogOpen(true); }} className="text-primary">Details</Button>
+                            <Button variant="outline" size="sm" onClick={() => { setSelectedLog(log); setIsDialogOpen(true); }} className="text-primary bg-popover">Details</Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-popover">
                             <div className="flex justify-between items-center mb-4">
                               <DialogTitle>Log Details</DialogTitle>
                             </div>

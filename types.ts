@@ -85,3 +85,75 @@ export type WasteDisposal = {
   tipoContenedor: string
   personaAutoriza: string
 }
+
+export type waste_types = {
+  waste_types_id: number
+  waste_type: string
+}
+
+export type wastes = {
+  wastes_id: number
+  waste_type_id: number
+  waste: string
+}
+
+export type waste_logs = {
+  logs_id: number
+  user_id: number
+  area_id: number
+  weight: number
+  REM: number
+  Type: number
+  driver_id: number
+  recolection_date: Date
+}
+
+export type users = {
+  id: number
+  role: string
+  employee_id: string
+  is_active: boolean
+  created_at: Date
+  locale: string
+  first_name: string
+  last_name: string
+  email: string
+  area_id: number
+}
+
+export type areas = {
+  areas_id: number
+  name: string
+}
+
+export type drivers = {
+  id: number
+  first_name: string
+  last_name: string
+  company: string
+  origin: string
+  destination: string
+  vehicle_plate: string
+  economic_number: string
+  is_active: boolean
+  created_at: Date
+}
+
+export type WasteDisposalLog = {
+  log_id: number; // primary key
+  user_id: string; // foreign key to users (UUID)
+  area_id: string; // foreign key to areas (UUID)
+  driver_id: string; // foreign key to drivers (UUID)
+  date: string; // formerly 'fecha'
+  departure_time: string; // formerly 'hora_salida'
+  folio: string;
+  department: string; // formerly 'departamento'
+  reason: string; // formerly 'motivo'
+  material_type: string; // formerly 'tipo_material'
+  container_type: string; // formerly 'tipo_contenedor'
+  authorizing_person: string; // formerly 'persona_autoriza'
+  waste_details: object; // JSONB, dynamic waste details (formerly 'residuos')
+  total_weight: string; // formerly 'peso_total'
+  created_at: Date;
+  updated_at: Date;
+};

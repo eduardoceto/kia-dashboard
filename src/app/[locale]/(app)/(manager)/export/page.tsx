@@ -210,7 +210,7 @@ export default function ExportPage() {
           templatePath = "/TemplateOthers.xlsx"
           break
         case "destruidas": // Assuming this corresponds to Uretano/Vidrio/Autopartes
-          templatePath = "/TempleteUretano.xlsx" // Note the typo in the actual filename
+          templatePath = "/TemplateUretano.xlsx" // Note the typo in the actual filename
           break
         default:
           setExportError("Invalid material type selected.")
@@ -236,8 +236,6 @@ export default function ExportPage() {
       }
 
       // --- Data Population Logic --- 
-      // This part needs to be adapted based on the *actual* structure of each template.
-      // The following is a placeholder/example assuming row 2 is the start.
       let startRow = 0
       if (activeTab === "metal") {
         startRow = 5
@@ -354,7 +352,7 @@ export default function ExportPage() {
 
           <div className="flex items-center gap-2">
             <Link href="/history">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button variant="outline" className="flex items-center gap-2 bg-primary-foreground">
                 <FileSpreadsheet className="h-4 w-4" />
                 Ver Historial
               </Button>

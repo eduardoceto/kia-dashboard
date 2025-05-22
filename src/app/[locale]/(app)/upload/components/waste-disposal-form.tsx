@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/src/components/ui/card";
 import { createClient } from "@/src/utils/supabase/client";
 import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
 import type { ResiduoDetails } from "@/src/utils/log/log-utils";
+import { useUser } from "@/src/hooks/useUser";
 
 // Import new sub-components
 import AutomaticInfo from './waste-disposal-form/AutomaticInfo';
@@ -117,6 +118,21 @@ export type WasteDisposalLogEntry = WasteDisposalFormValues & {
   pesoTotal: string;
 };
 
+function mapMaterialType(tipoMaterial: string): string {
+  switch (tipoMaterial) {
+    case "metal":
+      return "Metallic/nonMetallic";
+    case "lodos":
+      return "Sludge";
+    case "otros":
+      return "Other Recyclables";
+    case "destruidas":
+      return "Uretano/Vidrio/Autopartes Destruidas";
+    default:
+      return tipoMaterial;
+  }
+}
+
 export default function WasteDisposalForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -128,6 +144,7 @@ export default function WasteDisposalForm() {
   const [pdfData, setPdfData] = useState<WasteDisposalLogEntry | null>(null);
 
   const supabase = createClient();
+  const { profile } = useUser();
 
   // Fetch Drivers Effect
   useEffect(() => {
@@ -270,7 +287,41 @@ export default function WasteDisposalForm() {
         totalWeight = wasteDetails.peso ?? 0;
       }
 
-      const formData: WasteDisposalLogEntry = {
+      // Use string IDs (UUIDs)
+      const userId = String(profile?.id);
+      const areaId = String(profile?.area_id);
+      const driverId = String(selectedDriverId);
+
+      if (!userId || !areaId || !driverId) {
+        alert("User, area, or driver not selected.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Build the log object for DB submission
+      const log = {
+        user_id: userId,
+        area_id: areaId,
+        driver_id: driverId,
+        date: currentDate,
+        departure_time: currentTime,
+        folio: generatedNumber,
+        department: "EHS",
+        reason: "waste",
+        material_type: mapMaterialType(values.tipoMaterial),
+        container_type: values.tipoContenedor,
+        authorizing_person: values.personaAutoriza,
+        waste_details: wasteDetails,
+        total_weight: (typeof totalWeight === 'number' ? totalWeight : parseFloat(totalWeight || "0")).toFixed(2),
+      };
+
+      // Send only the log object to the DB
+      await submitWasteDisposal(log);
+
+      setSubmitSuccess(true);
+
+      // Build the PDF data from the form values (not the log object)
+      const pdfData: WasteDisposalLogEntry = {
         ...values,
         fecha: currentDate,
         horaSalida: currentTime,
@@ -280,19 +331,13 @@ export default function WasteDisposalForm() {
         residuos: wasteDetails,
         pesoTotal: (typeof totalWeight === 'number' ? totalWeight : parseFloat(totalWeight || "0")).toFixed(2),
       };
+      setPdfData(pdfData);
 
-      console.log("Submitting Form Data:", formData);
-      await submitWasteDisposal(formData);
-
-      setSubmitSuccess(true);
-      setPdfData(formData);
-      setShowDownloadAlert(true); // Show download prompt
-      form.reset(); // Reset form fields
-      setSelectedDriverId(""); // Reset driver selection
-
-    } catch (error: unknown) {
+      setShowDownloadAlert(true);
+      form.reset();
+      setSelectedDriverId("");
+    } catch (error) {
       console.error("Error submitting form:", error);
-      // Consider adding user-facing error feedback here
     } finally {
       setIsSubmitting(false);
     }
