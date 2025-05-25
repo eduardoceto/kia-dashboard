@@ -139,21 +139,27 @@ export type drivers = {
   created_at: Date
 }
 
-export type WasteDisposalLog = {
-  log_id: number; // primary key
-  user_id: string; // foreign key to users (UUID)
-  area_id: string; // foreign key to areas (UUID)
-  driver_id: string; // foreign key to drivers (UUID)
-  date: string; // formerly 'fecha'
-  departure_time: string; // formerly 'hora_salida'
-  folio: string;
-  department: string; // formerly 'departamento'
-  reason: string; // formerly 'motivo'
-  material_type: string; // formerly 'tipo_material'
-  container_type: string; // formerly 'tipo_contenedor'
-  authorizing_person: string; // formerly 'persona_autoriza'
-  waste_details: object; // JSONB, dynamic waste details (formerly 'residuos')
-  total_weight: string; // formerly 'peso_total'
-  created_at: Date;
-  updated_at: Date;
-};
+export interface WasteDisposalLog {
+  log_id?: string;
+  user_id?: string;
+  quantity?: number;
+  REM?: number;
+  driver_id?: string;
+  date?: string; // ISO date string
+  departure_time?: string;
+  folio?: string;
+  department?: string;
+  reason?: string;
+  container_type?: string;
+  authorizing_person?: string;
+  created_at?: string;
+  updated_at?: string;
+  excel_id?: number;
+  quantity_type?: string;
+  waste_type?: string;
+  waste_name?: string;
+  area?: string;
+  transport_num_services?: number;
+  [key: string]: any; // Allow special keys like "Manifiesto No."
+}
+
