@@ -38,13 +38,14 @@ import {
   type LodosResiduo,
   type DestruidasResiduo,
 } from "@/src/utils/log/log-utils"
+import { Driver } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form/DriverInfo"
 
 // Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
 type DbWasteLog = {
-  drivers?: any;
+  drivers?: Driver[] | Driver;
   excel_id?: number;
   waste_name?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export default function ExportPage() {
@@ -81,7 +82,15 @@ export default function ExportPage() {
         const mappedLogs = (result.data || []).map((log: DbWasteLog) => {
           // Use drivers field from explicit join
           const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
-          const getDriverField = (field: string) => driver && typeof driver === 'object' ? driver[field] || '' : '';
+          const getDriverField = (field: keyof Driver): string => {
+            if (!driver) return '';
+            if (Array.isArray(driver)) return '';
+            if (typeof driver === 'object' && driver !== null && field in driver) {
+              const value = driver[field];
+              return typeof value === 'string' ? value : '';
+            }
+            return '';
+          };
           const tipoMaterial = excelIdToTipoMaterial[Number(log.excel_id) as 1|2|3|4] || "";
           let residuos = {};
           if (tipoMaterial === "lodos") {
@@ -116,11 +125,11 @@ export default function ExportPage() {
             };
           }
           return {
-            fecha: log.date || '',
-            horaSalida: log.departure_time || '',
-            folio: log.folio || '',
-            departamento: log.department || '',
-            motivo: log.reason || '',
+            fecha: String(log.date || ''),
+            horaSalida: String(log.departure_time || ''),
+            folio: String(log.folio || ''),
+            departamento: String(log.department || ''),
+            motivo: String(log.reason || ''),
             nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
             compania: getDriverField('company'),
             procedencia: getDriverField('origin'),
@@ -130,8 +139,8 @@ export default function ExportPage() {
             tipoMaterial,
             residuos,
             pesoTotal: log.quantity?.toString() || '',
-            tipoContenedor: log.container_type || '',
-            personaAutoriza: log.authorizing_person || '',
+            tipoContenedor: String(log.container_type || ''),
+            personaAutoriza: String(log.authorizing_person || ''),
           };
         }).filter(log => isValidDate(log.fecha));
         setLogs(mappedLogs)
