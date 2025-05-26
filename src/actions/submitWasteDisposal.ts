@@ -37,3 +37,22 @@ export async function fetchWasteDisposalLogs() {
 
   return { success: true, data };
 }
+
+// Update a waste disposal log in the database by folio or log_id
+export async function updateWasteDisposalLog(identifier: { folio?: string; log_id?: string }, updates: Partial<WasteDisposalLog>) {
+  const supabase = createClient();
+  let query;
+  if (identifier.log_id) {
+    query = supabase.from("waste_logs").update(updates).eq("log_id", identifier.log_id);
+  } else if (identifier.folio) {
+    query = supabase.from("waste_logs").update(updates).eq("folio", identifier.folio);
+  } else {
+    throw new Error("No identifier provided for update");
+  }
+  const { data, error } = await query.select();
+  if (error) {
+    console.error("Error updating waste log:", error);
+    return { success: false, error };
+  }
+  return { success: true, data };
+}

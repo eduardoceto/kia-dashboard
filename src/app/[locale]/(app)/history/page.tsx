@@ -24,7 +24,7 @@ import {
   PaginationPrevious,
 } from "@/src/components/ui/pagination"
 import { cn } from "@/lib/utils"
-import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal"
+import { fetchWasteDisposalLogs, updateWasteDisposalLog } from "@/src/actions/submitWasteDisposal"
 import {
   type LogEntry,
   type LodosResiduo,
@@ -345,11 +345,18 @@ export default function HistoryPage() {
     setEditLog({ ...editLog, residuos: { ...editLog.residuos, [field]: value } })
   }
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!editLog) return
     setLogs((prev) => prev.map((l) => (l.folio === editLog.folio ? editLog : l)))
     setSelectedLog(editLog)
     setIsEditing(false)
+    // Persist update to database
+    try {
+      await updateWasteDisposalLog({ folio: editLog.folio }, editLog)
+    } catch (err) {
+      // Optionally handle error (e.g., show notification)
+      console.error('Error updating log in database:', err)
+    }
   }
 
   const handleEditCancel = () => {
@@ -410,7 +417,7 @@ export default function HistoryPage() {
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar registros..."
-                className="pl-9"
+                className="pl-9 bg-card"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
@@ -678,7 +685,7 @@ export default function HistoryPage() {
                                 {isEditing && editLog ? (
                                   <div className="space-y-6 py-4">
                                     {/* Edit mode banner */}
-                                    <div className="flex items-center gap-2 mb-2 p-2 bg-gray-200 border border-gray-400 rounded">
+                                    <div className="flex items-center gap-2 mb-2 p-2 bg-popover border border-gray-400 rounded-lg">
                                       <Pencil className="h-4 w-4 text-gray-600" />
                                       <span className="text-gray-800 font-semibold">Editando registro</span>
                                     </div>
@@ -686,69 +693,69 @@ export default function HistoryPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Fecha</h3>
-                                        <input type="date" className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.fecha} onChange={e => handleEditChange('fecha', e.target.value)} />
+                                        <Input type="date" className="w-full bg-card" value={editLog.fecha} onChange={e => handleEditChange('fecha', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Hora Salida</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.horaSalida} onChange={e => handleEditChange('horaSalida', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.horaSalida} onChange={e => handleEditChange('horaSalida', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Folio</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.folio} onChange={e => handleEditChange('folio', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.folio} onChange={e => handleEditChange('folio', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Departamento</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.departamento} onChange={e => handleEditChange('departamento', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.departamento} onChange={e => handleEditChange('departamento', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Motivo</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.motivo} onChange={e => handleEditChange('motivo', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.motivo} onChange={e => handleEditChange('motivo', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Autorizó</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.personaAutoriza} onChange={e => handleEditChange('personaAutoriza', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.personaAutoriza} onChange={e => handleEditChange('personaAutoriza', e.target.value)} />
                                       </div>
                                     </div>
                                     {/* Transport Info Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Chofer</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.nombreChofer} onChange={e => handleEditChange('nombreChofer', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.nombreChofer} onChange={e => handleEditChange('nombreChofer', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Compañía</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.compania} onChange={e => handleEditChange('compania', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.compania} onChange={e => handleEditChange('compania', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Placas</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.placas} onChange={e => handleEditChange('placas', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.placas} onChange={e => handleEditChange('placas', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">No. Económico</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.numeroEconomico} onChange={e => handleEditChange('numeroEconomico', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.numeroEconomico} onChange={e => handleEditChange('numeroEconomico', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Procedencia</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.procedencia} onChange={e => handleEditChange('procedencia', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.procedencia} onChange={e => handleEditChange('procedencia', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Destino</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.destino} onChange={e => handleEditChange('destino', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.destino} onChange={e => handleEditChange('destino', e.target.value)} />
                                       </div>
                                     </div>
                                     {/* Material and Container Info */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
-                                        <h3 className="text-sm font-medium text-muted-foreground">Tipo Material General</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.tipoMaterial} onChange={e => handleEditChange('tipoMaterial', e.target.value)} />
+                                        <h3 className="text-sm font-medium text-muted-foreground">Tipo Material</h3>
+                                        <Input className="w-full bg-card" value={editLog.tipoMaterial} onChange={e => handleEditChange('tipoMaterial', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Tipo Contenedor</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.tipoContenedor} onChange={e => handleEditChange('tipoContenedor', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.tipoContenedor} onChange={e => handleEditChange('tipoContenedor', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Peso Total</h3>
-                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.pesoTotal} onChange={e => handleEditChange('pesoTotal', e.target.value)} />
+                                        <Input className="w-full bg-card" value={editLog.pesoTotal} onChange={e => handleEditChange('pesoTotal', e.target.value)} />
                                       </div>
                                     </div>
                                     {/* Detailed Residues Section */}
@@ -763,23 +770,23 @@ export default function HistoryPage() {
                                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Nombre Residuo</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.nombreResiduo || ''} onChange={e => handleEditResiduoChange('nombreResiduo', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.nombreResiduo || ''} onChange={e => handleEditResiduoChange('nombreResiduo', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Manifiesto No.</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.manifiestoNo || ''} onChange={e => handleEditResiduoChange('manifiestoNo', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.manifiestoNo || ''} onChange={e => handleEditResiduoChange('manifiestoNo', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Transporte No. Servicios</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.transporteNoServicios || ''} onChange={e => handleEditResiduoChange('transporteNoServicios', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.transporteNoServicios || ''} onChange={e => handleEditResiduoChange('transporteNoServicios', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Peso (Kg)</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.pesoKg || ''} onChange={e => handleEditResiduoChange('pesoKg', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.pesoKg || ''} onChange={e => handleEditResiduoChange('pesoKg', e.target.value)} />
                                                 </div>
                                               </div>
                                             )
@@ -790,23 +797,23 @@ export default function HistoryPage() {
                                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Tipo Residuo</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.tipoResiduo || ''} onChange={e => handleEditResiduoChange('tipoResiduo', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.tipoResiduo || ''} onChange={e => handleEditResiduoChange('tipoResiduo', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Unidad</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
                                                 </div>
                                               </div>
                                             )
@@ -817,23 +824,23 @@ export default function HistoryPage() {
                                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Tipo Desecho</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.tipoDesecho || ''} onChange={e => handleEditResiduoChange('tipoDesecho', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.tipoDesecho || ''} onChange={e => handleEditResiduoChange('tipoDesecho', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Unidad</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
                                                 </div>
                                               </div>
                                             )
@@ -844,15 +851,15 @@ export default function HistoryPage() {
                                               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Residuos</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.residuos || ''} onChange={e => handleEditResiduoChange('residuos', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.residuos || ''} onChange={e => handleEditResiduoChange('residuos', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
                                                 </div>
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.peso || ''} onChange={e => handleEditResiduoChange('peso', e.target.value)} />
+                                                  <Input className="w-full bg-card" value={details.peso || ''} onChange={e => handleEditResiduoChange('peso', e.target.value)} />
                                                 </div>
                                               </div>
                                             )
