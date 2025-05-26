@@ -19,7 +19,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/src/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 
-import { getHistoricalLogs } from "@/src/components/testData/dataLogs"
+import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal"
 import {
   type LogEntry,
   formatTableDate,
@@ -49,8 +49,98 @@ export default function ExportPage() {
   const [exportError, setExportError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<string>("all")
 
-  // Get all logs
-  const logs: LogEntry[] = getHistoricalLogs()
+  // Get all logs from the database
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // State to control preview limit
+  const [showAllPreview, setShowAllPreview] = useState(false);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true)
+      setError(null)
+      const result = await fetchWasteDisposalLogs()
+      if (result.success) {
+        // --- Mapping logic from history page ---
+        const excelIdToTipoMaterial = {
+          1: "lodos",
+          2: "destruidas",
+          3: "otros",
+          4: "metal",
+        };
+        const mappedLogs = (result.data || []).map((log: any) => {
+          // Use drivers field from explicit join
+          const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
+          const getDriverField = (field: string) => driver && typeof driver === 'object' ? driver[field] || '' : '';
+          const tipoMaterial = excelIdToTipoMaterial[Number(log.excel_id) as 1|2|3|4] || "";
+          let residuos = {};
+          if (tipoMaterial === "lodos") {
+            residuos = {
+              nombreResiduo: log.waste_name,
+              manifiestoNo: log["Manifiesto No."],
+              area: log.area,
+              transporteNoServicios: log.transport_num_services,
+              pesoKg: log.quantity,
+            };
+          } else if (tipoMaterial === "metal") {
+            residuos = {
+              tipoResiduo: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "otros") {
+            residuos = {
+              tipoDesecho: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "destruidas") {
+            residuos = {
+              residuos: log.waste_name,
+              area: log.area,
+              peso: log.quantity,
+            };
+          }
+          return {
+            fecha: log.date || '',
+            horaSalida: log.departure_time || '',
+            folio: log.folio || '',
+            departamento: log.department || '',
+            motivo: log.reason || '',
+            nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
+            compania: getDriverField('company'),
+            procedencia: getDriverField('origin'),
+            destino: getDriverField('destination'),
+            placas: getDriverField('vehicle_plates'),
+            numeroEconomico: getDriverField('economic_number'),
+            tipoMaterial,
+            residuos,
+            pesoTotal: log.quantity?.toString() || '',
+            tipoContenedor: log.container_type || '',
+            personaAutoriza: log.authorizing_person || '',
+          };
+        }).filter(log => isValidDate(log.fecha));
+        setLogs(mappedLogs)
+      } else {
+        setError("Error al cargar los registros de la base de datos.")
+      }
+      setLoading(false)
+    }
+    fetchLogs()
+  }, [])
+
+  // Helper to check for valid date
+  const isValidDate = (dateStr: string) => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    return !isNaN(d.getTime());
+  };
 
   // Get unique material types
   const materialTypes = Array.from(new Set(logs.map((log) => log.tipoMaterial)))
@@ -340,6 +430,26 @@ export default function ExportPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-muted-foreground">Cargando registros...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-destructive">{error}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-6">
@@ -595,7 +705,7 @@ export default function ExportPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredLogs.slice(0, 5).map((log) => (
+                      {(showAllPreview ? filteredLogs : filteredLogs.slice(0, 5)).map((log) => (
                         <TableRow key={log.folio} className="hover:bg-muted/10">
                           <TableCell>{formatTableDate(log.fecha)}</TableCell>
                           <TableCell>
@@ -613,10 +723,27 @@ export default function ExportPage() {
                         </TableRow>
                       ))}
 
-                      {filteredLogs.length > 5 && (
+                      {filteredLogs.length > 5 && !showAllPreview && (
                         <TableRow>
-                          <TableCell colSpan={4} className="text-center py-2 text-muted-foreground">
-                            {filteredLogs.length - 5} registros más no mostrados en la vista previa
+                          <TableCell colSpan={4} className="text-center py-2">
+                            <button
+                              className="text-primary underline hover:no-underline"
+                              onClick={() => setShowAllPreview(true)}
+                            >
+                              Mostrar {filteredLogs.length - 5} más
+                            </button>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {filteredLogs.length > 5 && showAllPreview && (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center py-2">
+                            <button
+                              className="text-primary underline hover:no-underline"
+                              onClick={() => setShowAllPreview(false)}
+                            >
+                              Ocultar registros extra
+                            </button>
                           </TableCell>
                         </TableRow>
                       )}

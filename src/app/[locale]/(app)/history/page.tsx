@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
@@ -24,7 +24,7 @@ import {
   PaginationPrevious,
 } from "@/src/components/ui/pagination"
 import { cn } from "@/lib/utils"
-import { getHistoricalLogs } from "@/src/components/testData/dataLogs"
+import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal"
 import {
   type LogEntry,
   type LodosResiduo,
@@ -47,12 +47,95 @@ export default function HistoryPage() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const [logs, setLogs] = useState<LogEntry[]>(getHistoricalLogs())
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editLog, setEditLog] = useState<LogEntry | null>(null)
 
   // Items per page
   const itemsPerPage = 10
+
+  // Fetch logs from Supabase on mount
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true)
+      setError(null)
+      const result = await fetchWasteDisposalLogs()
+      if (result.success) {
+        const excelIdToTipoMaterial = {
+          1: "lodos",
+          2: "destruidas",
+          3: "otros",
+          4: "metal",
+        };
+
+        const mappedLogs = (result.data || []).map((log: any) => {
+          console.log("LOG ENTRY:", log);
+          // Use drivers field from explicit join
+          const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
+          const getDriverField = (field: string) => driver && typeof driver === 'object' ? driver[field] || '' : '';
+
+          const tipoMaterial = excelIdToTipoMaterial[Number(log.excel_id) as 1|2|3|4] || "";
+          let residuos = {};
+          if (tipoMaterial === "lodos") {
+            residuos = {
+              nombreResiduo: log.waste_name,
+              manifiestoNo: log["Manifiesto No."],
+              area: log.area,
+              transporteNoServicios: log.transport_num_services,
+              pesoKg: log.quantity,
+            };
+          } else if (tipoMaterial === "metal") {
+            residuos = {
+              tipoResiduo: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "otros") {
+            residuos = {
+              tipoDesecho: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "destruidas") {
+            residuos = {
+              residuos: log.waste_name,
+              area: log.area,
+              peso: log.quantity,
+            };
+          }
+          return {
+            fecha: log.date || '',
+            horaSalida: log.departure_time || '',
+            folio: log.folio || '',
+            departamento: log.department || '',
+            motivo: log.reason || '',
+            nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
+            compania: getDriverField('company'),
+            procedencia: getDriverField('origin'),
+            destino: getDriverField('destination'),
+            placas: getDriverField('vehicle_plates'),
+            numeroEconomico: getDriverField('economic_number'),
+            tipoMaterial,
+            residuos,
+            pesoTotal: log.quantity?.toString() || '',
+            tipoContenedor: log.container_type || '',
+            personaAutoriza: log.authorizing_person || '',
+          };
+        }).filter(log => !!log.fecha);
+        setLogs(mappedLogs)
+      } else {
+        setError("Error al cargar los registros de la base de datos.")
+      }
+      setLoading(false)
+    }
+    fetchLogs()
+  }, [])
 
   // Helper function to apply material and date filters
   const applyMaterialAndDateFilters = (log: LogEntry) => {
@@ -118,8 +201,6 @@ export default function HistoryPage() {
         false ||
         details.remisionHMMX?.toLowerCase().includes(searchTermLower) ||
         false ||
-        details.remisionKia?.toLowerCase().includes(searchTermLower) ||
-        false ||
         details.unidad?.toLowerCase().includes(searchTermLower) ||
         false
     } else if (log.tipoMaterial === "otros" && log.residuos) {
@@ -130,8 +211,6 @@ export default function HistoryPage() {
         details.item?.toLowerCase().includes(searchTermLower) ||
         false ||
         details.remisionHMMX?.toLowerCase().includes(searchTermLower) ||
-        false ||
-        details.remisionKia?.toLowerCase().includes(searchTermLower) ||
         false ||
         details.unidad?.toLowerCase().includes(searchTermLower) ||
         false
@@ -202,11 +281,20 @@ export default function HistoryPage() {
   }
 
   // Get unique material types for filter
-  const materialTypes = Array.from(new Set(logs.map((log) => log.tipoMaterial)))
+  const materialTypes = Array.from(
+    new Set(
+      logs
+        .map((log) => log.tipoMaterial)
+        .filter((type) => typeof type === 'string' && type.trim() !== '')
+    )
+  )
 
   // Calculate total weight
   const calculateTotalWeight = () => {
-    return filteredLogs.reduce((total, log) => total + Number.parseFloat(log.pesoTotal), 0).toFixed(2)
+    return filteredLogs
+      .filter(log => !(log.residuos && 'unidad' in log.residuos && typeof log.residuos.unidad === 'string' && log.residuos.unidad.toLowerCase() === 'pza'))
+      .reduce((total, log) => total + Number.parseFloat(log.pesoTotal), 0)
+      .toFixed(2)
   }
 
   // Reset filters
@@ -259,6 +347,26 @@ export default function HistoryPage() {
       setIsDialogOpen(false)
       setSelectedLog(null)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-muted-foreground">Cargando registros...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-destructive">{error}</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -459,7 +567,7 @@ export default function HistoryPage() {
                       </div>
                     </TableHead>
                     <TableHead>Residuo/Desecho</TableHead>
-                    <TableHead>Ubicación/Destino</TableHead>
+                    <TableHead>Compañía</TableHead>
                     <TableHead className="text-right cursor-pointer" onClick={() => handleSort("pesoTotal")}>
                       <div className="flex items-center justify-end">
                         Peso Total
@@ -517,7 +625,7 @@ export default function HistoryPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>{summary.tipo}</TableCell>
-                          <TableCell>{summary.item}</TableCell>
+                          <TableCell>{log.compania || '-'}</TableCell>
                           <TableCell className="text-right font-medium">
                             {log.pesoTotal}{" "}
                             {log.tipoMaterial === "otros" || log.tipoMaterial === "metal"
@@ -683,10 +791,6 @@ export default function HistoryPage() {
                                                   <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
                                                   <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
                                                 </div>
-                                                <div>
-                                                  <h4 className="text-sm font-medium text-muted-foreground">Remisión KIA</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionKia || ''} onChange={e => handleEditResiduoChange('remisionKia', e.target.value)} />
-                                                </div>
                                               </div>
                                             )
                                           }
@@ -713,10 +817,6 @@ export default function HistoryPage() {
                                                 <div>
                                                   <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
                                                   <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
-                                                </div>
-                                                <div>
-                                                  <h4 className="text-sm font-medium text-muted-foreground">Remisión KIA</h4>
-                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionKia || ''} onChange={e => handleEditResiduoChange('remisionKia', e.target.value)} />
                                                 </div>
                                               </div>
                                             )
@@ -887,10 +987,6 @@ export default function HistoryPage() {
                                                       <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
                                                       <p>{details.remisionHMMX || "-"}</p>
                                                     </div>
-                                                    <div>
-                                                      <h4 className="text-sm font-medium text-muted-foreground">Remisión KIA</h4>
-                                                      <p>{details.remisionKia || "-"}</p>
-                                                    </div>
                                                   </CardContent>
                                                 </Card>
                                               )
@@ -917,10 +1013,6 @@ export default function HistoryPage() {
                                                     <div>
                                                       <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
                                                       <p>{details.remisionHMMX || "-"}</p>
-                                                    </div>
-                                                    <div>
-                                                      <h4 className="text-sm font-medium text-muted-foreground">Remisión KIA</h4>
-                                                      <p>{details.remisionKia || "-"}</p>
                                                     </div>
                                                   </CardContent>
                                                 </Card>

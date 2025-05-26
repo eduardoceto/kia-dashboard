@@ -20,3 +20,20 @@ export async function submitWasteDisposal(log: Omit<WasteDisposalLog, "log_id" |
 
   return { success: true, data };
 }
+
+// Fetch all waste disposal logs from the database
+export async function fetchWasteDisposalLogs() {
+  const supabase = createClient();
+
+  // Join drivers table to get driver info
+  const { data, error } = await supabase
+    .from("waste_logs")
+    .select('*, drivers(*)');
+
+  if (error) {
+    console.error("Error fetching waste logs:", error);
+    return { success: false, error };
+  }
+
+  return { success: true, data };
+}
