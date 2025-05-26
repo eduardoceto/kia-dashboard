@@ -39,6 +39,14 @@ import {
   type DestruidasResiduo,
 } from "@/src/utils/log/log-utils"
 
+// Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
+type DbWasteLog = {
+  drivers?: any;
+  excel_id?: number;
+  waste_name?: string;
+  [key: string]: any;
+};
+
 export default function ExportPage() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
@@ -70,7 +78,7 @@ export default function ExportPage() {
           3: "otros",
           4: "metal",
         };
-        const mappedLogs = (result.data || []).map((log: any) => {
+        const mappedLogs = (result.data || []).map((log: DbWasteLog) => {
           // Use drivers field from explicit join
           const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
           const getDriverField = (field: string) => driver && typeof driver === 'object' ? driver[field] || '' : '';

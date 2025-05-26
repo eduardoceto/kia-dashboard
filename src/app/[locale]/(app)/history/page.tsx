@@ -36,6 +36,14 @@ import {
 } from "@/src/utils/log/log-utils"
 import { generatePdf } from "@/src/actions/generatePdf"
 
+// Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
+type DbWasteLog = {
+  drivers?: any;
+  excel_id?: number;
+  waste_name?: string;
+  [key: string]: any;
+};
+
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -70,7 +78,7 @@ export default function HistoryPage() {
           4: "metal",
         };
 
-        const mappedLogs = (result.data || []).map((log: any) => {
+        const mappedLogs = (result.data || []).map((log: DbWasteLog) => {
           console.log("LOG ENTRY:", log);
           // Use drivers field from explicit join
           const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;

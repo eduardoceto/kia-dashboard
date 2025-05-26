@@ -41,7 +41,7 @@ export function generatePdf(data: LogEntry) {
       ['Departamento:', data.departamento, 'Motivo:', data.motivo],
     ],
   });
-  // @ts-expect-error
+  // @ts-expect-error Needed for jsPDF plugin type mismatch
   y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y) + 16;
 
   // Divider after solicitante table
@@ -166,7 +166,7 @@ export function generatePdf(data: LogEntry) {
       ['Placas:', data.placas, 'Número económico:', data.numeroEconomico],
     ],
   });
-  // @ts-expect-error
+  // @ts-expect-error Needed for jsPDF plugin type mismatch
   y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y) + 40;
 
   // Divider before signature
