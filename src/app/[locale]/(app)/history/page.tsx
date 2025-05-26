@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowLeft, Calendar, ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search } from "lucide-react"
+import { ArrowLeft, Calendar, ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search, Pencil } from "lucide-react"
 
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -24,7 +24,7 @@ import {
   PaginationPrevious,
 } from "@/src/components/ui/pagination"
 import { cn } from "@/lib/utils"
-import { getHistoricalLogs } from "@/src/components/testData/dataLogs"
+import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal"
 import {
   type LogEntry,
   type LodosResiduo,
@@ -35,6 +35,15 @@ import {
   formatShortDate
 } from "@/src/utils/log/log-utils"
 import { generatePdf } from "@/src/actions/generatePdf"
+import { Driver } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form/DriverInfo"
+
+// Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
+type DbWasteLog = {
+  drivers?: Driver[] | Driver;
+  excel_id?: number;
+  waste_name?: string;
+  [key: string]: unknown;
+};
 
 export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -47,12 +56,103 @@ export default function HistoryPage() {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-
-  // Get historical logs
-  const logs: LogEntry[] = getHistoricalLogs()
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editLog, setEditLog] = useState<LogEntry | null>(null)
 
   // Items per page
   const itemsPerPage = 10
+
+  // Fetch logs from Supabase on mount
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true)
+      setError(null)
+      const result = await fetchWasteDisposalLogs()
+      if (result.success) {
+        const excelIdToTipoMaterial = {
+          1: "lodos",
+          2: "destruidas",
+          3: "otros",
+          4: "metal",
+        };
+
+        const mappedLogs = (result.data || []).map((log: DbWasteLog) => {
+          console.log("LOG ENTRY:", log);
+          // Use drivers field from explicit join
+          const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
+          const getDriverField = (field: keyof Driver): string => {
+            if (!driver) return '';
+            if (Array.isArray(driver)) return '';
+            if (typeof driver === 'object' && driver !== null && field in driver) {
+              const value = driver[field];
+              return typeof value === 'string' ? value : '';
+            }
+            return '';
+          };
+
+          const tipoMaterial = excelIdToTipoMaterial[Number(log.excel_id) as 1|2|3|4] || "";
+          let residuos = {};
+          if (tipoMaterial === "lodos") {
+            residuos = {
+              nombreResiduo: log.waste_name,
+              manifiestoNo: log["Manifiesto No."],
+              area: log.area,
+              transporteNoServicios: log.transport_num_services,
+              pesoKg: log.quantity,
+            };
+          } else if (tipoMaterial === "metal") {
+            residuos = {
+              tipoResiduo: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "otros") {
+            residuos = {
+              tipoDesecho: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "destruidas") {
+            residuos = {
+              residuos: log.waste_name,
+              area: log.area,
+              peso: log.quantity,
+            };
+          }
+          return {
+            fecha: String(log.date || ''),
+            horaSalida: String(log.departure_time || ''),
+            folio: String(log.folio || ''),
+            departamento: String(log.department || ''),
+            motivo: String(log.reason || ''),
+            nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
+            compania: getDriverField('company'),
+            procedencia: getDriverField('origin'),
+            destino: getDriverField('destination'),
+            placas: getDriverField('vehicle_plates'),
+            numeroEconomico: getDriverField('economic_number'),
+            tipoMaterial,
+            residuos,
+            pesoTotal: String(log.quantity?.toString() || ''),
+            tipoContenedor: String(log.container_type || ''),
+            personaAutoriza: String(log.authorizing_person || ''),
+          };
+        }).filter(log => !!log.fecha);
+        setLogs(mappedLogs)
+      } else {
+        setError("Error al cargar los registros de la base de datos.")
+      }
+      setLoading(false)
+    }
+    fetchLogs()
+  }, [])
 
   // Helper function to apply material and date filters
   const applyMaterialAndDateFilters = (log: LogEntry) => {
@@ -118,8 +218,6 @@ export default function HistoryPage() {
         false ||
         details.remisionHMMX?.toLowerCase().includes(searchTermLower) ||
         false ||
-        details.remisionKia?.toLowerCase().includes(searchTermLower) ||
-        false ||
         details.unidad?.toLowerCase().includes(searchTermLower) ||
         false
     } else if (log.tipoMaterial === "otros" && log.residuos) {
@@ -130,8 +228,6 @@ export default function HistoryPage() {
         details.item?.toLowerCase().includes(searchTermLower) ||
         false ||
         details.remisionHMMX?.toLowerCase().includes(searchTermLower) ||
-        false ||
-        details.remisionKia?.toLowerCase().includes(searchTermLower) ||
         false ||
         details.unidad?.toLowerCase().includes(searchTermLower) ||
         false
@@ -202,11 +298,20 @@ export default function HistoryPage() {
   }
 
   // Get unique material types for filter
-  const materialTypes = Array.from(new Set(logs.map((log) => log.tipoMaterial)))
+  const materialTypes = Array.from(
+    new Set(
+      logs
+        .map((log) => log.tipoMaterial)
+        .filter((type) => typeof type === 'string' && type.trim() !== '')
+    )
+  )
 
   // Calculate total weight
   const calculateTotalWeight = () => {
-    return filteredLogs.reduce((total, log) => total + Number.parseFloat(log.pesoTotal), 0).toFixed(2)
+    return filteredLogs
+      .filter(log => !(log.residuos && 'unidad' in log.residuos && typeof log.residuos.unidad === 'string' && log.residuos.unidad.toLowerCase() === 'pza'))
+      .reduce((total, log) => total + Number.parseFloat(log.pesoTotal), 0)
+      .toFixed(2)
   }
 
   // Reset filters
@@ -222,6 +327,63 @@ export default function HistoryPage() {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
     setCurrentPage(1) // Reset to first page when search changes
+  }
+
+  const handleEdit = (log: LogEntry | null) => {
+    if (!log) return
+    setEditLog({ ...log })
+    setIsEditing(true)
+  }
+
+  const handleEditChange = (field: string, value: unknown) => {
+    if (!editLog) return
+    setEditLog({ ...editLog, [field]: value })
+  }
+
+  const handleEditResiduoChange = (field: string, value: unknown) => {
+    if (!editLog) return
+    setEditLog({ ...editLog, residuos: { ...editLog.residuos, [field]: value } })
+  }
+
+  const handleEditSave = () => {
+    if (!editLog) return
+    setLogs((prev) => prev.map((l) => (l.folio === editLog.folio ? editLog : l)))
+    setSelectedLog(editLog)
+    setIsEditing(false)
+  }
+
+  const handleEditCancel = () => {
+    setIsEditing(false)
+    setEditLog(null)
+  }
+
+  const handleDelete = (log: LogEntry | null) => {
+    if (!log) return
+    if (window.confirm(`¿Seguro que deseas eliminar el registro #${log.folio}?`)) {
+      setLogs((prev) => prev.filter((l) => l.folio !== log.folio))
+      setIsDialogOpen(false)
+      setSelectedLog(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-muted-foreground">Cargando registros...</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <div className="flex justify-center items-center h-96">
+          <span className="text-lg text-destructive">{error}</span>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -256,7 +418,7 @@ export default function HistoryPage() {
 
             <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full md:w-auto flex gap-2 items-center">
+                <Button variant="outline" className="w-full md:w-auto flex gap-2 items-center bg-primary-foreground">
                   <Filter className="h-4 w-4" />
                   Filtros
                   <Badge className="ml-1 bg-primary text-primary-foreground">
@@ -422,7 +584,7 @@ export default function HistoryPage() {
                       </div>
                     </TableHead>
                     <TableHead>Residuo/Desecho</TableHead>
-                    <TableHead>Ubicación/Destino</TableHead>
+                    <TableHead>Compañía</TableHead>
                     <TableHead className="text-right cursor-pointer" onClick={() => handleSort("pesoTotal")}>
                       <div className="flex items-center justify-end">
                         Peso Total
@@ -480,7 +642,7 @@ export default function HistoryPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>{summary.tipo}</TableCell>
-                          <TableCell>{summary.item}</TableCell>
+                          <TableCell>{log.compania || '-'}</TableCell>
                           <TableCell className="text-right font-medium">
                             {log.pesoTotal}{" "}
                             {log.tipoMaterial === "otros" || log.tipoMaterial === "metal"
@@ -510,239 +672,189 @@ export default function HistoryPage() {
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <DialogTitle>Detalles del Registro</DialogTitle>
-              
-            </div>
                                 <DialogHeader>
                                   <DialogTitle>Detalles del Registro #{selectedLog?.folio}</DialogTitle>
                                 </DialogHeader>
-                                {selectedLog && (
+                                {isEditing && editLog ? (
                                   <div className="space-y-6 py-4">
+                                    {/* Edit mode banner */}
+                                    <div className="flex items-center gap-2 mb-2 p-2 bg-gray-200 border border-gray-400 rounded">
+                                      <Pencil className="h-4 w-4 text-gray-600" />
+                                      <span className="text-gray-800 font-semibold">Editando registro</span>
+                                    </div>
                                     {/* General Info Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Fecha</h3>
-                                        <p>{formatDate(selectedLog.fecha)}</p>
+                                        <input type="date" className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.fecha} onChange={e => handleEditChange('fecha', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Hora Salida</h3>
-                                        <p>{selectedLog.horaSalida}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.horaSalida} onChange={e => handleEditChange('horaSalida', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Folio</h3>
-                                        <p>{selectedLog.folio}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.folio} onChange={e => handleEditChange('folio', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Departamento</h3>
-                                        <p>{selectedLog.departamento}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.departamento} onChange={e => handleEditChange('departamento', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Motivo</h3>
-                                        <p>{selectedLog.motivo}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.motivo} onChange={e => handleEditChange('motivo', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Autorizó</h3>
-                                        <p>{selectedLog.personaAutoriza}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.personaAutoriza} onChange={e => handleEditChange('personaAutoriza', e.target.value)} />
                                       </div>
                                     </div>
-
                                     {/* Transport Info Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Chofer</h3>
-                                        <p>{selectedLog.nombreChofer}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.nombreChofer} onChange={e => handleEditChange('nombreChofer', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Compañía</h3>
-                                        <p>{selectedLog.compania}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.compania} onChange={e => handleEditChange('compania', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Placas</h3>
-                                        <p>{selectedLog.placas}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.placas} onChange={e => handleEditChange('placas', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">No. Económico</h3>
-                                        <p>{selectedLog.numeroEconomico}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.numeroEconomico} onChange={e => handleEditChange('numeroEconomico', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Procedencia</h3>
-                                        <p>{selectedLog.procedencia}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.procedencia} onChange={e => handleEditChange('procedencia', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Destino</h3>
-                                        <p>{selectedLog.destino}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.destino} onChange={e => handleEditChange('destino', e.target.value)} />
                                       </div>
                                     </div>
-
                                     {/* Material and Container Info */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                       <div>
-                                        <h3 className="text-sm font-medium text-muted-foreground">
-                                          Tipo Material General
-                                        </h3>
-                                        <p>{selectedLog.tipoMaterial}</p>
+                                        <h3 className="text-sm font-medium text-muted-foreground">Tipo Material General</h3>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.tipoMaterial} onChange={e => handleEditChange('tipoMaterial', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Tipo Contenedor</h3>
-                                        <p>{selectedLog.tipoContenedor}</p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.tipoContenedor} onChange={e => handleEditChange('tipoContenedor', e.target.value)} />
                                       </div>
                                       <div>
                                         <h3 className="text-sm font-medium text-muted-foreground">Peso Total</h3>
-                                        <p>
-                                          {selectedLog.pesoTotal}{" "}
-                                          {selectedLog.tipoMaterial === "otros" || selectedLog.tipoMaterial === "metal"
-                                            ? "unidad" in selectedLog.residuos
-                                              ? selectedLog.residuos.unidad || "KG"
-                                              : "KG"
-                                            : "KG"}
-                                        </p>
+                                        <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={editLog.pesoTotal} onChange={e => handleEditChange('pesoTotal', e.target.value)} />
                                       </div>
                                     </div>
-
                                     {/* Detailed Residues Section */}
                                     <div>
                                       <h3 className="text-lg font-semibold mb-2">Detalles Específicos del Material</h3>
                                       {(() => {
-                                        if (!selectedLog.residuos) return null
-
-                                        switch (selectedLog.tipoMaterial) {
+                                        if (!editLog.residuos) return null
+                                        switch (editLog.tipoMaterial) {
                                           case "lodos": {
-                                            const details = selectedLog.residuos as LodosResiduo
+                                            const details = editLog.residuos as LodosResiduo
                                             return (
-                                              <Card>
-                                                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Nombre Residuo
-                                                    </h4>
-                                                    <p>{details.nombreResiduo || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Manifiesto No.
-                                                    </h4>
-                                                    <p>{details.manifiestoNo || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
-                                                    <p>{details.area || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Transporte No. Servicios
-                                                    </h4>
-                                                    <p>{details.transporteNoServicios || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Peso (Kg)
-                                                    </h4>
-                                                    <p>{details.pesoKg || "-"}</p>
-                                                  </div>
-                                                </CardContent>
-                                              </Card>
+                                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Nombre Residuo</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.nombreResiduo || ''} onChange={e => handleEditResiduoChange('nombreResiduo', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Manifiesto No.</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.manifiestoNo || ''} onChange={e => handleEditResiduoChange('manifiestoNo', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Transporte No. Servicios</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.transporteNoServicios || ''} onChange={e => handleEditResiduoChange('transporteNoServicios', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Peso (Kg)</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.pesoKg || ''} onChange={e => handleEditResiduoChange('pesoKg', e.target.value)} />
+                                                </div>
+                                              </div>
                                             )
                                           }
                                           case "metal": {
-                                            const details = selectedLog.residuos as MetalResiduo
+                                            const details = editLog.residuos as MetalResiduo
                                             return (
-                                              <Card>
-                                                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Tipo Residuo
-                                                    </h4>
-                                                    <p>{details.tipoResiduo || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
-                                                    <p>{details.item || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Cantidad
-                                                    </h4>
-                                                    <p>
-                                                      {details.cantidad || "-"} {details.unidad || ""}
-                                                    </p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Remisión HMMX
-                                                    </h4>
-                                                    <p>{details.remisionHMMX || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Remisión KIA
-                                                    </h4>
-                                                    <p>{details.remisionKia || "-"}</p>
-                                                  </div>
-                                                </CardContent>
-                                              </Card>
+                                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Tipo Residuo</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.tipoResiduo || ''} onChange={e => handleEditResiduoChange('tipoResiduo', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Unidad</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
+                                                </div>
+                                              </div>
                                             )
                                           }
                                           case "otros": {
-                                            const details = selectedLog.residuos as OtrosResiduo
+                                            const details = editLog.residuos as OtrosResiduo
                                             return (
-                                              <Card>
-                                                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Tipo Desecho
-                                                    </h4>
-                                                    <p>{details.tipoDesecho || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
-                                                    <p>{details.item || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Cantidad
-                                                    </h4>
-                                                    <p>
-                                                      {details.cantidad || "-"} {details.unidad || ""}
-                                                    </p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Remisión HMMX
-                                                    </h4>
-                                                    <p>{details.remisionHMMX || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Remisión KIA
-                                                    </h4>
-                                                    <p>{details.remisionKia || "-"}</p>
-                                                  </div>
-                                                </CardContent>
-                                              </Card>
+                                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Tipo Desecho</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.tipoDesecho || ''} onChange={e => handleEditResiduoChange('tipoDesecho', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.item || ''} onChange={e => handleEditResiduoChange('item', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.cantidad || ''} onChange={e => handleEditResiduoChange('cantidad', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Unidad</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.unidad || ''} onChange={e => handleEditResiduoChange('unidad', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.remisionHMMX || ''} onChange={e => handleEditResiduoChange('remisionHMMX', e.target.value)} />
+                                                </div>
+                                              </div>
                                             )
                                           }
                                           case "destruidas": {
-                                            const details = selectedLog.residuos as DestruidasResiduo
+                                            const details = editLog.residuos as DestruidasResiduo
                                             return (
-                                              <Card>
-                                                <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">
-                                                      Residuos
-                                                    </h4>
-                                                    <p>{details.residuos || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
-                                                    <p>{details.area || "-"}</p>
-                                                  </div>
-                                                  <div>
-                                                    <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
-                                                    <p>{details.peso || "-"} kg</p>
-                                                  </div>
-                                                </CardContent>
-                                              </Card>
+                                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Residuos</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.residuos || ''} onChange={e => handleEditResiduoChange('residuos', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.area || ''} onChange={e => handleEditResiduoChange('area', e.target.value)} />
+                                                </div>
+                                                <div>
+                                                  <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
+                                                  <input className="w-full bg-gray-100 border border-gray-400 focus:border-primary focus:ring-primary/20 shadow-sm rounded px-2 py-1" value={details.peso || ''} onChange={e => handleEditResiduoChange('peso', e.target.value)} />
+                                                </div>
+                                              </div>
                                             )
                                           }
                                           default:
@@ -750,7 +862,207 @@ export default function HistoryPage() {
                                         }
                                       })()}
                                     </div>
+                                    <div className="flex gap-2 mt-4">
+                                      <Button variant="default" size="sm" onClick={handleEditSave}>Guardar</Button>
+                                      <Button variant="outline" size="sm" onClick={handleEditCancel}>Cancelar</Button>
+                                    </div>
                                   </div>
+                                ) : (
+                                  selectedLog && (
+                                    <div className="space-y-6 py-4">
+                                      {/* General Info Grid */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Fecha</h3>
+                                          <p>{formatDate(selectedLog.fecha)}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Hora Salida</h3>
+                                          <p>{selectedLog.horaSalida}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Folio</h3>
+                                          <p>{selectedLog.folio}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Departamento</h3>
+                                          <p>{selectedLog.departamento}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Motivo</h3>
+                                          <p>{selectedLog.motivo}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Autorizó</h3>
+                                          <p>{selectedLog.personaAutoriza}</p>
+                                        </div>
+                                      </div>
+                                      {/* Transport Info Grid */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Chofer</h3>
+                                          <p>{selectedLog.nombreChofer}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Compañía</h3>
+                                          <p>{selectedLog.compania}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Placas</h3>
+                                          <p>{selectedLog.placas}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">No. Económico</h3>
+                                          <p>{selectedLog.numeroEconomico}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Procedencia</h3>
+                                          <p>{selectedLog.procedencia}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Destino</h3>
+                                          <p>{selectedLog.destino}</p>
+                                        </div>
+                                      </div>
+                                      {/* Material and Container Info */}
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Tipo Material General</h3>
+                                          <p>{selectedLog.tipoMaterial}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Tipo Contenedor</h3>
+                                          <p>{selectedLog.tipoContenedor}</p>
+                                        </div>
+                                        <div>
+                                          <h3 className="text-sm font-medium text-muted-foreground">Peso Total</h3>
+                                          <p>
+                                            {selectedLog.pesoTotal}{" "}
+                                            {selectedLog.tipoMaterial === "otros" || selectedLog.tipoMaterial === "metal"
+                                              ? "unidad" in selectedLog.residuos
+                                                ? selectedLog.residuos.unidad || "KG"
+                                                : "KG"
+                                              : "KG"}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      {/* Detailed Residues Section */}
+                                      <div>
+                                        <h3 className="text-lg font-semibold mb-2">Detalles Específicos del Material</h3>
+                                        {(() => {
+                                          if (!selectedLog.residuos) return null
+                                          switch (selectedLog.tipoMaterial) {
+                                            case "lodos": {
+                                              const details = selectedLog.residuos as LodosResiduo
+                                              return (
+                                                <Card>
+                                                  <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Nombre Residuo</h4>
+                                                      <p>{details.nombreResiduo || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Manifiesto No.</h4>
+                                                      <p>{details.manifiestoNo || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
+                                                      <p>{details.area || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Transporte No. Servicios</h4>
+                                                      <p>{details.transporteNoServicios || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Peso (Kg)</h4>
+                                                      <p>{details.pesoKg || "-"}</p>
+                                                    </div>
+                                                  </CardContent>
+                                                </Card>
+                                              )
+                                            }
+                                            case "metal": {
+                                              const details = selectedLog.residuos as MetalResiduo
+                                              return (
+                                                <Card>
+                                                  <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Tipo Residuo</h4>
+                                                      <p>{details.tipoResiduo || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
+                                                      <p>{details.item || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
+                                                      <p>
+                                                        {details.cantidad || "-"} {details.unidad || ""}
+                                                      </p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
+                                                      <p>{details.remisionHMMX || "-"}</p>
+                                                    </div>
+                                                  </CardContent>
+                                                </Card>
+                                              )
+                                            }
+                                            case "otros": {
+                                              const details = selectedLog.residuos as OtrosResiduo
+                                              return (
+                                                <Card>
+                                                  <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Tipo Desecho</h4>
+                                                      <p>{details.tipoDesecho || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Item</h4>
+                                                      <p>{details.item || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Cantidad</h4>
+                                                      <p>
+                                                        {details.cantidad || "-"} {details.unidad || ""}
+                                                      </p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Remisión HMMX</h4>
+                                                      <p>{details.remisionHMMX || "-"}</p>
+                                                    </div>
+                                                  </CardContent>
+                                                </Card>
+                                              )
+                                            }
+                                            case "destruidas": {
+                                              const details = selectedLog.residuos as DestruidasResiduo
+                                              return (
+                                                <Card>
+                                                  <CardContent className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Residuos</h4>
+                                                      <p>{details.residuos || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Área</h4>
+                                                      <p>{details.area || "-"}</p>
+                                                    </div>
+                                                    <div>
+                                                      <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
+                                                      <p>{details.peso || "-"} kg</p>
+                                                    </div>
+                                                  </CardContent>
+                                                </Card>
+                                              )
+                                            }
+                                            default:
+                                              return <p>No hay detalles disponibles para este tipo de material.</p>
+                                          }
+                                        })()}
+                                      </div>
+                                    </div>
+                                  )
                                 )}
                                 <Button
                                     variant="outline"
@@ -761,6 +1073,24 @@ export default function HistoryPage() {
                                     <Download className="h-4 w-4" />
                                     Descargar PDF
                                   </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex items-center gap-2 mt-2"
+                                  onClick={() => handleEdit(selectedLog)}
+                                  disabled={!selectedLog}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="flex items-center gap-2 mt-2 ml-2"
+                                  onClick={() => handleDelete(selectedLog)}
+                                  disabled={!selectedLog}
+                                >
+                                  Eliminar
+                                </Button>
                               </DialogContent>
                               
                             </Dialog>

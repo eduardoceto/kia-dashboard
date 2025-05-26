@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/src/components/ui/card";
 import { createClient } from "@/src/utils/supabase/client";
 import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
 import type { ResiduoDetails } from "@/src/utils/log/log-utils";
+import { useUser } from "@/src/hooks/useUser";
 
 // Import new sub-components
 import AutomaticInfo from './waste-disposal-form/AutomaticInfo';
@@ -54,7 +55,6 @@ const formSchema = z.object({
   metal_cantidad: z.string().optional(),
   metal_unidad: z.string().optional(),
   metal_remisionHMMX: z.string().optional(),
-  metal_remisionKia: z.string().optional(),
 
   // Otros Reciclables fields (optional)
   otros_tipoDesecho: z.string().optional(),
@@ -62,7 +62,6 @@ const formSchema = z.object({
   otros_cantidad: z.string().optional(),
   otros_unidad: z.string().optional(),
   otros_remisionHMMX: z.string().optional(),
-  otros_remisionKia: z.string().optional(),
 
   // Uretano/Vidrio/Autopartes Destruidas fields (optional)
   destruidas_residuos: z.string().optional(),
@@ -85,7 +84,6 @@ const formSchema = z.object({
     if (isNaN(cantidad) || cantidad <= 0) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Cantidad es requerida y debe ser un número mayor a 0 para Metal/no Metal", path: ["metal_cantidad"] });
     if (!data.metal_unidad) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unidad es requerida para Metal/no Metal", path: ["metal_unidad"] });
     if (!data.metal_remisionHMMX?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Remisión HMMX es requerida para Metal/no Metal", path: ["metal_remisionHMMX"] });
-    if (!data.metal_remisionKia?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Remisión Kia es requerida para Metal/no Metal", path: ["metal_remisionKia"] });
   } else if (data.tipoMaterial === "otros") {
     if (!data.otros_tipoDesecho?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Tipo de desecho es requerido para Otros Reciclables", path: ["otros_tipoDesecho"] });
     if (!data.otros_item?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Item es requerido para Otros Reciclables", path: ["otros_item"] });
@@ -93,7 +91,6 @@ const formSchema = z.object({
     if (isNaN(cantidad) || cantidad <= 0) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Cantidad es requerida y debe ser un número mayor a 0 para Otros Reciclables", path: ["otros_cantidad"] });
     if (!data.otros_unidad) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Unidad es requerida para Otros Reciclables", path: ["otros_unidad"] });
     if (!data.otros_remisionHMMX?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Remisión HMMX es requerida para Otros Reciclables", path: ["otros_remisionHMMX"] });
-    if (!data.otros_remisionKia?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Remisión Kia es requerida para Otros Reciclables", path: ["otros_remisionKia"] });
   } else if (data.tipoMaterial === "destruidas") {
     if (!data.destruidas_residuos?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Residuos es requerido para Uretano/Vidrio/Autopartes", path: ["destruidas_residuos"] });
     if (!data.destruidas_area?.trim()) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Área es requerida para Uretano/Vidrio/Autopartes", path: ["destruidas_area"] });
@@ -117,6 +114,28 @@ export type WasteDisposalLogEntry = WasteDisposalFormValues & {
   pesoTotal: string;
 };
 
+// Add this type above the component:
+export type WasteDisposalDbLog = {
+  user_id: string;
+  driver_id: string;
+  date: string;
+  departure_time: string;
+  folio: string;
+  department: string;
+  reason: string;
+  container_type: string;
+  authorizing_person: string;
+  quantity: number | null;
+  quantity_type: string | null;
+  waste_type: string | null;
+  waste_name: string | null;
+  area: string | null;
+  transport_num_services: number | null;
+  "Manifiesto No."?: string | null;
+  excel_id?: number;
+  REM?: number;
+};
+
 export default function WasteDisposalForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -128,6 +147,7 @@ export default function WasteDisposalForm() {
   const [pdfData, setPdfData] = useState<WasteDisposalLogEntry | null>(null);
 
   const supabase = createClient();
+  const { profile } = useUser();
 
   // Fetch Drivers Effect
   useEffect(() => {
@@ -181,13 +201,11 @@ export default function WasteDisposalForm() {
       metal_cantidad: "",
       metal_unidad: "",
       metal_remisionHMMX: "",
-      metal_remisionKia: "",
       otros_tipoDesecho: "",
       otros_item: "",
       otros_cantidad: "",
       otros_unidad: "",
       otros_remisionHMMX: "",
-      otros_remisionKia: "",
       destruidas_residuos: "",
       destruidas_area: "",
       destruidas_peso: "",
@@ -228,71 +246,140 @@ export default function WasteDisposalForm() {
   async function onSubmit(values: WasteDisposalFormValues) {
     setIsSubmitting(true);
     try {
-      let wasteDetails: ResiduoDetails = {};
-      let totalWeight: string | number = 0;
+      // Use string IDs (UUIDs)
+      const userId = String(profile?.id);
+      const driverId = String(selectedDriverId);
 
-      // Calculate wasteDetails and totalWeight based on tipoMaterial
+      if (!userId || !driverId) {
+        alert("User or driver not selected.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Build the log object for DB submission (new waste_logs schema)
+      const log: WasteDisposalDbLog = {
+        user_id: userId,
+        driver_id: driverId,
+        date: currentDate,
+        departure_time: currentTime,
+        folio: generatedNumber,
+        department: "EHS",
+        reason: "Residuos",
+        container_type: values.tipoContenedor,
+        authorizing_person: values.personaAutoriza,
+        quantity: null,
+        quantity_type: null,
+        waste_type: null,
+        waste_name: null,
+        area: null,
+        transport_num_services: null,
+        "Manifiesto No.": null,
+      };
+
+      // Set excel_id based on tipoMaterial
+      let excelId: number | undefined;
+      switch (values.tipoMaterial) {
+        case "lodos":
+          excelId = 1;
+          break;
+        case "destruidas":
+          excelId = 2;
+          break;
+        case "otros":
+          excelId = 3;
+          break;
+        case "metal":
+          excelId = 4;
+          break;
+        default:
+          excelId = undefined;
+      }
+      log.excel_id = excelId;
+
       if (values.tipoMaterial === "lodos") {
-        wasteDetails = {
+        log.quantity = parseFloat(values.lodos_pesoKg || "0") || 0;
+        log.quantity_type = "kg";
+        log.waste_name = values.lodos_nombreResiduo ?? null;
+        log.area = values.lodos_area ?? null;
+        log.transport_num_services = values.lodos_transporteNoServicios ? Number(values.lodos_transporteNoServicios) : null;
+        log["Manifiesto No."] = values.lodos_manifiestoNo ?? null;
+      } else if (values.tipoMaterial === "metal") {
+        log.quantity = parseFloat(values.metal_cantidad || "0") || 0;
+        log.quantity_type = values.metal_unidad ?? null;
+        log.waste_type = values.metal_tipoResiduo ?? null;
+        log.waste_name = values.metal_item ?? null;
+        if (values.metal_remisionHMMX && !isNaN(Number(values.metal_remisionHMMX))) {
+          log.REM = Number(values.metal_remisionHMMX);
+        }
+      } else if (values.tipoMaterial === "otros") {
+        log.quantity = parseFloat(values.otros_cantidad || "0") || 0;
+        log.quantity_type = values.otros_unidad ?? null;
+        log.waste_type = values.otros_tipoDesecho ?? null;
+        log.waste_name = values.otros_item ?? null;
+        if (values.otros_remisionHMMX && !isNaN(Number(values.otros_remisionHMMX))) {
+          log.REM = Number(values.otros_remisionHMMX);
+        }
+      } else if (values.tipoMaterial === "destruidas") {
+        log.quantity = parseFloat(values.destruidas_peso || "0") || 0;
+        log.quantity_type = "kg";
+        log.waste_name = values.destruidas_residuos ?? null;
+        log.area = values.destruidas_area ?? null;
+      }
+
+      await submitWasteDisposal(log);
+
+      setSubmitSuccess(true);
+
+      // Build the PDF data from the form values (not the log object)
+      let residuos: ResiduoDetails = {};
+      if (values.tipoMaterial === "lodos") {
+        residuos = {
           nombreResiduo: values.lodos_nombreResiduo,
           manifiestoNo: values.lodos_manifiestoNo,
           area: values.lodos_area,
           transporteNoServicios: values.lodos_transporteNoServicios,
-          pesoKg: parseFloat(values.lodos_pesoKg || "0") || 0,
+          pesoKg: values.lodos_pesoKg ? parseFloat(values.lodos_pesoKg) : undefined,
         };
-        totalWeight = wasteDetails.pesoKg ?? 0;
       } else if (values.tipoMaterial === "metal") {
-        wasteDetails = {
+        residuos = {
           tipoResiduo: values.metal_tipoResiduo,
           item: values.metal_item,
-          cantidad: parseFloat(values.metal_cantidad || "0") || 0,
+          cantidad: values.metal_cantidad ? parseFloat(values.metal_cantidad) : undefined,
           unidad: values.metal_unidad,
           remisionHMMX: values.metal_remisionHMMX,
-          remisionKia: values.metal_remisionKia,
         };
-        totalWeight = values.metal_unidad === 'kg' ? (wasteDetails.cantidad ?? 0) : 0;
       } else if (values.tipoMaterial === "otros") {
-        wasteDetails = {
+        residuos = {
           tipoDesecho: values.otros_tipoDesecho,
           item: values.otros_item,
-          cantidad: parseFloat(values.otros_cantidad || "0") || 0,
+          cantidad: values.otros_cantidad ? parseFloat(values.otros_cantidad) : undefined,
           unidad: values.otros_unidad,
           remisionHMMX: values.otros_remisionHMMX,
-          remisionKia: values.otros_remisionKia,
         };
-        totalWeight = values.otros_unidad === 'kg' ? (wasteDetails.cantidad ?? 0) : 0;
       } else if (values.tipoMaterial === "destruidas") {
-        wasteDetails = {
+        residuos = {
           residuos: values.destruidas_residuos,
           area: values.destruidas_area,
-          peso: parseFloat(values.destruidas_peso || "0") || 0,
+          peso: values.destruidas_peso ? parseFloat(values.destruidas_peso) : undefined,
         };
-        totalWeight = wasteDetails.peso ?? 0;
       }
-
-      const formData: WasteDisposalLogEntry = {
+      const pdfData: WasteDisposalLogEntry = {
         ...values,
         fecha: currentDate,
         horaSalida: currentTime,
         folio: generatedNumber,
         departamento: "EHS",
         motivo: "residuos",
-        residuos: wasteDetails,
-        pesoTotal: (typeof totalWeight === 'number' ? totalWeight : parseFloat(totalWeight || "0")).toFixed(2),
+        residuos,
+        pesoTotal: log.quantity?.toFixed ? log.quantity.toFixed(2) : String(log.quantity),
       };
+      setPdfData(pdfData);
 
-      console.log("Submitting Form Data:", formData);
-      await submitWasteDisposal(formData);
-
-      setSubmitSuccess(true);
-      setPdfData(formData);
-      setShowDownloadAlert(true); // Show download prompt
-      form.reset(); // Reset form fields
-      setSelectedDriverId(""); // Reset driver selection
-
-    } catch (error: unknown) {
+      setShowDownloadAlert(true);
+      form.reset();
+      setSelectedDriverId("");
+    } catch (error) {
       console.error("Error submitting form:", error);
-      // Consider adding user-facing error feedback here
     } finally {
       setIsSubmitting(false);
     }

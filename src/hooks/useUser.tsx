@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react"; // Import React
+import React, { createContext, useContext, useState, useEffect, useRef } from "react"; // Import React and useRef
 import { createClient } from "@/src/utils/supabase/client"; // Import the specific error type if available
 import { Loader2 } from "lucide-react";
 
@@ -43,6 +43,7 @@ export const UserContextProvider = (props: UserProviderProps) => {
     const [isManager, setIsManager] = useState<boolean>(false); // Add isManager state
     const [loading, setLoading] = useState(true); // Keep loading state
     const supabase = createClient();
+    const lastAuthEvent = useRef<string | null>(null); // Add ref to track last event
 
 
     useEffect(() => {
@@ -110,18 +111,22 @@ export const UserContextProvider = (props: UserProviderProps) => {
 
         // Add listener for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-             console.log("Auth state changed:", event);
-             if (event === 'SIGNED_OUT') {
-                 // User logged out, directly reset state
-                 setProfile(null);
-                 setIsManager(false);
-                 setLoading(false); // Ensure loading is false on logout
-             } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-                 // User logged in, token refreshed, or user data updated
-                 // Re-check user and role
-                 checkUserAndRole();
-             }
-             // Handle other events if necessary
+            // Only run if the event is different from the last one, especially for SIGNED_IN
+            if (lastAuthEvent.current === event && event === 'SIGNED_IN') {
+                // Ignore duplicate SIGNED_IN events
+                return;
+            }
+            lastAuthEvent.current = event;
+
+            console.log("Auth state changed:", event);
+            if (event === 'SIGNED_OUT') {
+                setProfile(null);
+                setIsManager(false);
+                setLoading(false); // Ensure loading is false on logout
+            } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                checkUserAndRole();
+            }
+            // Handle other events if necessary
         });
 
         // Cleanup subscription on unmount

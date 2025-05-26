@@ -18,7 +18,7 @@ export default function Upload() {
           <Link href="/history">
             <Button
               variant="outline"
-              className="flex items-center gap-2 bg-background/10 border-muted"
+              className="flex items-center gap-2 bg-primary-foreground border"
             >
               <ClipboardList className="h-4 w-4" />
               Ver Historial
@@ -27,7 +27,7 @@ export default function Upload() {
           <Link href="/export">
             <Button
               variant="outline"
-              className="flex items-center gap-2 bg-background/10 border-muted"
+              className="flex items-center gap-2 bg-primary-foreground border"
             >
               <FileSpreadsheet className="h-4 w-4" />
               Exportar

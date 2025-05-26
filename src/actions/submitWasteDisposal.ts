@@ -1,21 +1,39 @@
 "use server"
 
-import type { WasteDisposalFormValues } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form";
+import { createClient } from "@/src/utils/supabase/client";
+import type { WasteDisposalLog } from "@/types";
 
-// This is a server action that would handle the form submission
-// In a real application, this would connect to a database
-export async function submitWasteDisposal(formData: WasteDisposalFormValues) {
-  // Simulate a delay to mimic database operation
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+// This is a server action that handles the form submission to the database
+export async function submitWasteDisposal(log: Omit<WasteDisposalLog, "log_id" | "created_at" | "updated_at">) {
+  const supabase = createClient();
 
-  // Here you would typically:
-  // 1. Connect to your database
-  // 2. Insert the form data
-  // 3. Calculate the weight automatically if needed
-  // 4. Return success or error
+  // Insert the log into the waste_logs table
+  const { data, error } = await supabase
+    .from("waste_logs")
+    .insert([log])
+    .select();
 
-  console.log("Form data submitted:", formData)
+  if (error) {
+    console.error("Error inserting waste log:", error);
+    return { success: false, error };
+  }
 
-  // For demonstration purposes, we're just returning success
-  return { success: true }
+  return { success: true, data };
+}
+
+// Fetch all waste disposal logs from the database
+export async function fetchWasteDisposalLogs() {
+  const supabase = createClient();
+
+  // Join drivers table to get driver info
+  const { data, error } = await supabase
+    .from("waste_logs")
+    .select('*, drivers(*)');
+
+  if (error) {
+    console.error("Error fetching waste logs:", error);
+    return { success: false, error };
+  }
+
+  return { success: true, data };
 }

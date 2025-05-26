@@ -185,19 +185,6 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="metal_remisionKia"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Remisión Kia</FormLabel>
-                <FormControl>
-                  <Input placeholder="Número de remisión Kia" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
       )}
 
@@ -274,19 +261,6 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
                 <FormLabel>Remisión HMMX</FormLabel>
                 <FormControl>
                   <Input placeholder="Número de remisión HMMX" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="otros_remisionKia"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Remisión Kia</FormLabel>
-                <FormControl>
-                  <Input placeholder="Número de remisión Kia" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
