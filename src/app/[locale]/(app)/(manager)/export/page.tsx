@@ -39,6 +39,7 @@ import {
   type DestruidasResiduo,
 } from "@/src/utils/log/log-utils"
 import { Driver } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form/DriverInfo"
+import DashboardHeader from "@/src/components/DashboardHeader"
 
 // Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
 type DbWasteLog = {
@@ -470,22 +471,18 @@ export default function ExportPage() {
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-6">
-
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Exportar Registros</h1>
-            <p className="text-muted-foreground">Filtra y exporta los registros de residuos a Excel</p>
-          </div>
-
-          <div className="flex items-center gap-2">
+        <DashboardHeader
+          variant="page"
+          title="Exportar Registros"
+          actions={
             <Link href="/history">
               <Button variant="outline" className="flex items-center gap-2 bg-primary-foreground">
                 <FileSpreadsheet className="h-4 w-4" />
                 Ver Historial
               </Button>
             </Link>
-          </div>
-        </div>
+          }
+        />
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid grid-cols-5 w-full bg-popover">

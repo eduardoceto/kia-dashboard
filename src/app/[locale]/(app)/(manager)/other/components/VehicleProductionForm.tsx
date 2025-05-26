@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/pop
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { Calendar } from "@/src/components/ui/calendar"
+import { createClient } from "@/src/utils/supabase/client"
 
 export default function VehicleProductionForm() {
   const [quantity, setQuantity] = useState("")
@@ -38,15 +39,29 @@ export default function VehicleProductionForm() {
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 10 }, (_, i) => (currentYear - 5 + i).toString())
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Here you would typically send the data to your backend
-    console.log({
-      quantity,
-      month,
-      year,
-    })
+    let usedMonth = month
+    let usedYear = year
+    if (date) {
+      usedMonth = date.toLocaleString('default', { month: 'long' })
+      usedYear = date.getFullYear().toString()
+    }
+
+    const supabase = createClient()
+    const { error } = await supabase.from("vehicle_production").insert([
+      {
+        quantity: Number(quantity),
+        month: usedMonth,
+        year: Number(usedYear),
+      },
+    ])
+
+    if (error) {
+      alert("Error saving data: " + error.message)
+      return
+    }
 
     // Show success message
     setIsSubmitted(true)
@@ -56,6 +71,7 @@ export default function VehicleProductionForm() {
       setQuantity("")
       setMonth("")
       setYear("")
+      setDate(undefined)
       setIsSubmitted(false)
     }, 3000)
   }

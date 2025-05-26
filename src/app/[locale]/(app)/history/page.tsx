@@ -36,6 +36,7 @@ import {
 } from "@/src/utils/log/log-utils"
 import { generatePdf } from "@/src/actions/generatePdf"
 import { Driver } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form/DriverInfo"
+import DashboardHeader from "@/src/components/DashboardHeader"
 
 // Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
 type DbWasteLog = {
@@ -395,20 +396,15 @@ export default function HistoryPage() {
 
   return (
     <div className="container mx-auto py-6 px-4">
+      <DashboardHeader
+        variant="page"
+        title="Historial de Registros"
+      />
+
       {/* Header Section */}
       <div className="mb-6">
-        <div className="flex items-center mb-4">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver al Formulario
-            </Button>
-          </Link>
-        </div>
-
         <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Historial de Registros</h1>
             <p className="text-muted-foreground">Consulta y gestiona todos los registros de salida de residuos</p>
           </div>
 

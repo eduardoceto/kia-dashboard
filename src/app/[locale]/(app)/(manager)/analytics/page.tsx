@@ -3,6 +3,7 @@
 import { BarChart4, LineChart } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { useTranslations } from "next-intl"; // Import useTranslations
+import DashboardHeader from "@/src/components/DashboardHeader";
 
 import { YearComparisonGraph } from "@/src/components/graphs/yearlyComparisonGraph"
 import { MultiGraphPanel } from "@/src/components/graphs/multiGraphPanel"
@@ -22,10 +23,7 @@ export default function UnifiedWasteDashboard() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        {/* Use translation key */}
-        <h1 className="text-2xl KiaSignatureBold">{t('title')}</h1>
-      </div>
+      <DashboardHeader variant="page" title={t('title')} />
 
       <Tabs defaultValue="multi-graph" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4 bg-popover">

@@ -29,71 +29,8 @@ import { Button } from "@/src/components/ui/button";
 import { Download } from "lucide-react";
 import { generatePdf } from "@/src/actions/generatePdf";
 import { formatDate } from "@/src/utils/log/log-utils";
+import DashboardHeader from "@/src/components/DashboardHeader";
 
-
-function DashboardHeader() {
-  const { profile } = useUser();
-  const pathname = usePathname();
-  const [today, setToday] = useState("");
-  useEffect(() => {
-    const date = new Date();
-    setToday(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-  }, []);
-
-  // Breadcrumbs logic (copied from TopNav)
-  function formatSegment(segment: string): string {
-    if (!segment) return "";
-    return segment.replace(/[-_]/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-  }
-  const rawSegments = pathname.split("/").filter(Boolean);
-  const localeSegment = routing.locales.includes(rawSegments[0] as (typeof routing.locales)[number]) ? rawSegments[0] : null;
-  const displaySegments = localeSegment ? rawSegments.slice(1) : rawSegments;
-  const baseHref = localeSegment ? `/${localeSegment}` : '/';
-  const breadcrumbs = [
-    { label: "Dashboard", href: baseHref + "/dashboard" },
-    ...displaySegments.slice(1).map((seg, idx) => {
-      const label = formatSegment(seg);
-      const originalIndex = localeSegment ? idx + 2 : idx + 1;
-      const href = "/" + rawSegments.slice(0, originalIndex + 1).join("/");
-      return { label, href };
-    })
-  ];
-
-  const profileName = (profile?.first_name ? profile.first_name + " " : "") + (profile?.last_name || "User");
-
-  return (
-    <div className="w-full max-w-6xl mx-auto bg-[#101a26] rounded-xl shadow p-6 mb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-2xl font-bold leading-tight text-white">Hello, {profileName}</span>
-          <span className="text-xs text-gray-400 mt-1">{today}</span>
-        </div>
-        <div className="flex gap-2 mt-4 sm:mt-0">
-      
-        </div>
-      </div>
-      <div className="flex flex-row items-center mt-4 w-full">
-        <div className="font-medium text-xs flex items-center space-x-1 truncate max-w-[400px] text-gray-400">
-          {breadcrumbs.map((item, index) => (
-            <div key={item.label + index} className="flex items-center">
-              {index > 0 && <ChevronRight className="h-3 w-3 text-gray-500 mx-1" />}
-              {item.href && index !== breadcrumbs.length - 1 ? (
-                <Link
-                  href={item.href}
-                  className="hover:underline transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <span className="hover:underline">{item.label}</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 const MONTHLY_TARGET = 10000; // monthly target in kg
 const COLORS = ["#2563eb", "#22c55e", "#f59e42", "#ef4444"];
@@ -143,8 +80,8 @@ export default function Dashboard() {
   const recentLogs = useMemo<LogEntry[]>(() => getRecentLogs(logs, 5), [logs]);
 
   return (
-    <div className="space-y-8 bg-[#f6f7fb] min-h-screen p-6">
-      <DashboardHeader />
+    <div>
+      <DashboardHeader variant="dashboard" />
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 gap-y-8">
         {/* Monthly Waste Progress - full width */}
         <DashboardCard title={<span className="flex items-center gap-2 text-2xl font-semibold text-blue-900"><FaChartBar className="text-blue-500" />Monthly Waste Progress</span>} className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md p-8 flex flex-col justify-center h-full min-h-[260px] col-span-1 md:col-span-3">
