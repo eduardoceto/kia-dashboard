@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { LogEntry, ResiduoDetails, LodosResiduo, MetalResiduo, OtrosResiduo, DestruidasResiduo } from '@/src/utils/log/log-utils';
+import type { LogEntry } from '@/src/utils/log/log-utils';
 
 export function generatePdf(data: LogEntry) {
   const doc = new jsPDF();
@@ -41,7 +41,7 @@ export function generatePdf(data: LogEntry) {
       ['Departamento:', data.departamento, 'Motivo:', data.motivo],
     ],
   });
-  // @ts-ignore
+  // @ts-expect-error
   y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y) + 16;
 
   // Divider after solicitante table
@@ -61,7 +61,7 @@ export function generatePdf(data: LogEntry) {
   const margin = 15;
   const minGap = 8;
   doc.setFont('helvetica', 'normal');
-  materialTypes.forEach((type, idx) => {
+  materialTypes.forEach((type) => {
     const optionWidth = 2 + minGap + doc.getTextWidth(type);
     if (x + optionWidth > pageWidth - margin) {
       rowY += 20;
@@ -114,7 +114,7 @@ export function generatePdf(data: LogEntry) {
     descEndY = y + 18;
   }
   // Draw divider after both lines, with extra space
-  let dividerY = descEndY + 10;
+  const dividerY = descEndY + 10;
   y = dividerY + 2;
 
   // Divider after descripción
@@ -134,7 +134,7 @@ export function generatePdf(data: LogEntry) {
   x = 40;
   rowY = y + 12;
   doc.setFont('helvetica', 'normal');
-  containerTypes.forEach((type, idx) => {
+  containerTypes.forEach((type) => {
     const optionWidth = 2 + minGap + doc.getTextWidth(type);
     if (x + optionWidth > pageWidth - margin) {
       rowY += 20;
@@ -166,7 +166,7 @@ export function generatePdf(data: LogEntry) {
       ['Placas:', data.placas, 'Número económico:', data.numeroEconomico],
     ],
   });
-  // @ts-ignore
+  // @ts-expect-error
   y = (doc.lastAutoTable && doc.lastAutoTable.finalY ? doc.lastAutoTable.finalY : y) + 40;
 
   // Divider before signature

@@ -114,20 +114,27 @@ export type WasteDisposalLogEntry = WasteDisposalFormValues & {
   pesoTotal: string;
 };
 
-function mapMaterialType(tipoMaterial: string): string {
-  switch (tipoMaterial) {
-    case "metal":
-      return "Metallic/nonMetallic";
-    case "lodos":
-      return "Sludge";
-    case "otros":
-      return "Other Recyclables";
-    case "destruidas":
-      return "Uretano/Vidrio/Autopartes Destruidas";
-    default:
-      return tipoMaterial;
-  }
-}
+// Add this type above the component:
+export type WasteDisposalDbLog = {
+  user_id: string;
+  driver_id: string;
+  date: string;
+  departure_time: string;
+  folio: string;
+  department: string;
+  reason: string;
+  container_type: string;
+  authorizing_person: string;
+  quantity: number | null;
+  quantity_type: string | null;
+  waste_type: string | null;
+  waste_name: string | null;
+  area: string | null;
+  transport_num_services: number | null;
+  "Manifiesto No."?: string | null;
+  excel_id?: number;
+  REM?: number;
+};
 
 export default function WasteDisposalForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -250,7 +257,7 @@ export default function WasteDisposalForm() {
       }
 
       // Build the log object for DB submission (new waste_logs schema)
-      let log: any = {
+      const log: WasteDisposalDbLog = {
         user_id: userId,
         driver_id: driverId,
         date: currentDate,
@@ -292,31 +299,31 @@ export default function WasteDisposalForm() {
       if (values.tipoMaterial === "lodos") {
         log.quantity = parseFloat(values.lodos_pesoKg || "0") || 0;
         log.quantity_type = "kg";
-        log.waste_name = values.lodos_nombreResiduo;
-        log.area = values.lodos_area;
+        log.waste_name = values.lodos_nombreResiduo ?? null;
+        log.area = values.lodos_area ?? null;
         log.transport_num_services = values.lodos_transporteNoServicios ? Number(values.lodos_transporteNoServicios) : null;
-        log["Manifiesto No."] = values.lodos_manifiestoNo;
+        log["Manifiesto No."] = values.lodos_manifiestoNo ?? null;
       } else if (values.tipoMaterial === "metal") {
         log.quantity = parseFloat(values.metal_cantidad || "0") || 0;
-        log.quantity_type = values.metal_unidad;
-        log.waste_type = values.metal_tipoResiduo;
-        log.waste_name = values.metal_item;
+        log.quantity_type = values.metal_unidad ?? null;
+        log.waste_type = values.metal_tipoResiduo ?? null;
+        log.waste_name = values.metal_item ?? null;
         if (values.metal_remisionHMMX && !isNaN(Number(values.metal_remisionHMMX))) {
           log.REM = Number(values.metal_remisionHMMX);
         }
       } else if (values.tipoMaterial === "otros") {
         log.quantity = parseFloat(values.otros_cantidad || "0") || 0;
-        log.quantity_type = values.otros_unidad;
-        log.waste_type = values.otros_tipoDesecho;
-        log.waste_name = values.otros_item;
+        log.quantity_type = values.otros_unidad ?? null;
+        log.waste_type = values.otros_tipoDesecho ?? null;
+        log.waste_name = values.otros_item ?? null;
         if (values.otros_remisionHMMX && !isNaN(Number(values.otros_remisionHMMX))) {
           log.REM = Number(values.otros_remisionHMMX);
         }
       } else if (values.tipoMaterial === "destruidas") {
         log.quantity = parseFloat(values.destruidas_peso || "0") || 0;
         log.quantity_type = "kg";
-        log.waste_name = values.destruidas_residuos;
-        log.area = values.destruidas_area;
+        log.waste_name = values.destruidas_residuos ?? null;
+        log.area = values.destruidas_area ?? null;
       }
 
       await submitWasteDisposal(log);

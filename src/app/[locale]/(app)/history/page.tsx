@@ -318,12 +318,12 @@ export default function HistoryPage() {
     setIsEditing(true)
   }
 
-  const handleEditChange = (field: string, value: any) => {
+  const handleEditChange = (field: string, value: unknown) => {
     if (!editLog) return
     setEditLog({ ...editLog, [field]: value })
   }
 
-  const handleEditResiduoChange = (field: string, value: any) => {
+  const handleEditResiduoChange = (field: string, value: unknown) => {
     if (!editLog) return
     setEditLog({ ...editLog, residuos: { ...editLog.residuos, [field]: value } })
   }
