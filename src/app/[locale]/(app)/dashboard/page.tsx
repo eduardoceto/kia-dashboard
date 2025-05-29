@@ -5,7 +5,6 @@ import { FaWeight } from "react-icons/fa";
 import { useEffect, useState, useMemo } from "react";
 
 import { DashboardCard } from "@/src/components/ui/dashboard-card";
-import { getHistoricalLogs } from "@/src/components/testData/dataLogs";
 import type { LogEntry, LodosResiduo, MetalResiduo, OtrosResiduo, DestruidasResiduo } from "@/src/utils/log/log-utils";
 import {
   getWasteByType,
