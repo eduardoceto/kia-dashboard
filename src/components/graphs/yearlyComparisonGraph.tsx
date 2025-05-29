@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/ca
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Loader2 } from "lucide-react"
 
-import { mockData, mockCombinedData } from "@/src/components/testData/data"
+import { mockCombinedData } from "@/src/components/testData/data"
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { createClient } from "@/src/utils/supabase/client"
 
@@ -163,7 +163,7 @@ export function YearComparisonGraph() {
   const [material, setMaterial] = useState(MATERIALS[0])
   const [years, setYears] = useState<number[]>([])
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<{ month: string; [key: string]: number | string }[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [yearLoading, setYearLoading] = useState(true)

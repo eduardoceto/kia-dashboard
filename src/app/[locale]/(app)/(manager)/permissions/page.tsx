@@ -1,7 +1,7 @@
 "use client"
 
 import { Accordion } from "@/src/components/ui/accordion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Card, CardContent } from "@/src/components/ui/card"
 import { createClient } from "@/src/utils/supabase/client"
 import EmployeeManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/EmployeeManagement" // Import new component
 import DriverManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/DriverManagement" // Import new component

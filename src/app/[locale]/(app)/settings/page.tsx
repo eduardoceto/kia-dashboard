@@ -1,8 +1,7 @@
 "use client"
 
-import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
-import { ArrowLeft, Languages } from "lucide-react"
+import { Languages } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Label } from "@/src/components/ui/label"

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
-import { ArrowLeft, Calendar, ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search, Pencil } from "lucide-react"
+import { ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search, Pencil } from "lucide-react"
 
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -458,8 +458,15 @@ export default function HistoryPage() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-start text-left font-normal">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {startDate ? format(startDate, "dd/MM/yy") : "Inicio"}
+                            <CalendarComponent
+                              mode="single"
+                              selected={startDate}
+                              onSelect={(date) => {
+                                setStartDate(date)
+                                setCurrentPage(1) // Reset to first page when date changes
+                              }}
+                              initialFocus
+                            />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -471,14 +478,23 @@ export default function HistoryPage() {
                               setCurrentPage(1) // Reset to first page when date changes
                             }}
                             initialFocus
+                            disabled={(date) => (startDate ? isBefore(date, startDate) : false)}
                           />
                         </PopoverContent>
                       </Popover>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-start text-left font-normal">
-                            <Calendar className="h-4 w-4 mr-2" />
-                            {endDate ? format(endDate, "dd/MM/yy") : "Fin"}
+                            <CalendarComponent
+                              mode="single"
+                              selected={endDate}
+                              onSelect={(date) => {
+                                setEndDate(date)
+                                setCurrentPage(1) // Reset to first page when date changes
+                              }}
+                              initialFocus
+                              disabled={(date) => (startDate ? isBefore(date, startDate) : false)}
+                            />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">

@@ -28,6 +28,24 @@ const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
   "Metal/Non metallic": [4],
 }
 
+// Define a type for log entries
+interface WasteLog {
+  created_at: string;
+  excel_id: number;
+  quantity: number;
+  quantity_type: string;
+  waste_name?: string;
+  waste_type?: string;
+  area?: string;
+  REM?: string;
+}
+
+// Define a type for chart data points
+interface ChartDataPoint {
+  name: string;
+  value: number;
+}
+
 interface GraphProps {
     id: number
     onRemove: (id: number) => void
@@ -37,7 +55,7 @@ interface GraphProps {
 export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
   const [material, setMaterial] = useState(MATERIALS[0])
   const [timeRange, setTimeRange] = useState(TIME_RANGES[0])
-  const [data, setData] = useState<any[]>([])
+  const [data, setData] = useState<ChartDataPoint[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,7 +67,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
         const supabase = createClient()
         // Calculate date range
         const now = new Date()
-        let fromDate = new Date()
+        const fromDate = new Date()
         if (timeRange === "Last Week") fromDate.setDate(now.getDate() - 6)
         else if (timeRange === "Last Month") fromDate.setDate(now.getDate() - 29)
         else if (timeRange === "Last Quarter") fromDate.setMonth(now.getMonth() - 2)
