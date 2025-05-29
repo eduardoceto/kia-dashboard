@@ -2,13 +2,7 @@
 
 import { FaChartBar } from "react-icons/fa6";
 import { FaWeight } from "react-icons/fa";
-import { ChevronRight } from "lucide-react";
-import { useUser } from "@/src/hooks/useUser";
-import { usePathname } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link";
-import { routing } from "@/src/i18n/routing";
-
 
 import { DashboardCard } from "@/src/components/ui/dashboard-card";
 import { getHistoricalLogs } from "@/src/components/testData/dataLogs";
@@ -30,6 +24,7 @@ import { Download } from "lucide-react";
 import { generatePdf } from "@/src/actions/generatePdf";
 import { formatDate } from "@/src/utils/log/log-utils";
 import DashboardHeader from "@/src/components/DashboardHeader";
+import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal";
 
 
 const MONTHLY_TARGET = 10000; // monthly target in kg
@@ -49,9 +44,97 @@ const getWasteByMaterialForMonth = (logs: LogEntry[], year: number, month: numbe
 };
 
 export default function Dashboard() {
-  const logs = useMemo(() => getHistoricalLogs(), []);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const year = 2025; // Today is 11 May 2025
   const month = 4; // May (0-indexed)
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setLoading(true);
+      setError(null);
+      const result = await fetchWasteDisposalLogs();
+      if (result.success) {
+        const excelIdToTipoMaterial: Record<string, string> = {
+          "1": "lodos",
+          "2": "destruidas",
+          "3": "otros",
+          "4": "metal",
+        };
+        const mappedLogs = (result.data || []).map((log: any) => {
+          // Use drivers field from explicit join
+          const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
+          const getDriverField = (field: string): string => {
+            if (!driver) return '';
+            if (Array.isArray(driver)) return '';
+            if (typeof driver === 'object' && driver !== null && field in driver) {
+              const value = driver[field];
+              return typeof value === 'string' ? value : '';
+            }
+            return '';
+          };
+          const tipoMaterial = excelIdToTipoMaterial[String(log.excel_id)] || "";
+          let residuos = {};
+          if (tipoMaterial === "lodos") {
+            residuos = {
+              nombreResiduo: log.waste_name,
+              manifiestoNo: log["Manifiesto No."],
+              area: log.area,
+              transporteNoServicios: log.transport_num_services,
+              pesoKg: log.quantity,
+            };
+          } else if (tipoMaterial === "metal") {
+            residuos = {
+              tipoResiduo: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "otros") {
+            residuos = {
+              tipoDesecho: log.waste_type,
+              item: log.waste_name,
+              cantidad: log.quantity,
+              unidad: log.quantity_type,
+              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+            };
+          } else if (tipoMaterial === "destruidas") {
+            residuos = {
+              residuos: log.waste_name,
+              area: log.area,
+              peso: log.quantity,
+            };
+          }
+          return {
+            fecha: String(log.date || ''),
+            horaSalida: String(log.departure_time || ''),
+            folio: String(log.folio || ''),
+            departamento: String(log.department || ''),
+            motivo: String(log.reason || ''),
+            nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
+            compania: getDriverField('company'),
+            procedencia: getDriverField('origin'),
+            destino: getDriverField('destination'),
+            placas: getDriverField('vehicle_plate'),
+            numeroEconomico: getDriverField('economic_number'),
+            tipoMaterial,
+            residuos,
+            pesoTotal: String(log.quantity?.toString() || ''),
+            tipoContenedor: String(log.container_type || ''),
+            personaAutoriza: String(log.authorizing_person || ''),
+          };
+        }).filter((log: LogEntry) => !!log.fecha);
+        setLogs(mappedLogs);
+      } else {
+        setError("Error loading logs from the database.");
+      }
+      setLoading(false);
+    };
+    fetchLogs();
+  }, []);
 
   // Aggregated data
   const wasteByType = useMemo(() => getWasteByType(logs, year), [logs, year]);
@@ -78,6 +161,9 @@ export default function Dashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const recentLogs = useMemo<LogEntry[]>(() => getRecentLogs(logs, 5), [logs]);
+
+  if (loading) return <div className="p-8 text-center text-lg">Loading dashboard data...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
   return (
     <div>
