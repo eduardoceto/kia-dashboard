@@ -46,14 +46,20 @@ function CombinedChart({
     showComparison,
     onShowComparisonChange,
     selectors,
-  }: { title: string; data?: typeof mockCombinedData; height?: string; showComparison: boolean; onShowComparisonChange: (val: boolean) => void; selectors?: React.ReactNode }) {
+    selectedYear,
+  }: { title: string; data?: Record<string, any>[]; height?: string; showComparison: boolean; onShowComparisonChange: (val: boolean) => void; selectors?: React.ReactNode; selectedYear: number }) {
+    const prevYear = selectedYear - 1;
+    const kgKey = `kg/${selectedYear}`;
+    const kgPrevKey = `kg/${prevYear}`;
+    const kgVehicleKey = `kg/Vehicle (${selectedYear})`;
+    const kgVehiclePrevKey = `kg/Vehicle (${prevYear})`;
     // Calculate max values for y-axis scaling
     const maxKg = Math.max(
-      ...data.map((item) => Math.max(item["kg/2024"] || 0, showComparison ? item["kg/2023"] || 0 : 0)),
+      ...data.map((item) => Math.max(item[kgKey] || 0, showComparison ? item[kgPrevKey] || 0 : 0)),
     )
     const maxKgVehicle = Math.max(
       ...data.map((item) =>
-        Math.max(item["kg/Vehicle (2024)"] || 0, showComparison ? item["kg/Vehicle (2023)"] || 0 : 0),
+        Math.max(item[kgVehicleKey] || 0, showComparison ? item[kgVehiclePrevKey] || 0 : 0),
       ),
     )
     return (
@@ -104,8 +110,8 @@ function CombinedChart({
                 <Legend />
                 <Bar
                   yAxisId="left"
-                  dataKey="kg/2024"
-                  name="kg/2024"
+                  dataKey={kgKey}
+                  name={kgKey}
                   fill="#4f46e5"
                   radius={[4, 4, 0, 0]}
                   barSize={showComparison ? 20 : 40}
@@ -113,8 +119,8 @@ function CombinedChart({
                 {showComparison && (
                   <Bar
                     yAxisId="left"
-                    dataKey="kg/2023"
-                    name="kg/2023"
+                    dataKey={kgPrevKey}
+                    name={kgPrevKey}
                     fill="#10b981"
                     radius={[4, 4, 0, 0]}
                     barSize={20}
@@ -123,8 +129,8 @@ function CombinedChart({
                 <Line
                   yAxisId="right"
                   type="monotone"
-                  dataKey="kg/Vehicle (2024)"
-                  name="kg/Vehicle (2024)"
+                  dataKey={kgVehicleKey}
+                  name={kgVehicleKey}
                   stroke="#ef4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
@@ -134,8 +140,8 @@ function CombinedChart({
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    dataKey="kg/Vehicle (2023)"
-                    name="kg/Vehicle (2023)"
+                    dataKey={kgVehiclePrevKey}
+                    name={kgVehiclePrevKey}
                     stroke="#8b5cf6"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -201,10 +207,15 @@ export function YearComparisonGraph() {
         const supabase = createClient()
         // Map material to excel_id(s)
         const excelIds = MATERIAL_TO_EXCEL_ID[material] || []
+        // Calculate date range for selectedYear and previous year
+        const startDate = `${selectedYear - 1}-01-01T00:00:00.000Z`;
+        const endDate = `${selectedYear}-12-31T23:59:59.999Z`;
         // Fetch waste_logs for selected excel_id(s) and year, and previous year for comparison
         let query = supabase
           .from('waste_logs')
           .select('created_at, excel_id, quantity, quantity_type')
+          .gte('created_at', startDate)
+          .lte('created_at', endDate)
         if (excelIds.length === 1) {
           query = query.eq('excel_id', excelIds[0])
         } else if (excelIds.length > 1) {
@@ -231,10 +242,10 @@ export function YearComparisonGraph() {
         const dataPrevYear = groupByYear(selectedYear - 1)
         const combined = months.map((month, i) => ({
           month,
-          "kg/2024": dataThisYear[i],
-          "kg/2023": dataPrevYear[i],
-          "kg/Vehicle (2024)": 0,
-          "kg/Vehicle (2023)": 0,
+          [`kg/${selectedYear}`]: dataThisYear[i],
+          [`kg/${selectedYear - 1}`]: dataPrevYear[i],
+          [`kg/Vehicle (${selectedYear})`]: 0,
+          [`kg/Vehicle (${selectedYear - 1})`]: 0,
         }))
         setData(combined)
       } catch (e: any) {
@@ -302,17 +313,12 @@ export function YearComparisonGraph() {
         {selectedYear ? (
           <CombinedChart
             title={`${material} ${selectedYear}`}
-            data={data.map(row => ({
-              month: row.month,
-              "kg/2024": row[`kg/2024`] || 0,
-              "kg/2023": row[`kg/2023`] || 0,
-              "kg/Vehicle (2024)": 0,
-              "kg/Vehicle (2023)": 0,
-            }))}
+            data={data}
             height="h-[500px]"
             showComparison={showComparison}
             onShowComparisonChange={setShowComparison}
             selectors={selectors}
+            selectedYear={selectedYear}
           />
         ) : null}
       </GraphContainer>
