@@ -63,9 +63,10 @@ export default function Dashboard() {
           "3": "otros",
           "4": "metal",
         };
-        const mappedLogs = (result.data || []).map((log: any) => {
+        const mappedLogs = (result.data || []).map((log: unknown) => {
+          const l = log as any; // TODO: Replace 'any' with a more specific type if possible
           // Use drivers field from explicit join
-          const driver = Array.isArray(log.drivers) ? log.drivers[0] : log.drivers;
+          const driver = Array.isArray(l.drivers) ? l.drivers[0] : l.drivers;
           const getDriverField = (field: string): string => {
             if (!driver) return '';
             if (Array.isArray(driver)) return '';
@@ -75,45 +76,45 @@ export default function Dashboard() {
             }
             return '';
           };
-          const tipoMaterial = excelIdToTipoMaterial[String(log.excel_id)] || "";
+          const tipoMaterial = excelIdToTipoMaterial[String(l.excel_id)] || "";
           let residuos = {};
           if (tipoMaterial === "lodos") {
             residuos = {
-              nombreResiduo: log.waste_name,
-              manifiestoNo: log["Manifiesto No."],
-              area: log.area,
-              transporteNoServicios: log.transport_num_services,
-              pesoKg: log.quantity,
+              nombreResiduo: l.waste_name,
+              manifiestoNo: l["Manifiesto No."],
+              area: l.area,
+              transporteNoServicios: l.transport_num_services,
+              pesoKg: l.quantity,
             };
           } else if (tipoMaterial === "metal") {
             residuos = {
-              tipoResiduo: log.waste_type,
-              item: log.waste_name,
-              cantidad: log.quantity,
-              unidad: log.quantity_type,
-              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+              tipoResiduo: l.waste_type,
+              item: l.waste_name,
+              cantidad: l.quantity,
+              unidad: l.quantity_type,
+              remisionHMMX: l.REM ? l.REM.toString() : undefined,
             };
           } else if (tipoMaterial === "otros") {
             residuos = {
-              tipoDesecho: log.waste_type,
-              item: log.waste_name,
-              cantidad: log.quantity,
-              unidad: log.quantity_type,
-              remisionHMMX: log.REM ? log.REM.toString() : undefined,
+              tipoDesecho: l.waste_type,
+              item: l.waste_name,
+              cantidad: l.quantity,
+              unidad: l.quantity_type,
+              remisionHMMX: l.REM ? l.REM.toString() : undefined,
             };
           } else if (tipoMaterial === "destruidas") {
             residuos = {
-              residuos: log.waste_name,
-              area: log.area,
-              peso: log.quantity,
+              residuos: l.waste_name,
+              area: l.area,
+              peso: l.quantity,
             };
           }
           return {
-            fecha: String(log.date || ''),
-            horaSalida: String(log.departure_time || ''),
-            folio: String(log.folio || ''),
-            departamento: String(log.department || ''),
-            motivo: String(log.reason || ''),
+            fecha: String(l.date || ''),
+            horaSalida: String(l.departure_time || ''),
+            folio: String(l.folio || ''),
+            departamento: String(l.department || ''),
+            motivo: String(l.reason || ''),
             nombreChofer: `${getDriverField('first_name')} ${getDriverField('last_name')}`.trim(),
             compania: getDriverField('company'),
             procedencia: getDriverField('origin'),
@@ -122,9 +123,9 @@ export default function Dashboard() {
             numeroEconomico: getDriverField('economic_number'),
             tipoMaterial,
             residuos,
-            pesoTotal: String(log.quantity?.toString() || ''),
-            tipoContenedor: String(log.container_type || ''),
-            personaAutoriza: String(log.authorizing_person || ''),
+            pesoTotal: String(l.quantity?.toString() || ''),
+            tipoContenedor: String(l.container_type || ''),
+            personaAutoriza: String(l.authorizing_person || ''),
           };
         }).filter((log: LogEntry) => !!log.fecha);
         setLogs(mappedLogs);

@@ -28,18 +28,6 @@ const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
   "Metal/Non metallic": [4],
 }
 
-// Define a type for log entries
-interface WasteLog {
-  created_at: string;
-  excel_id: number;
-  quantity: number;
-  quantity_type: string;
-  waste_name?: string;
-  waste_type?: string;
-  area?: string;
-  REM?: string;
-}
-
 // Define a type for chart data points
 interface ChartDataPoint {
   name: string;
@@ -114,8 +102,8 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
           return { name: label, value: sum }
         })
         setData(grouped)
-      } catch (e: any) {
-        setError(e.message || "Error fetching data")
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error fetching data')
       } finally {
         setLoading(false)
       }

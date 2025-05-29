@@ -44,10 +44,9 @@ function CombinedChart({
     data = mockCombinedData,
     height = "h-[500px]",
     showComparison,
-    onShowComparisonChange,
     selectors,
     selectedYear,
-  }: { title: string; data?: Record<string, any>[]; height?: string; showComparison: boolean; onShowComparisonChange: (val: boolean) => void; selectors?: React.ReactNode; selectedYear: number }) {
+  }: { title: string; data?: Record<string, any>[]; height?: string; showComparison: boolean; selectors?: React.ReactNode; selectedYear: number }) {
     const prevYear = selectedYear - 1;
     const kgKey = `kg/${selectedYear}`;
     const kgPrevKey = `kg/${prevYear}`;
@@ -189,8 +188,8 @@ export function YearComparisonGraph() {
         const yearArr = Array.from(yearSet).sort((a, b) => b - a)
         setYears(yearArr)
         setSelectedYear(yearArr[0] || null)
-      } catch (e: any) {
-        setYearError(e.message || "Error fetching years")
+      } catch (e: unknown) {
+        setYearError(e instanceof Error ? e.message : "Error fetching years")
       } finally {
         setYearLoading(false)
       }
@@ -248,8 +247,8 @@ export function YearComparisonGraph() {
           [`kg/Vehicle (${selectedYear - 1})`]: 0,
         }))
         setData(combined)
-      } catch (e: any) {
-        setError(e.message || "Error fetching data")
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Error fetching data")
       } finally {
         setLoading(false)
       }
@@ -316,7 +315,6 @@ export function YearComparisonGraph() {
             data={data}
             height="h-[500px]"
             showComparison={showComparison}
-            onShowComparisonChange={setShowComparison}
             selectors={selectors}
             selectedYear={selectedYear}
           />
