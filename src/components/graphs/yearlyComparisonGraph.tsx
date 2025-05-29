@@ -46,7 +46,7 @@ function CombinedChart({
     showComparison,
     selectors,
     selectedYear,
-  }: { title: string; data?: Record<string, any>[]; height?: string; showComparison: boolean; selectors?: React.ReactNode; selectedYear: number }) {
+  }: { title: string; data?: Record<string, unknown>[]; height?: string; showComparison: boolean; selectors?: React.ReactNode; selectedYear: number }) {
     const prevYear = selectedYear - 1;
     const kgKey = `kg/${selectedYear}`;
     const kgPrevKey = `kg/${prevYear}`;
@@ -54,11 +54,11 @@ function CombinedChart({
     const kgVehiclePrevKey = `kg/Vehicle (${prevYear})`;
     // Calculate max values for y-axis scaling
     const maxKg = Math.max(
-      ...data.map((item) => Math.max(item[kgKey] || 0, showComparison ? item[kgPrevKey] || 0 : 0)),
+      ...data.map((item) => Math.max(Number(item[kgKey] || 0), showComparison ? Number(item[kgPrevKey] || 0) : 0)),
     )
     const maxKgVehicle = Math.max(
       ...data.map((item) =>
-        Math.max(item[kgVehicleKey] || 0, showComparison ? item[kgVehiclePrevKey] || 0 : 0),
+        Math.max(Number(item[kgVehicleKey] || 0), showComparison ? Number(item[kgVehiclePrevKey] || 0) : 0),
       ),
     )
     return (

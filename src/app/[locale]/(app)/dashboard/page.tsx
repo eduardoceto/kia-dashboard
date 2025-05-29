@@ -64,14 +64,14 @@ export default function Dashboard() {
           "4": "metal",
         };
         const mappedLogs = (result.data || []).map((log: unknown) => {
-          const l = log as any; // TODO: Replace 'any' with a more specific type if possible
+          const l = log as Record<string, unknown>;
           // Use drivers field from explicit join
           const driver = Array.isArray(l.drivers) ? l.drivers[0] : l.drivers;
           const getDriverField = (field: string): string => {
             if (!driver) return '';
             if (Array.isArray(driver)) return '';
             if (typeof driver === 'object' && driver !== null && field in driver) {
-              const value = driver[field];
+              const value = (driver as Record<string, unknown>)[field];
               return typeof value === 'string' ? value : '';
             }
             return '';
@@ -92,7 +92,7 @@ export default function Dashboard() {
               item: l.waste_name,
               cantidad: l.quantity,
               unidad: l.quantity_type,
-              remisionHMMX: l.REM ? l.REM.toString() : undefined,
+              remisionHMMX: l.REM ? String(l.REM) : undefined,
             };
           } else if (tipoMaterial === "otros") {
             residuos = {
@@ -100,7 +100,7 @@ export default function Dashboard() {
               item: l.waste_name,
               cantidad: l.quantity,
               unidad: l.quantity_type,
-              remisionHMMX: l.REM ? l.REM.toString() : undefined,
+              remisionHMMX: l.REM ? String(l.REM) : undefined,
             };
           } else if (tipoMaterial === "destruidas") {
             residuos = {
