@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/src/components/ui/alert-dialog"; // Adjust path if needed
+import { useTranslations } from "next-intl";
 
 interface DownloadConfirmationDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ const DownloadConfirmationDialog: React.FC<DownloadConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const t = useTranslations('wasteDisposalForm');
   // Prevent closing the dialog by clicking outside or pressing Escape
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
@@ -33,15 +35,15 @@ const DownloadConfirmationDialog: React.FC<DownloadConfirmationDialogProps> = ({
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Confirmar Descarga</AlertDialogTitle>
+          <AlertDialogTitle>{t('downloadDialogTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            ¿Quieres descargar el archivo PDF del registro?
+            {t('downloadDialogDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel onClick={onCancel}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction className='bg-foreground hover:text-foreground hover:border ' onClick={onConfirm}>
-            Descargar
+            {t('download')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

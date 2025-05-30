@@ -1,13 +1,14 @@
 "use client"
 
 import { Accordion } from "@/src/components/ui/accordion"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Card, CardContent } from "@/src/components/ui/card"
 import { createClient } from "@/src/utils/supabase/client"
 import EmployeeManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/EmployeeManagement" // Import new component
 import DriverManagement from "@/src/app/[locale]/(app)/(manager)/permissions/components/DriverManagement" // Import new component
 import { useTranslations } from "next-intl"; // Import useTranslations
 import { useUser } from "@/src/hooks/useUser";
 import { redirect } from "next/navigation";
+import DashboardHeader from "@/src/components/DashboardHeader";
 
 export default function AdminPage() {
   const supabase = createClient() // Create Supabase client instance here
@@ -26,12 +27,8 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <DashboardHeader variant="page" title={t('title')} />
       <Card>
-        <CardHeader>
-          {/* Use translation keys */}
-          <CardTitle>{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
-        </CardHeader>
         <CardContent>
           <Accordion type="single" collapsible className="w-full" defaultValue="employees"> {/* Optionally set a default open item */}
             {/* --- Employee Management Section --- */}

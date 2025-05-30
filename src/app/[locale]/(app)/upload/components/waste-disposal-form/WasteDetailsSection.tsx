@@ -17,6 +17,7 @@ import {
 } from "@/src/components/ui/select";
 import { Input } from "@/src/components/ui/input";
 import { WasteDisposalFormValues } from "../waste-disposal-form";
+import { useTranslations } from "next-intl";
 
 // Define units locally or import from a shared constants file
 export const metalUnits = [
@@ -30,11 +31,12 @@ interface WasteDetailsSectionProps {
 }
 
 const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selectedMaterialType }) => {
+  const t = useTranslations('wasteDisposalForm');
   if (!selectedMaterialType) return null; // Don't render if no material type is selected
 
   return (
     <div className="border rounded-md p-4 space-y-4 mt-4">
-      <h3 className="text-lg font-medium mb-2">Detalles del Material</h3>
+      <h3 className="text-lg font-medium mb-2">{t('wasteLabel')} {t('materialTypeLabel')}</h3>
 
       {/* --- Conditional Waste Fields --- */}
       {selectedMaterialType === "lodos" && (
@@ -44,9 +46,9 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
             name="lodos_nombreResiduo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre Residuo</FormLabel>
+                <FormLabel>{t('wasteLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ej: Lodos de pintura" {...field} />
+                  <Input placeholder={t('wasteLabel')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -57,9 +59,9 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
             name="lodos_manifiestoNo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Manifiesto No.</FormLabel>
+                <FormLabel>{t('lodos.manifiestoNo')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Número de manifiesto" {...field} />
+                  <Input placeholder={t('lodos.manifiestoNo')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -70,9 +72,9 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
             name="lodos_area"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Área</FormLabel>
+                <FormLabel>{t('lodos.area')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Área de origen" {...field} />
+                  <Input placeholder={t('lodos.area')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -83,9 +85,9 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
             name="lodos_transporteNoServicios"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Transporte No. de Servicios</FormLabel>
+                <FormLabel>{t('lodos.transportNoServices')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Número de servicio" {...field} />
+                  <Input placeholder={t('lodos.transportNoServices')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -96,9 +98,9 @@ const WasteDetailsSection: React.FC<WasteDetailsSectionProps> = ({ form, selecte
             name="lodos_pesoKg"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Peso (kg)</FormLabel>
+                <FormLabel>{t('lodos.weightKg')}</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Peso en kilogramos" {...field} />
+                  <Input type="number" placeholder={t('lodos.weightKg')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

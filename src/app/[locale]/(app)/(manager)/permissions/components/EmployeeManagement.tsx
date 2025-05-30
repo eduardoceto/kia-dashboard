@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner"
 import type { SupabaseClient } from '@supabase/supabase-js' // Import SupabaseClient type
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/src/components/ui/alert-dialog"
+import { useTranslations } from "next-intl"
 
 // Define Employee type
 type Employee = {
@@ -37,6 +38,7 @@ interface EmployeeManagementProps {
 }
 
 export default function EmployeeManagement({ supabase }: EmployeeManagementProps) {
+  const t = useTranslations('permissionsPage.employeeManagement')
   // Employee State
   const [employees, setEmployees] = useState<Employee[]>([])
   const [loadingEmployees, setLoadingEmployees] = useState(true)
@@ -235,14 +237,14 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   // --- Render Logic ---
   return (
     <AccordionItem value="employees">
-      <AccordionTrigger className="text-lg font-semibold">Employee Management</AccordionTrigger>
+      <AccordionTrigger className="text-lg font-semibold">{t('sectionTitle')}</AccordionTrigger>
       <AccordionContent>
         {/* Search and Add Button */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search employees by name, email, or ID..."
+              placeholder={t('searchPlaceholder')}
               className="pl-8"
               value={employeeSearchTerm}
               onChange={(e) => setEmployeeSearchTerm(e.target.value)}
@@ -251,52 +253,51 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
           {/* Add Employee Dialog */}
           <Dialog open={isAddEmployeeDialogOpen} onOpenChange={setIsAddEmployeeDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline"className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
-                Add Employee
+                {t('addButton')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Employee</DialogTitle>
-                <DialogDescription>Create a new employee profile and login.</DialogDescription>
+                <DialogTitle>{t('addDialogTitle')}</DialogTitle>
+                <DialogDescription>{t('addDialogDescription')}</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">First Name *</Label>
+                  <Label htmlFor="name">{t('firstName')} *</Label>
                   <Input id="name" value={newEmployee.first_name} onChange={(e) => setNewEmployee({ ...newEmployee, first_name: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Last Name *</Label>
+                  <Label htmlFor="name">{t('lastName')} *</Label>
                   <Input id="name" value={newEmployee.last_name} onChange={(e) => setNewEmployee({ ...newEmployee, last_name: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="employee_id">Employee ID</Label>
+                  <Label htmlFor="employee_id">{t('employeeId')}</Label>
                   <Input id="employee_id" value={newEmployee.employee_id} onChange={(e) => setNewEmployee({ ...newEmployee, employee_id: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t('email')} *</Label>
                   <Input id="email" type="email" value={newEmployee.email} onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">{t('password')} *</Label>
                   <Input id="password" type="password" value={newEmployee.password} onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })} placeholder="Min. 6 characters" disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="role">Role</Label>
-                  {/* Consider using a Select component if roles are predefined */}
+                  <Label htmlFor="role">{t('role')}</Label>
                   <Input id="role" value={newEmployee.role} onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })} disabled={isSubmittingEmployee}/>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch id="active" checked={newEmployee.is_active} onCheckedChange={(checked) => setNewEmployee({ ...newEmployee, is_active: checked })} disabled={isSubmittingEmployee}/>
-                  <Label htmlFor="active">Active (Profile)</Label>
+                  <Label htmlFor="active">{t('active')}</Label>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>Cancel</Button>
+                <Button variant="outline" onClick={() => setIsAddEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>{t('cancel')}</Button>
                 <Button variant="default" onClick={handleAddEmployee} disabled={isSubmittingEmployee}>
                    {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                   {isSubmittingEmployee ? 'Adding...' : 'Add Employee'}
+                   {isSubmittingEmployee ? t('adding') : t('add')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -308,19 +309,19 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Employee ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('table.employeeId')}</TableHead>
+                <TableHead>{t('table.name')}</TableHead>
+                <TableHead>{t('table.email')}</TableHead>
+                <TableHead>{t('table.role')}</TableHead>
+                <TableHead>{t('table.status')}</TableHead>
+                <TableHead className="text-right">{t('table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loadingEmployees ? (
                 <TableRow><TableCell colSpan={6} className="h-24 text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" /></TableCell></TableRow>
               ) : !filteredEmployees.length ? (
-                <TableRow><TableCell colSpan={6} className="h-24 text-center">No employees found.</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="h-24 text-center">{t('noEmployees')}</TableCell></TableRow>
               ) : (
                 filteredEmployees.map((employee) => (
                   <TableRow key={employee.id}>
@@ -331,7 +332,7 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Switch id={`active-emp-${employee.id}`} checked={employee.is_active} onCheckedChange={() => handleToggleEmployeeActive(employee.id, employee.is_active, employee.first_name ?? '', employee.last_name || employee.email || employee.id)} />
-                        <Label htmlFor={`active-emp-${employee.id}`} className="text-sm">{employee.is_active ? "Active" : "Inactive"}</Label>
+                        <Label htmlFor={`active-emp-${employee.id}`} className="text-sm">{employee.is_active ? t('active') : t('status')}</Label>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -352,23 +353,23 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                           {editingEmployee && editingEmployee.id === employee.id && (
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>Edit Employee</DialogTitle>
-                                <DialogDescription>Update employee profile information.</DialogDescription>
+                                <DialogTitle>{t('editDialogTitle')}</DialogTitle>
+                                <DialogDescription>{t('editDialogDescription')}</DialogDescription>
                               </DialogHeader>
                               <div className="grid gap-4 py-4">
                                 <div className="grid gap-2"><Label htmlFor="edit-id">Auth ID</Label><Input id="edit-id" value={editingEmployee.id} disabled /></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-first-name">First Name</Label><Input id="edit-first-name" value={editingEmployee.first_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, first_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-last-name">Last Name</Label><Input id="edit-last-name" value={editingEmployee.last_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, last_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-employee-id">Employee ID</Label><Input id="edit-employee-id" value={editingEmployee.employee_id ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, employee_id: e.target.value })} disabled={isSubmittingEmployee}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-email">Email (Read-only)</Label><Input id="edit-email" type="email" value={editingEmployee.email ?? ''} disabled title="Email cannot be changed here."/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-role">Role</Label><Input id="edit-role" value={editingEmployee.role ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })} disabled={isSubmittingEmployee}/></div>
-                                <div className="flex items-center space-x-2"><Switch id="edit-active" checked={editingEmployee.is_active} onCheckedChange={(checked) => setEditingEmployee({ ...editingEmployee, is_active: checked })} disabled={isSubmittingEmployee}/><Label htmlFor="edit-active">Active (Profile)</Label></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-first-name">{t('firstName')}</Label><Input id="edit-first-name" value={editingEmployee.first_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, first_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-last-name">{t('lastName')}</Label><Input id="edit-last-name" value={editingEmployee.last_name ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, last_name: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-employee-id">{t('employeeId')}</Label><Input id="edit-employee-id" value={editingEmployee.employee_id ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, employee_id: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-email">{t('email')} (Read-only)</Label><Input id="edit-email" type="email" value={editingEmployee.email ?? ''} disabled title="Email cannot be changed here."/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-role">{t('role')}</Label><Input id="edit-role" value={editingEmployee.role ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })} disabled={isSubmittingEmployee}/></div>
+                                <div className="flex items-center space-x-2"><Switch id="edit-active" checked={editingEmployee.is_active} onCheckedChange={(checked) => setEditingEmployee({ ...editingEmployee, is_active: checked })} disabled={isSubmittingEmployee}/><Label htmlFor="edit-active">{t('active')}</Label></div>
                               </div>
                               <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsEditEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>Cancel</Button>
+                                <Button variant="outline" onClick={() => setIsEditEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>{t('cancel')}</Button>
                                 <Button onClick={handleEditEmployee} disabled={isSubmittingEmployee}>
                                   {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                  {isSubmittingEmployee ? 'Saving...' : 'Save Changes'}
+                                  {isSubmittingEmployee ? t('saving') : t('save')}
                                 </Button>
                               </DialogFooter>
                             </DialogContent>
@@ -377,20 +378,20 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                         {/* Deactivate Employee Button */}
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteEmployee(employee.id)} className="text-destructive hover:text-destructive" disabled={isSubmittingEmployee || !employee.is_active} title={employee.is_active ? "Deactivate Employee Profile" : "Employee Profile is Inactive"}>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteEmployee(employee.id)} className="text-destructive hover:text-destructive" disabled={isSubmittingEmployee || !employee.is_active} title={employee.is_active ? t('deactivateTitle') : t('status')}>
                               <Trash className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Deactivate Employee</AlertDialogTitle>
+                              <AlertDialogTitle>{t('deactivateTitle')}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to deactivate {pendingDeleteEmployee?.first_name} {pendingDeleteEmployee?.last_name}? This will prevent them from logging in.
+                                {t('deactivateDescription', { name: `${pendingDeleteEmployee?.first_name ?? ''} ${pendingDeleteEmployee?.last_name ?? ''}`.trim() })}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setPendingDeleteEmployee(null)}>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={confirmDeleteEmployee} disabled={isSubmittingEmployee}>Deactivate</AlertDialogAction>
+                              <AlertDialogCancel onClick={() => setPendingDeleteEmployee(null)}>{t('cancel')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={confirmDeleteEmployee} disabled={isSubmittingEmployee}>{t('deactivateConfirm')}</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -406,15 +407,15 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
       <AlertDialog open={!!pendingToggleEmployee} onOpenChange={(open) => { if (!open) setPendingToggleEmployee(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{pendingToggleEmployee?.currentStatus ? 'Deactivate' : 'Activate'} Employee</AlertDialogTitle>
+            <AlertDialogTitle>{t('toggleTitle', { action: pendingToggleEmployee?.currentStatus ? t('deactivate') : t('activate') })}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {pendingToggleEmployee?.currentStatus ? 'deactivate' : 'activate'} {pendingToggleEmployee?.first_name} {pendingDeleteEmployee?.last_name}? This action can be undone.
+              {t('toggleDescription', { action: pendingToggleEmployee?.currentStatus ? t('deactivate') : t('activate'), name: `${pendingToggleEmployee?.first_name ?? ''} ${pendingDeleteEmployee?.last_name ?? ''}`.trim() })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPendingToggleEmployee(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setPendingToggleEmployee(null)}>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmToggleEmployeeActive} disabled={isSubmittingEmployee}>
-              {pendingToggleEmployee?.currentStatus ? 'Deactivate' : 'Activate'}
+              {pendingToggleEmployee?.currentStatus ? t('deactivate') : t('activate')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -4,12 +4,14 @@ import { useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import { UniqueGraph } from "./uniqueGraph"
+import { useTranslations } from "next-intl"
 
 
 export function MultiGraphPanel() {
     const [graphs, setGraphs] = useState([0]) // Start with one graph
     const [nextId, setNextId] = useState(1)
     const [gridCols, setGridCols] = useState("md:grid-cols-1")
+    const t = useTranslations('analyticsPage');
   
     // Update grid columns based on number of graphs
     useEffect(() => {
@@ -46,11 +48,11 @@ export function MultiGraphPanel() {
         {graphs.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No graphs to display. Add a graph to start analyzing waste disposal data.
+              {t('noGraphs')}
             </p>
             <Button variant="outline" onClick={addGraph} className="mt-4 flex items-center gap-1 mx-auto bg-card hover:text-white">
               <PlusCircle className="h-4 w-4 mr-1" />
-              Add Graph
+              {t('addGraph')}
             </Button>
           </div>
         )}

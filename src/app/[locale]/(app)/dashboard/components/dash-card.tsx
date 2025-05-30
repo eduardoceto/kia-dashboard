@@ -5,11 +5,13 @@ import { TaskCard } from "@/src/components/task-card"
 import { LogUploadModal } from "@/src/components/log-upload-modal"
 import { useTasks } from "@/src/hooks/use-tasks"
 import type { TaskCardProps } from "@/types"
+import { useTranslations } from "next-intl"
 
 export default function TasksPage() {
   const { tasks, completeTask, deleteTask } = useTasks()
   const [selectedTask, setSelectedTask] = useState<TaskCardProps | null>(null)
   const [isLogModalOpen, setIsLogModalOpen] = useState(false)
+  const t = useTranslations('dashboardPage')
 
   const handleUploadLog = (task: TaskCardProps) => {
     setSelectedTask(task)
@@ -40,7 +42,7 @@ export default function TasksPage() {
 
             {tasks.length === 0 && (
               <div className="text-center py-12 text-zinc-400 w-full">
-                <p>All tasks completed! Great job!</p>
+                <p>{t('allTasksCompleted')}</p>
               </div>
             )}
           </div>

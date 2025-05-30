@@ -41,7 +41,7 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <body className={inter.className}>
                 <NextIntlClientProvider locale={locale} messages={messages}>
-                    <Toaster />
+                    <Toaster className="bg-foreground text-background border-tertiarty" />
                         {children}
                 </NextIntlClientProvider>
         </body>

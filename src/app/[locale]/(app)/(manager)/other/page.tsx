@@ -9,6 +9,7 @@ import PanelProductionForm from "./components/PanelProductionForm";
 import { useTranslations } from "next-intl"; // Import useTranslations
 import { useUser } from "@/src/hooks/useUser";
 import { redirect } from "next/navigation";
+import DashboardHeader from "@/src/components/DashboardHeader";
 
 export default function Other() {
     const t = useTranslations('otherPage'); // Initialize translations
@@ -22,8 +23,8 @@ export default function Other() {
 
     return (
         <main className="mx-auto py-10 px-4">
+            <DashboardHeader variant="page" title={t('title')} />
             <div className=" items-start sm:items-center gap-4 mb-6">
-                <h1 className="text-3xl font-bold p-3">{t('title')}</h1>
                 <Card className="w-full">
                     <CardContent>
                         <Accordion type="single" collapsible className="w-full">

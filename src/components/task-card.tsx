@@ -6,6 +6,7 @@ import { Trash, Calendar, ArrowRight, Wrench, ClipboardCheck, Shield, Clock, Ale
 import { cn } from "@/lib/utils"
 import { formatDistanceToNow, isToday, parseISO, isValid } from "date-fns"
 import { es } from "date-fns/locale"
+import { useTranslations } from "next-intl"
 
 interface Task {
   id: string
@@ -34,36 +35,37 @@ const iconStyles = {
   safety: "bg-green-900/20 text-green-400",
 }
 
-const statusConfig = {
-  now: {
-    bg: "bg-blue-900/20",
-    class: "text-blue-400",
-    icon: Clock,
-    label: "Now",
-  },
-  pending: {
-    bg: "bg-amber-900/20",
-    class: "text-amber-400",
-    icon: Clock,
-    label: "Pending",
-  },
-  overdue: {
-    bg: "bg-red-900/20",
-    class: "text-red-400",
-    icon: AlertTriangle,
-    label: "Overdue",
-  },
-  completed: {
-    bg: "bg-green-900/20",
-    class: "text-green-400",
-    icon: ClipboardCheck,
-    label: "Completed",
-  },
-}
-
 export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
   const [isHovering, setIsHovering] = useState(false)
   const router = useRouter()
+  const t = useTranslations('taskCard')
+
+  const statusConfig = {
+    now: {
+      bg: "bg-blue-900/20",
+      class: "text-blue-400",
+      icon: Clock,
+      label: t('now'),
+    },
+    pending: {
+      bg: "bg-amber-900/20",
+      class: "text-amber-400",
+      icon: Clock,
+      label: t('pending'),
+    },
+    overdue: {
+      bg: "bg-red-900/20",
+      class: "text-red-400",
+      icon: AlertTriangle,
+      label: t('overdue'),
+    },
+    completed: {
+      bg: "bg-green-900/20",
+      class: "text-green-400",
+      icon: ClipboardCheck,
+      label: t('completed'),
+    },
+  }
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -114,7 +116,7 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
 
     if (dueDateObj) {
       if (isToday(dueDateObj)) {
-        dueDateLabel = "Hoy"
+        dueDateLabel = t('today')
       } else {
         try {
           // Ensure the date object passed to formatDistanceToNow is valid
@@ -168,9 +170,9 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-zinc-200">Progress</span>
+            <span className="text-zinc-200">{t('progress')}</span>
             <span className="text-white">
-              {task.progress === 100 ? "Completado" : "No Completado"}
+              {task.progress === 100 ? t('completedLabel') : t('notCompletedLabel')}
             </span>
           </div>
           <div className="h-1.5 bg-color-primary rounded-full overflow-hidden">
@@ -187,7 +189,7 @@ export function TaskCard({ task, onUploadLog, onDelete }: TaskCardProps) {
         <div className="flex flex-col gap-1 text-xs text-zinc-200">
           <div className="flex items-center">
             <Calendar className="w-3.5 h-3.5 mr-1.5" />
-            <span>Vence: {dueDateLabel}</span>
+            <span>{t('due')}: {dueDateLabel}</span>
           </div>
           <div className="flex items-center justify-between">
           </div>

@@ -1,75 +1,70 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-
-import { mockData, mockCombinedData } from "@/src/components/testData/data"
+import { Loader2 } from "lucide-react"
+import { mockCombinedData } from "@/src/components/testData/data"
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { createClient } from "@/src/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
+const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
+  "Sludge": [1],
+  "Uretano": [2],
+  "Vidrio": [2],
+  "Autopartes Destruida": [2],
+  "Other Recycables": [3],
+  "Metal/Non metallic": [4],
+}
+
+function GraphContainer({ loading, error, children }: { loading: boolean; error: string | null; children: React.ReactNode }) {
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[400px]">
+        <Loader2 className="animate-spin w-12 h-12 text-muted-foreground" />
+      </div>
+    )
+  }
+  if (error) {
+    return <div className="text-red-500 text-center py-8">{error}</div>
+  }
+  return <>{children}</>
+}
 
 function CombinedChart({
     data = mockCombinedData,
     height = "h-[500px]",
-  }: { title: string; data?: typeof mockCombinedData; height?: string }) {
-    const [showComparison, setShowComparison] = useState<boolean>(true)
-
-    const [selectedMaterial] = useState(mockData.materials[0])
-
+    showComparison,
+    selectors,
+    selectedYear,
+  }: { title: string; data?: Record<string, unknown>[]; height?: string; showComparison: boolean; selectors?: React.ReactNode; selectedYear: number }) {
+    const t = useTranslations('analyticsPage');
+    const prevYear = selectedYear - 1;
+    const kgKey = `kg/${selectedYear}`;
+    const kgPrevKey = `kg/${prevYear}`;
+    const kgVehicleKey = `kg/Vehicle (${selectedYear})`;
+    const kgVehiclePrevKey = `kg/Vehicle (${prevYear})`;
     // Calculate max values for y-axis scaling
     const maxKg = Math.max(
-      ...data.map((item) => Math.max(item["kg/2024"] || 0, showComparison ? item["kg/2023"] || 0 : 0)),
+      ...data.map((item) => Math.max(Number(item[kgKey] || 0), showComparison ? Number(item[kgPrevKey] || 0) : 0)),
     )
     const maxKgVehicle = Math.max(
       ...data.map((item) =>
-        Math.max(item["kg/Vehicle (2024)"] || 0, showComparison ? item["kg/Vehicle (2023)"] || 0 : 0),
+        Math.max(Number(item[kgVehicleKey] || 0), showComparison ? Number(item[kgVehiclePrevKey] || 0) : 0),
       ),
     )
-    
-  
     return (
       <Card className="w-full rounded-md bg-[#fbfbfb] shadow-md">
         <CardHeader className="pb-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <CardTitle>{selectedMaterial}</CardTitle>
-            
-          </div>
+          <CardTitle> </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-2 grid-cols-2 mb-2">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Material:</span>
-              <Select value={selectedMaterial}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select material" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockData.materials.map((material) => (
-                    <SelectItem key={material} value={material}>
-                      {material}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {selectors && (
+            <div className="flex flex-col justify-between md:flex-row md:gap-12 gap-4 mb-6 items-stretch md:items-end w-full">
+              {selectors}
             </div>
-          </div>
-
-            <div className="flex flex-col justify-between items-center gap-2 ml-auto">
-              <Select
-              value={showComparison ? "comparison" : "single"}
-              onValueChange={(value) => setShowComparison(value === "comparison")}
-              >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="View mode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="comparison">Compare with 2023</SelectItem>
-                <SelectItem value="single">Show 2024 only</SelectItem>
-              </SelectContent>
-              </Select>
-            </div>
-          </div>
+          )}
           <div className={`w-full ${height}`}>
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
@@ -86,29 +81,29 @@ function CombinedChart({
                 <YAxis
                   yAxisId="left"
                   orientation="left"
-                  label={{ value: "kg", angle: -90, position: "insideLeft" }}
+                  label={{ value: t('kg'), angle: -90, position: "insideLeft" }}
                   domain={[0, maxKg * 1.1]}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  label={{ value: "kg/Vehicle", angle: 90, position: "insideRight" }}
+                  label={{ value: t('kgVehicle'), angle: 90, position: "insideRight" }}
                   domain={[0, maxKgVehicle * 1.1]}
                 />
                 <Tooltip
                   formatter={(value, name) => {
                     const nameStr = String(name);
                     if (nameStr.includes("Vehicle")) {
-                      return [`${value} kg/vehicle`, name]
+                      return [`${value} ${t('kgVehicle')}`, name]
                     }
-                    return [`${value.toLocaleString()} kg`, name]
+                    return [`${value.toLocaleString()} ${t('kg')}`, name]
                   }}
                 />
                 <Legend />
                 <Bar
                   yAxisId="left"
-                  dataKey="kg/2024"
-                  name="kg/2024"
+                  dataKey={kgKey}
+                  name={kgKey}
                   fill="#4f46e5"
                   radius={[4, 4, 0, 0]}
                   barSize={showComparison ? 20 : 40}
@@ -116,8 +111,8 @@ function CombinedChart({
                 {showComparison && (
                   <Bar
                     yAxisId="left"
-                    dataKey="kg/2023"
-                    name="kg/2023"
+                    dataKey={kgPrevKey}
+                    name={kgPrevKey}
                     fill="#10b981"
                     radius={[4, 4, 0, 0]}
                     barSize={20}
@@ -126,8 +121,8 @@ function CombinedChart({
                 <Line
                   yAxisId="right"
                   type="monotone"
-                  dataKey="kg/Vehicle (2024)"
-                  name="kg/Vehicle (2024)"
+                  dataKey={kgVehicleKey}
+                  name={kgVehicleKey}
                   stroke="#ef4444"
                   strokeWidth={2}
                   dot={{ r: 4 }}
@@ -137,8 +132,8 @@ function CombinedChart({
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    dataKey="kg/Vehicle (2023)"
-                    name="kg/Vehicle (2023)"
+                    dataKey={kgVehiclePrevKey}
+                    name={kgVehiclePrevKey}
                     stroke="#8b5cf6"
                     strokeWidth={2}
                     dot={{ r: 4 }}
@@ -157,34 +152,178 @@ function CombinedChart({
   
   // Year-over-year comparison dashboard
 export function YearComparisonGraph() {
-  const [selectedMaterial] = useState(mockData.materials[0])
-    return (
-      <div className="space-y-6">
-        
-  
-        <CombinedChart title={`${selectedMaterial} 2024`} />
-  
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Key Insights</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Total waste increased by 32.8% compared to 2023</li>
-              <li>Highest volume month was October with 343,672 kg</li>
-              <li>Efficiency (kg/vehicle) increased by 22.4% year-over-year</li>
-              <li>Second half of the year showed significantly higher volumes</li>
-            </ul>
-          </div>
-  
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Recommendations</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Investigate July-November spike to understand volume increase</li>
-              <li>Review efficiency improvements to replicate across other materials</li>
-              <li>Consider capacity planning for year-end based on current trends</li>
-              <li>Analyze correlation between production volume and waste generation</li>
-            </ul>
-          </div> 
-        </div> */}
+  const t = useTranslations('analyticsPage');
+  const [material, setMaterial] = useState(t('material.metal'))
+  const [years, setYears] = useState<number[]>([])
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
+  const [data, setData] = useState<{ month: string; [key: string]: number | string }[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [yearLoading, setYearLoading] = useState(true)
+  const [yearError, setYearError] = useState<string | null>(null)
+  const [showComparison, setShowComparison] = useState(true)
+
+  const MATERIAL_KEYS = [
+    'material.metal',
+    'material.other',
+    'material.sludge',
+    'material.uretano',
+    'material.vidrio',
+    'material.autopartes',
+  ];
+  const MATERIALS = MATERIAL_KEYS.map((key) => t(key));
+
+  useEffect(() => {
+    // Fetch available years from waste_logs
+    const fetchYears = async () => {
+      setYearLoading(true)
+      setYearError(null)
+      try {
+        const supabase = createClient()
+        const { data: logs, error: logsErr } = await supabase
+          .from('waste_logs')
+          .select('created_at')
+        if (logsErr) throw logsErr
+        const yearSet = new Set<number>()
+        logs?.forEach(l => {
+          const d = new Date(l.created_at)
+          yearSet.add(d.getFullYear())
+        })
+        const yearArr = Array.from(yearSet).sort((a, b) => b - a)
+        setYears(yearArr)
+        setSelectedYear(yearArr[0] || null)
+      } catch (e: unknown) {
+        setYearError(e instanceof Error ? e.message : "Error fetching years")
+      } finally {
+        setYearLoading(false)
+      }
+    }
+    fetchYears()
+  }, [])
+
+  useEffect(() => {
+    if (!selectedYear) return
+    setLoading(true)
+    setError(null)
+    const fetchData = async () => {
+      try {
+        const supabase = createClient()
+        // Map material to excel_id(s)
+        const excelIds = MATERIAL_TO_EXCEL_ID[material] || []
+        // Calculate date range for selectedYear and previous year
+        const startDate = `${selectedYear - 1}-01-01T00:00:00.000Z`;
+        const endDate = `${selectedYear}-12-31T23:59:59.999Z`;
+        // Fetch waste_logs for selected excel_id(s) and year, and previous year for comparison
+        let query = supabase
+          .from('waste_logs')
+          .select('created_at, excel_id, quantity, quantity_type')
+          .gte('created_at', startDate)
+          .lte('created_at', endDate)
+        if (excelIds.length === 1) {
+          query = query.eq('excel_id', excelIds[0])
+        } else if (excelIds.length > 1) {
+          query = query.in('excel_id', excelIds)
+        }
+        const { data: logs, error: logsErr } = await query
+        if (logsErr) throw logsErr
+        // Only use rows where quantity_type is 'kg'
+        const filteredLogs = logs?.filter(l => l.quantity_type === 'kg') || []
+        // Group by month for selected year and previous year
+        const months = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ]
+        const getMonth = (date: Date) => date.toLocaleString('default', { month: 'long' })
+        const groupByYear = (year: number) => months.map((month) => {
+          const sum = filteredLogs.filter(l => {
+            const d = new Date(l.created_at)
+            return d.getFullYear() === year && getMonth(d) === month
+          }).reduce((acc, l) => acc + (l.quantity || 0), 0) || 0
+          return sum
+        })
+        const dataThisYear = groupByYear(selectedYear)
+        const dataPrevYear = groupByYear(selectedYear - 1)
+        const combined = months.map((month, i) => ({
+          month,
+          [`kg/${selectedYear}`]: dataThisYear[i],
+          [`kg/${selectedYear - 1}`]: dataPrevYear[i],
+          [`kg/Vehicle (${selectedYear})`]: 0,
+          [`kg/Vehicle (${selectedYear - 1})`]: 0,
+        }))
+        setData(combined)
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Error fetching data")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [material, selectedYear])
+
+  if (yearLoading) return <div>{t('loadingYears')}</div>
+  if (yearError) return <div className="text-red-500">{yearError}</div>
+
+  const selectors = (
+    <>
+      <div className="space-y-1 min-w-[200px] w-full md:w-auto">
+        <label className="text-sm font-medium">{t('materialLabel')}</label>
+        <Select value={material} onValueChange={setMaterial}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('selectMaterial')} />
+          </SelectTrigger>
+          <SelectContent>
+            {MATERIALS.map((mat) => (
+              <SelectItem key={mat} value={mat}>
+                {mat}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-    )
-  }
+      <div className="space-y-1 min-w-[200px] w-full md:w-auto">
+        <label className="text-sm font-medium">{t('yearLabel')}</label>
+        <Select value={selectedYear?.toString() || ""} onValueChange={y => setSelectedYear(Number(y))}>
+          <SelectTrigger>
+            <SelectValue placeholder={t('selectYear')} />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((y) => (
+              <SelectItem key={y} value={y.toString()}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-1 min-w-[200px] w-full md:w-auto">
+        <label className="text-sm font-medium">{t('comparisonLabel')}</label>
+        <Select value={showComparison ? "comparison" : "single"} onValueChange={v => setShowComparison(v === "comparison") }>
+          <SelectTrigger>
+            <SelectValue placeholder={t('comparisonMode')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="comparison">{t('compareWithPrev', { year: selectedYear ? selectedYear - 1 : t('previousYear') })}</SelectItem>
+            <SelectItem value="single">{t('showOnly', { year: selectedYear ?? '' })}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </>
+  )
+
+  return (
+    <div className="space-y-6">
+      <GraphContainer loading={loading} error={error}>
+        {selectedYear ? (
+          <CombinedChart
+            title={`${material} ${selectedYear}`}
+            data={data}
+            height="h-[500px]"
+            showComparison={showComparison}
+            selectors={selectors}
+            selectedYear={selectedYear}
+          />
+        ) : null}
+      </GraphContainer>
+    </div>
+  )
+}

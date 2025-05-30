@@ -6,6 +6,7 @@ import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
 import { Calendar, Check, Download, FileSpreadsheet, Loader2 } from "lucide-react"
 import ExcelJS from "exceljs"
+import { useTranslations } from "next-intl"
 
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -39,6 +40,7 @@ import {
   type DestruidasResiduo,
 } from "@/src/utils/log/log-utils"
 import { Driver } from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form/DriverInfo"
+import DashboardHeader from "@/src/components/DashboardHeader"
 
 // Define a type for the DB log structure, e.g. type DbWasteLog = { ... } and use it instead of 'any'.
 type DbWasteLog = {
@@ -49,6 +51,7 @@ type DbWasteLog = {
 };
 
 export default function ExportPage() {
+  const t = useTranslations('exportPage');
   const [startDate, setStartDate] = useState<Date | undefined>(undefined)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([])
@@ -470,59 +473,41 @@ export default function ExportPage() {
   return (
     <div className="container mx-auto py-6 px-4">
       <div className="mb-6">
-
-        <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Exportar Registros</h1>
-            <p className="text-muted-foreground">Filtra y exporta los registros de residuos a Excel</p>
-          </div>
-
-          <div className="flex items-center gap-2">
+        <DashboardHeader
+          variant="page"
+          title={t('title')}
+          actions={
             <Link href="/history">
               <Button variant="outline" className="flex items-center gap-2 bg-primary-foreground">
                 <FileSpreadsheet className="h-4 w-4" />
-                Ver Historial
+                {t('historyButton')}
               </Button>
             </Link>
-          </div>
-        </div>
+          }
+        />
 
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid grid-cols-5 w-full bg-popover">
-            <TabsTrigger value="all">Todos</TabsTrigger>
-            <TabsTrigger value="metal">Metal/No Metal</TabsTrigger>
-            <TabsTrigger value="otros">Otros Reciclables</TabsTrigger>
-            <TabsTrigger value="lodos">Lodos</TabsTrigger>
-            <TabsTrigger value="destruidas">Uretano/Vidrio/Autopartes</TabsTrigger>
+            <TabsTrigger value="all">{t('filters.allMaterialsLabel')}</TabsTrigger>
+            <TabsTrigger value="metal">{t('filters.metalTab')}</TabsTrigger>
+            <TabsTrigger value="otros">{t('filters.otrosTab')}</TabsTrigger>
+            <TabsTrigger value="lodos">{t('filters.lodosTab')}</TabsTrigger>
+            <TabsTrigger value="destruidas">{t('filters.destruidasTab')}</TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Mostrando todos los tipos de residuos. Cada tipo se exportará en su formato específico.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('filtersDescription')}</p>
           </TabsContent>
           <TabsContent value="metal" className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Formato de exportación para chatarra, incluye columnas para tipo de residuo, empresa transportista,
-              empresa compradora, item, cantidad, unidad y remisión.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('metalTabDescription')}</p>
           </TabsContent>
           <TabsContent value="otros" className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Formato de exportación para reciclables (cartón, plástico, madera), incluye columnas específicas para
-              estos materiales.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('otrosTabDescription')}</p>
           </TabsContent>
           <TabsContent value="lodos" className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Formato de exportación para lodos y residuos de manejo especial, incluye columnas para manifiestos y áreas
-              específicas.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('lodosTabDescription')}</p>
           </TabsContent>
           <TabsContent value="destruidas" className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              Formato de exportación para sellos de uretano y materiales destruidos, con formato específico para este
-              tipo de residuo.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('destruidasTabDescription')}</p>
           </TabsContent>
         </Tabs>
 
@@ -530,22 +515,22 @@ export default function ExportPage() {
           {/* Filter Card */}
           <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>Filtros</CardTitle>
-              <CardDescription>Define los parámetros para la exportación</CardDescription>
+              <CardTitle>{t('filtersTitle')}</CardTitle>
+              <CardDescription>{t('filtersDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Date Range */}
               <div className="space-y-4">
-                <h3 className="font-medium">Rango de Fechas</h3>
+                <h3 className="font-medium">{t('dateRangeTitle')}</h3>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="start-date">Fecha Inicio</Label>
+                    <Label htmlFor="start-date">{t('startDateLabel')}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-start text-left font-normal">
                           <Calendar className="h-4 w-4 mr-2" />
-                          {startDate ? formatDate(startDate) : "Seleccionar"}
+                          {startDate ? formatDate(startDate) : t('selectDatePlaceholder')}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -555,12 +540,12 @@ export default function ExportPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="end-date">Fecha Fin</Label>
+                    <Label htmlFor="end-date">{t('endDateLabel')}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-start text-left font-normal">
                           <Calendar className="h-4 w-4 mr-2" />
-                          {endDate ? formatDate(endDate) : "Seleccionar"}
+                          {endDate ? formatDate(endDate) : t('selectDatePlaceholder')}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -580,7 +565,7 @@ export default function ExportPage() {
               {/* Material Types - Only show if "all" tab is selected */}
               {activeTab === "all" && (
                 <div className="space-y-4">
-                  <h3 className="font-medium">Tipos de Material</h3>
+                  <h3 className="font-medium">{t('materialTypesTitle')}</h3>
 
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
@@ -589,7 +574,7 @@ export default function ExportPage() {
                         checked={selectAllMaterials}
                         onCheckedChange={handleSelectAllMaterials}
                       />
-                      <Label htmlFor="select-all">Todos los Materiales</Label>
+                      <Label htmlFor="select-all">{t('selectAllMaterialsLabel')}</Label>
                     </div>
 
                     {!selectAllMaterials && (
@@ -615,24 +600,24 @@ export default function ExportPage() {
               {/* Additional Filters - Only show if a specific tab is selected */}
               {activeTab !== "all" && (
                 <div className="space-y-4">
-                  <h3 className="font-medium">Filtros Adicionales</h3>
+                  <h3 className="font-medium">{t('filtersTitle')}</h3>
 
                   <div className="space-y-4">
                     {/* Waste Type Filter */}
                     <div className="space-y-2">
                       <Label htmlFor="waste-type">
-                        {activeTab === "metal" && "Tipo de Residuo"}
-                        {activeTab === "otros" && "Tipo de Desecho"}
-                        {activeTab === "lodos" && "Nombre de Residuo"}
-                        {activeTab === "destruidas" && "Residuos"}
+                        {activeTab === "metal" && t('filters.metalWasteType')}
+                        {activeTab === "otros" && t('filters.otrosWasteType')}
+                        {activeTab === "lodos" && t('filters.lodosWasteType')}
+                        {activeTab === "destruidas" && t('filters.destruidasWasteType')}
                       </Label>
                         <Select 
                         value={selectedWasteType} onValueChange={setSelectedWasteType}>
                         <SelectTrigger id="waste-type">
-                          <SelectValue placeholder="Seleccionar tipo" />
+                          <SelectValue placeholder={t('filters.selectWasteTypePlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos</SelectItem>
+                          <SelectItem value="all">{t('filters.allWasteTypes')}</SelectItem>
                           {getWasteTypes().map((type) => (
                           <SelectItem key={type} value={type}>
                             {type}
@@ -645,15 +630,15 @@ export default function ExportPage() {
                     {/* Item/Area Filter */}
                     <div className="space-y-2">
                       <Label htmlFor="item">
-                        {(activeTab === "metal" || activeTab === "otros") && "Item"}
-                        {(activeTab === "lodos" || activeTab === "destruidas") && "Área"}
+                        {(activeTab === "metal" || activeTab === "otros") && t('filters.itemLabel')}
+                        {(activeTab === "lodos" || activeTab === "destruidas") && t('filters.areaLabel')}
                       </Label>
                       <Select value={selectedItem} onValueChange={setSelectedItem}>
                         <SelectTrigger id="item">
-                          <SelectValue placeholder="Seleccionar" />
+                          <SelectValue placeholder={t('filters.selectItemPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Todos</SelectItem>
+                          <SelectItem value="all">{t('filters.allItems')}</SelectItem>
                           {getItems().map((item) => (
                             <SelectItem key={item} value={item}>
                               {item}
@@ -668,19 +653,11 @@ export default function ExportPage() {
 
               {/* Export Format Info */}
               <div className="space-y-2 border-t pt-4">
-                <h3 className="font-medium">Formato de Exportación</h3>
+                <h3 className="font-medium">{t('exportFormatTitle')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {activeTab === "all"
-                    ? "Se crearán hojas separadas para cada tipo de material con su formato específico."
-                    : `Se exportará en el formato específico para ${
-                        activeTab === "metal"
-                          ? "chatarra"
-                          : activeTab === "otros"
-                            ? "reciclables"
-                            : activeTab === "lodos"
-                              ? "lodos"
-                              : "sellos"
-                      }`}
+                    ? t('exportFormatAll')
+                    : t(`exportFormatSpecific.${activeTab}`)}
                 </p>
               </div>
             </CardContent>
@@ -689,12 +666,12 @@ export default function ExportPage() {
                 {isExporting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Exportando...
+                    {t('exportingButton')}
                   </>
                 ) : (
                   <>
                     <Download className="mr-2 h-4 w-4" />
-                    Exportar a Excel
+                    {t('exportButton')}
                   </>
                 )}
               </Button>
@@ -704,9 +681,9 @@ export default function ExportPage() {
           {/* Preview Card */}
           <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Vista Previa</CardTitle>
+              <CardTitle>{t('previewTitle')}</CardTitle>
               <CardDescription>
-                {filteredLogs.length} {filteredLogs.length === 1 ? "registro encontrado" : "registros encontrados"}
+                {t('recordsFound', { count: filteredLogs.length })}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -715,10 +692,10 @@ export default function ExportPage() {
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/30 hover:bg-muted/40">
-                        <TableHead className="w-[100px]">Fecha</TableHead>
-                        <TableHead>Tipo Material</TableHead>
-                        <TableHead>Residuo/Desecho</TableHead>
-                        <TableHead className="text-right">Peso Total</TableHead>
+                        <TableHead className="w-[100px]">{t('previewTableHeaders.date')}</TableHead>
+                        <TableHead>{t('previewTableHeaders.materialType')}</TableHead>
+                        <TableHead>{t('previewTableHeaders.waste')}</TableHead>
+                        <TableHead className="text-right">{t('previewTableHeaders.totalWeight')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -747,7 +724,7 @@ export default function ExportPage() {
                               className="text-primary underline hover:no-underline"
                               onClick={() => setShowAllPreview(true)}
                             >
-                              Mostrar {filteredLogs.length - 5} más
+                              {t('moreItemsBadge', { count: filteredLogs.length - 5 })}
                             </button>
                           </TableCell>
                         </TableRow>
@@ -759,7 +736,7 @@ export default function ExportPage() {
                               className="text-primary underline hover:no-underline"
                               onClick={() => setShowAllPreview(false)}
                             >
-                              Ocultar registros extra
+                              {t('hideExtraRecords')}
                             </button>
                           </TableCell>
                         </TableRow>
@@ -769,7 +746,7 @@ export default function ExportPage() {
                 </div>
               ) : (
                 <div className="py-8 text-center text-muted-foreground">
-                  No se encontraron registros con los filtros seleccionados
+                  {t('noRecordsFound')}
                 </div>
               )}
             </CardContent>
@@ -777,7 +754,7 @@ export default function ExportPage() {
             {filteredLogs.length > 0 && (
               <CardFooter className="flex flex-col items-stretch">
                 <div className="w-full border-t border-muted pt-4 mt-2">
-                  <h3 className="font-medium mb-2">Resumen</h3>
+                  <h3 className="font-medium mb-2">{t('summaryTitle')}</h3>
                   <div className="space-y-2">
                     {Object.entries(calculateTotalWeightByMaterial(filteredLogs)).map(([material, weight]) => (
                       <div key={material} className="flex justify-between">
@@ -786,7 +763,7 @@ export default function ExportPage() {
                       </div>
                     ))}
                     <div className="flex justify-between pt-2 border-t border-muted">
-                      <span className="font-bold">Total</span>
+                      <span className="font-bold">{t('totalLabel')}</span>
                       <span className="font-bold">{calculateTotalWeight(filteredLogs)} kg</span>
                     </div>
                   </div>
@@ -795,7 +772,7 @@ export default function ExportPage() {
                 {exportSuccess && (
                   <div className="flex items-center gap-2 text-green-500 mt-4 self-end">
                     <Check className="h-4 w-4" />
-                    <span>Exportación exitosa</span>
+                    <span>{t('exportSuccessMessage')}</span>
                   </div>
                 )}
 
