@@ -10,6 +10,7 @@ import {
 } from "@/src/components/ui/form";
 import { Input } from "@/src/components/ui/input";
 import { WasteDisposalFormValues } from "../waste-disposal-form";
+import { useTranslations } from "next-intl";
 
 interface AuthorizingPersonInputProps {
   form: UseFormReturn<WasteDisposalFormValues>;
@@ -18,15 +19,16 @@ interface AuthorizingPersonInputProps {
 export default function AuthorizingPersonInput({
   form,
 }: AuthorizingPersonInputProps) {
+  const t = useTranslations('wasteDisposalForm');
   return (
     <FormField
       control={form.control}
       name="personaAutoriza"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Persona que Autoriza</FormLabel>
+          <FormLabel>{t('authorizingPersonLabel')}</FormLabel>
           <FormControl>
-            <Input placeholder="Nombre completo" {...field} />
+            <Input placeholder={t('authorizingPersonPlaceholder')} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>

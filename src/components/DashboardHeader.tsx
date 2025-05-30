@@ -6,6 +6,7 @@ import Link from "next/link";
 import { routing } from "@/src/i18n/routing";
 import { ChevronRight } from "lucide-react";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface DashboardHeaderProps {
   variant?: "dashboard" | "page";
@@ -17,6 +18,7 @@ export default function DashboardHeader({ variant = "dashboard", title, actions 
   const { profile } = useUser();
   const pathname = usePathname();
   const [today, setToday] = useState("");
+  const t = useTranslations('dashboardPage');
   useEffect(() => {
     const date = new Date();
     setToday(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
@@ -32,7 +34,7 @@ export default function DashboardHeader({ variant = "dashboard", title, actions 
   const displaySegments = localeSegment ? rawSegments.slice(1) : rawSegments;
   const baseHref = localeSegment ? `/${localeSegment}` : '/';
   const breadcrumbs = [
-    { label: "Dashboard", href: baseHref + "/dashboard" },
+    { label: t('dashboard'), href: baseHref + "/dashboard" },
     ...displaySegments.slice(1).map((seg, idx) => {
       const label = formatSegment(seg);
       const originalIndex = localeSegment ? idx + 2 : idx + 1;
@@ -49,7 +51,7 @@ export default function DashboardHeader({ variant = "dashboard", title, actions 
         <div className="flex flex-col gap-0.5">
           {variant === "dashboard" ? (
             <>
-              <span className="text-2xl font-bold leading-tight text-white">Hello, {profileName}</span>
+              <span className="text-2xl font-bold leading-tight text-white">{t('hello', { name: profileName })}</span>
               <span className="text-xs text-gray-400 mt-1">{today}</span>
             </>
           ) : (

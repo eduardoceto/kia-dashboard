@@ -18,6 +18,7 @@ import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"
 import { usePathname, useRouter } from "next/navigation"
 import { useLocale } from "next-intl"
+import { useTranslations } from "next-intl";
 
 import { useUser } from "@/src/hooks/useUser"
 import LanguageSwitcher from "./languageSwitcher";
@@ -34,6 +35,7 @@ export default function Sidebar() {
   const { isManager, profile } = useUser();
   const router = useRouter()
   const locale = useLocale()
+  const t = useTranslations('sidebar');
   
 
   useEffect(() => {
@@ -123,53 +125,53 @@ export default function Sidebar() {
               <div className="space-y-8">
                 <div>
                   <div className="Formula1 px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400/80">
-                    General
+                    {t('general')}
                   </div>
                   <div className="KiaSignature space-y-1">
                     <NavItem href="/dashboard" icon={Home}>
-                      Dashboard
+                      {t('dashboard')}
                     </NavItem>
                     {isManager && (
                       <NavItem href="/analytics" icon={BarChart2}>
-                        Analytics
+                        {t('analytics')}
                       </NavItem>
                     )}
                   </div>
                 </div>
                 <div className="border-t border-[#232e3c] pt-6 mt-2">
                   <div className="Formula1 px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400/80">
-                    Files
+                    {t('files')}
                   </div>
                   <div className="KiaSignature space-y-1">
                     <NavItem href="/upload" icon={FaFileUpload}>
-                      Upload Log
+                      {t('uploadLog')}
                     </NavItem>
                     <NavItem href="/history" icon={RiFolderHistoryFill}>
-                      History
+                      {t('history')}
                     </NavItem>
                     {isManager && (
                       <NavItem href="/export" icon={FaFileExport}>
-                        Export Report
+                        {t('exportReport')}
                       </NavItem>
                     )}
                     {isManager && (
                       <NavItem href="/other" icon={BsThreeDotsVertical}>
-                        Other
+                        {t('other')}
                       </NavItem>
                     )}
                   </div>
                 </div>
                 <div className="border-t border-[#232e3c] pt-6 mt-2">
                   <div className="Formula1 px-3 mb-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400/80">
-                    User
+                    {t('user')}
                   </div>
                   <div className="KiaSignature space-y-1">
                     <NavItem href="/settings" icon={IoMdSettings}>
-                      Settings
+                      {t('settings')}
                     </NavItem>
                     {isManager && (
                       <NavItem href="/permissions" icon={Users2}>
-                        User Permissions
+                        {t('userPermissions')}
                       </NavItem>
                     )}
                   </div>

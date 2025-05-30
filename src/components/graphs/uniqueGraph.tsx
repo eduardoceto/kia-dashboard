@@ -7,16 +7,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { createClient } from "@/src/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
-const MATERIALS = [
-  "Metal/Non metallic",
-  "Other Recycables",
-  "Sludge",
-  "Uretano",
-  "Vidrio",
-  "Autopartes Destruida"
+const MATERIAL_KEYS = [
+  'material.metal',
+  'material.other',
+  'material.sludge',
+  'material.uretano',
+  'material.vidrio',
+  'material.autopartes',
 ]
-const TIME_RANGES = ["Last Week", "Last Month", "Last Quarter", "Last Year"]
+const TIME_RANGE_KEYS = [
+  'lastWeek',
+  'lastMonth',
+  'lastQuarter',
+  'lastYear',
+]
 
 // Map material to excel_id
 const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
@@ -41,6 +47,9 @@ interface GraphProps {
 }
 
 export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
+  const t = useTranslations('analyticsPage')
+  const MATERIALS = MATERIAL_KEYS.map((key) => t(key))
+  const TIME_RANGES = TIME_RANGE_KEYS.map((key) => t(key))
   const [material, setMaterial] = useState(MATERIALS[0])
   const [timeRange, setTimeRange] = useState(TIME_RANGES[0])
   const [data, setData] = useState<ChartDataPoint[]>([])
@@ -169,7 +178,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
           </div>
         </div>
         {loading ? (
-          <div>Loading...</div>
+          <div>{t('loading')}</div>
         ) : error ? (
           <div className="text-red-500">{error}</div>
         ) : (
@@ -192,13 +201,13 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                     totalGraphs <= 6
                       ? {
                           value:
-                            timeRange === "Last Week"
-                              ? "Days"
-                              : timeRange === "Last Month"
-                                ? "Days"
-                                : timeRange === "Last Quarter"
-                                  ? "Months"
-                                  : "Months",
+                            timeRange === t('lastWeek')
+                              ? t('days')
+                              : timeRange === t('lastMonth')
+                                ? t('days')
+                                : timeRange === t('lastQuarter')
+                                  ? t('months')
+                                  : t('months'),
                           position: "insideBottomRight",
                           offset: -5,
                           fontSize: totalGraphs > 4 ? 10 : 12,
@@ -211,7 +220,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                   label={
                     totalGraphs <= 6
                       ? {
-                          value: "Waste (kg)",
+                          value: t('wasteKg'),
                           angle: -90,
                           position: "insideLeft",
                           fontSize: totalGraphs > 4 ? 10 : 12,
@@ -220,16 +229,16 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                   }
                 />
                 <Tooltip
-                  formatter={(value) => [`${value} kg`, `${material} waste`]}
+                  formatter={(value) => [`${value} ${t('kg')}`, `${material} ${t('waste')}`]}
                   labelFormatter={(label) => {
-                    if (timeRange === "Last Week") {
-                      return `Day ${Number.parseInt(label) + 1}`
-                    } else if (timeRange === "Last Month") {
-                      return `Day ${Number.parseInt(label) + 1}`
-                    } else if (timeRange === "Last Quarter") {
-                      return `Month ${label}`
+                    if (timeRange === t('lastWeek')) {
+                      return `${t('day')} ${Number.parseInt(label) + 1}`
+                    } else if (timeRange === t('lastMonth')) {
+                      return `${t('day')} ${Number.parseInt(label) + 1}`
+                    } else if (timeRange === t('lastQuarter')) {
+                      return `${t('month')} ${label}`
                     } else {
-                      return `Month ${label}`
+                      return `${t('month')} ${label}`
                     }
                   }}
                 />

@@ -28,6 +28,7 @@ import {
 import { Input } from "@/src/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/src/components/ui/alert";
 import { WasteDisposalFormValues } from "../waste-disposal-form"; // Import the main form values type
+import { useTranslations } from "next-intl";
 
 // Define Driver interface locally or import from a shared types file
 export interface Driver {
@@ -59,10 +60,11 @@ export default function DriverInfo({
   onDriverSelect,
 }: DriverInfoProps) {
   const [driverPopoverOpen, setDriverPopoverOpen] = useState(false);
+  const t = useTranslations('wasteDisposalForm');
 
   return (
     <div className="space-y-4 border rounded-md p-4">
-      <h3 className="text-lg font-medium mb-2">Información del Chofer</h3>
+      <h3 className="text-lg font-medium mb-2">{t('selectDriverLabel')}</h3>
 
       {/* Driver Selection Combobox */}
       <Popover open={driverPopoverOpen} onOpenChange={setDriverPopoverOpen}>
@@ -75,22 +77,22 @@ export default function DriverInfo({
             disabled={isLoadingDrivers || !!driverError}
           >
             {isLoadingDrivers
-              ? "Cargando choferes..."
+              ? t('loadingDrivers')
               : driverError
-              ? "Error al cargar"
+              ? t('errorLoadingDrivers')
               : selectedDriverId
               ? drivers.find((driver) => driver.id === selectedDriverId)?.first_name
                 ? `${drivers.find((driver) => driver.id === selectedDriverId)?.first_name} ${drivers.find((driver) => driver.id === selectedDriverId)?.last_name}`
-                : "Seleccionar Chofer..."
-              : "Seleccionar Chofer..."}
+                : t('selectDriverPlaceholder')
+              : t('selectDriverPlaceholder')}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] max-h-[--radix-popover-content-available-height] p-0">
           <Command>
-            <CommandInput placeholder="Buscar chofer..." />
+            <CommandInput placeholder={t('searchWastePlaceholder')} />
             <CommandList>
-              <CommandEmpty>No se encontró el chofer.</CommandEmpty>
+              <CommandEmpty>{t('noDriversAvailable')}</CommandEmpty>
               <CommandGroup>
                 {drivers.map((driver) => (
                     <CommandItem
@@ -119,7 +121,7 @@ export default function DriverInfo({
 
       {driverError && (
         <Alert variant="destructive">
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{t('errorLoading')}</AlertTitle>
           <AlertDescription>{driverError}</AlertDescription>
         </Alert>
       )}
@@ -131,7 +133,7 @@ export default function DriverInfo({
           name="nombreChofer"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre Chofer</FormLabel>
+              <FormLabel>{t('driverNameLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>
@@ -144,7 +146,7 @@ export default function DriverInfo({
           name="compania"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Compañía</FormLabel>
+              <FormLabel>{t('companyLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>
@@ -157,7 +159,7 @@ export default function DriverInfo({
           name="procedencia"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Procedencia</FormLabel>
+              <FormLabel>{t('originLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>
@@ -170,7 +172,7 @@ export default function DriverInfo({
           name="destino"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Destino</FormLabel>
+              <FormLabel>{t('destinationLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>
@@ -183,7 +185,7 @@ export default function DriverInfo({
           name="placas"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Placas</FormLabel>
+              <FormLabel>{t('platesLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>
@@ -196,7 +198,7 @@ export default function DriverInfo({
           name="numeroEconomico"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Número Económico</FormLabel>
+              <FormLabel>{t('economicNumberLabel')}</FormLabel>
               <FormControl>
                 <Input {...field} readOnly  />
               </FormControl>

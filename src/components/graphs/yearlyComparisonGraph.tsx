@@ -4,19 +4,11 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Loader2 } from "lucide-react"
-
 import { mockCombinedData } from "@/src/components/testData/data"
 import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { createClient } from "@/src/utils/supabase/client"
+import { useTranslations } from "next-intl"
 
-const MATERIALS = [
-  "Metal/Non metallic",
-  "Other Recycables",
-  "Sludge",
-  "Uretano",
-  "Vidrio",
-  "Autopartes Destruida"
-]
 const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
   "Sludge": [1],
   "Uretano": [2],
@@ -47,6 +39,7 @@ function CombinedChart({
     selectors,
     selectedYear,
   }: { title: string; data?: Record<string, unknown>[]; height?: string; showComparison: boolean; selectors?: React.ReactNode; selectedYear: number }) {
+    const t = useTranslations('analyticsPage');
     const prevYear = selectedYear - 1;
     const kgKey = `kg/${selectedYear}`;
     const kgPrevKey = `kg/${prevYear}`;
@@ -88,22 +81,22 @@ function CombinedChart({
                 <YAxis
                   yAxisId="left"
                   orientation="left"
-                  label={{ value: "kg", angle: -90, position: "insideLeft" }}
+                  label={{ value: t('kg'), angle: -90, position: "insideLeft" }}
                   domain={[0, maxKg * 1.1]}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  label={{ value: "kg/Vehicle", angle: 90, position: "insideRight" }}
+                  label={{ value: t('kgVehicle'), angle: 90, position: "insideRight" }}
                   domain={[0, maxKgVehicle * 1.1]}
                 />
                 <Tooltip
                   formatter={(value, name) => {
                     const nameStr = String(name);
                     if (nameStr.includes("Vehicle")) {
-                      return [`${value} kg/vehicle`, name]
+                      return [`${value} ${t('kgVehicle')}`, name]
                     }
-                    return [`${value.toLocaleString()} kg`, name]
+                    return [`${value.toLocaleString()} ${t('kg')}`, name]
                   }}
                 />
                 <Legend />
@@ -159,7 +152,8 @@ function CombinedChart({
   
   // Year-over-year comparison dashboard
 export function YearComparisonGraph() {
-  const [material, setMaterial] = useState(MATERIALS[0])
+  const t = useTranslations('analyticsPage');
+  const [material, setMaterial] = useState(t('material.metal'))
   const [years, setYears] = useState<number[]>([])
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
   const [data, setData] = useState<{ month: string; [key: string]: number | string }[]>([])
@@ -168,6 +162,16 @@ export function YearComparisonGraph() {
   const [yearLoading, setYearLoading] = useState(true)
   const [yearError, setYearError] = useState<string | null>(null)
   const [showComparison, setShowComparison] = useState(true)
+
+  const MATERIAL_KEYS = [
+    'material.metal',
+    'material.other',
+    'material.sludge',
+    'material.uretano',
+    'material.vidrio',
+    'material.autopartes',
+  ];
+  const MATERIALS = MATERIAL_KEYS.map((key) => t(key));
 
   useEffect(() => {
     // Fetch available years from waste_logs
@@ -256,16 +260,16 @@ export function YearComparisonGraph() {
     fetchData()
   }, [material, selectedYear])
 
-  if (yearLoading) return <div>Loading years...</div>
+  if (yearLoading) return <div>{t('loadingYears')}</div>
   if (yearError) return <div className="text-red-500">{yearError}</div>
 
   const selectors = (
     <>
       <div className="space-y-1 min-w-[200px] w-full md:w-auto">
-        <label className="text-sm font-medium">Material</label>
+        <label className="text-sm font-medium">{t('materialLabel')}</label>
         <Select value={material} onValueChange={setMaterial}>
           <SelectTrigger>
-            <SelectValue placeholder="Select material" />
+            <SelectValue placeholder={t('selectMaterial')} />
           </SelectTrigger>
           <SelectContent>
             {MATERIALS.map((mat) => (
@@ -277,10 +281,10 @@ export function YearComparisonGraph() {
         </Select>
       </div>
       <div className="space-y-1 min-w-[200px] w-full md:w-auto">
-        <label className="text-sm font-medium">Year</label>
+        <label className="text-sm font-medium">{t('yearLabel')}</label>
         <Select value={selectedYear?.toString() || ""} onValueChange={y => setSelectedYear(Number(y))}>
           <SelectTrigger>
-            <SelectValue placeholder="Select year" />
+            <SelectValue placeholder={t('selectYear')} />
           </SelectTrigger>
           <SelectContent>
             {years.map((y) => (
@@ -292,14 +296,14 @@ export function YearComparisonGraph() {
         </Select>
       </div>
       <div className="space-y-1 min-w-[200px] w-full md:w-auto">
-        <label className="text-sm font-medium">Comparison</label>
+        <label className="text-sm font-medium">{t('comparisonLabel')}</label>
         <Select value={showComparison ? "comparison" : "single"} onValueChange={v => setShowComparison(v === "comparison") }>
           <SelectTrigger>
-            <SelectValue placeholder="Comparison mode" />
+            <SelectValue placeholder={t('comparisonMode')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="comparison">Compare with {selectedYear ? selectedYear - 1 : "previous year"}</SelectItem>
-            <SelectItem value="single">Show {selectedYear} only</SelectItem>
+            <SelectItem value="comparison">{t('compareWithPrev', { year: selectedYear ? selectedYear - 1 : t('previousYear') })}</SelectItem>
+            <SelectItem value="single">{t('showOnly', { year: selectedYear ?? '' })}</SelectItem>
           </SelectContent>
         </Select>
       </div>

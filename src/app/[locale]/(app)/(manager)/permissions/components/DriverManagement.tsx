@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner"
 import type { SupabaseClient } from '@supabase/supabase-js' // Import SupabaseClient type
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/src/components/ui/alert-dialog"
+import { useTranslations } from "next-intl"
 
 // Define Driver type
 type Driver = {
@@ -39,6 +40,7 @@ interface DriverManagementProps {
 }
 
 export default function DriverManagement({ supabase }: DriverManagementProps) {
+  const t = useTranslations('permissionsPage.driverManagement')
   // Driver State
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [loadingDrivers, setLoadingDrivers] = useState(true)
@@ -243,14 +245,14 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
   // --- Render Logic ---
   return (
     <AccordionItem value="drivers">
-      <AccordionTrigger className="text-lg font-semibold">Driver Management</AccordionTrigger>
+      <AccordionTrigger className="text-lg font-semibold">{t('sectionTitle')}</AccordionTrigger>
       <AccordionContent>
         {/* Search and Add Button */}
          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search drivers by name, company, plates..."
+              placeholder={t('searchPlaceholder')}
               className="pl-8"
               value={driverSearchTerm}
               onChange={(e) => setDriverSearchTerm(e.target.value)}
@@ -261,32 +263,32 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
             <DialogTrigger asChild>
               <Button variant="outline" className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
-                Add Driver
+                {t('addButton')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Add New Driver</DialogTitle>
-                <DialogDescription>Create a new driver profile.</DialogDescription>
+                <DialogTitle>{t('addDialogTitle')}</DialogTitle>
+                <DialogDescription>{t('addDialogDescription')}</DialogDescription>
               </DialogHeader>
               <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2">
-                <div className="grid gap-2"><Label htmlFor="driver-nombre">Nombre de Chofer *</Label><Input id="driver-first_name" value={newDriver.first_name} onChange={(e) => setNewDriver({ ...newDriver, first_name: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-nombre">Apellido(s) de Chofer *</Label><Input id="driver-last_name" value={newDriver.last_name} onChange={(e) => setNewDriver({ ...newDriver, last_name: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-compania">Compañía</Label><Input id="driver-compania" value={newDriver.company} onChange={(e) => setNewDriver({ ...newDriver, company: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-procedencia">Procedencia</Label><Input id="driver-procedencia" value={newDriver.origin} onChange={(e) => setNewDriver({ ...newDriver, origin: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-destino">Destino</Label><Input id="driver-destino" value={newDriver.destination} onChange={(e) => setNewDriver({ ...newDriver, destination: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-placas">Placas *</Label><Input id="driver-placas" value={newDriver.vehicle_plates} onChange={(e) => setNewDriver({ ...newDriver, vehicle_plates: e.target.value })} disabled={isSubmittingDriver}/></div>
-                <div className="grid gap-2"><Label htmlFor="driver-numeroEconomico">Número Económico *</Label><Input id="driver-numeroEconomico" value={newDriver.economic_number} onChange={(e) => setNewDriver({ ...newDriver, economic_number: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-first_name">{t('firstName')} *</Label><Input id="driver-first_name" value={newDriver.first_name} onChange={(e) => setNewDriver({ ...newDriver, first_name: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-last_name">{t('lastName')} *</Label><Input id="driver-last_name" value={newDriver.last_name} onChange={(e) => setNewDriver({ ...newDriver, last_name: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-company">{t('company')}</Label><Input id="driver-company" value={newDriver.company} onChange={(e) => setNewDriver({ ...newDriver, company: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-origin">{t('origin')}</Label><Input id="driver-origin" value={newDriver.origin} onChange={(e) => setNewDriver({ ...newDriver, origin: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-destination">{t('destination')}</Label><Input id="driver-destination" value={newDriver.destination} onChange={(e) => setNewDriver({ ...newDriver, destination: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-vehicle_plates">{t('vehiclePlates')} *</Label><Input id="driver-vehicle_plates" value={newDriver.vehicle_plates} onChange={(e) => setNewDriver({ ...newDriver, vehicle_plates: e.target.value })} disabled={isSubmittingDriver}/></div>
+                <div className="grid gap-2"><Label htmlFor="driver-economic_number">{t('economicNumber')} *</Label><Input id="driver-economic_number" value={newDriver.economic_number} onChange={(e) => setNewDriver({ ...newDriver, economic_number: e.target.value })} disabled={isSubmittingDriver}/></div>
                 <div className="flex items-center space-x-2 md:col-span-2">
                   <Switch id="driver-active" checked={newDriver.is_active} onCheckedChange={(checked) => setNewDriver({ ...newDriver, is_active: checked })} disabled={isSubmittingDriver}/>
-                  <Label htmlFor="driver-active">Active</Label>
+                  <Label htmlFor="driver-active">{t('active')}</Label>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDriverDialogOpen(false)} disabled={isSubmittingDriver}>Cancel</Button>
+                <Button variant="outline" onClick={() => setIsAddDriverDialogOpen(false)} disabled={isSubmittingDriver}>{t('cancel')}</Button>
                 <Button variant="default" onClick={handleAddDriver} disabled={isSubmittingDriver}>
                    {isSubmittingDriver ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                   {isSubmittingDriver ? 'Adding...' : 'Add Driver'}
+                   {isSubmittingDriver ? t('adding') : t('add')}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -298,21 +300,21 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Compañía</TableHead>
-                <TableHead>Procedencia</TableHead>
-                <TableHead>Destino</TableHead>
-                <TableHead>Placas</TableHead>
-                <TableHead>Num. Económico</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('table.name')}</TableHead>
+                <TableHead>{t('table.company')}</TableHead>
+                <TableHead>{t('table.origin')}</TableHead>
+                <TableHead>{t('table.destination')}</TableHead>
+                <TableHead>{t('table.vehiclePlates')}</TableHead>
+                <TableHead>{t('table.economicNumber')}</TableHead>
+                <TableHead>{t('table.status')}</TableHead>
+                <TableHead className="text-right">{t('table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
              <TableBody>
               {loadingDrivers ? (
                  <TableRow><TableCell colSpan={8} className="h-24 text-center"><Loader2 className="mx-auto h-6 w-6 animate-spin text-muted-foreground" /></TableCell></TableRow>
               ) : !filteredDrivers.length ? (
-                 <TableRow><TableCell colSpan={8} className="h-24 text-center">No drivers found.</TableCell></TableRow>
+                 <TableRow><TableCell colSpan={8} className="h-24 text-center">{t('noDrivers')}</TableCell></TableRow>
               ) : (
                 filteredDrivers.map((driver) => (
                   <TableRow key={driver.id}>
@@ -325,7 +327,7 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
                     <TableCell>
                       <div className="flex items-center space-x-2">
                         <Switch id={`active-drv-${driver.id}`} checked={driver.is_active} onCheckedChange={() => handleToggleDriverActive(driver.id, driver.is_active, driver.first_name ?? '', driver.last_name || driver.vehicle_plates || driver.id)} />
-                        <Label htmlFor={`active-drv-${driver.id}`} className="text-sm">{driver.is_active ? "Active" : "Inactive"}</Label>
+                        <Label htmlFor={`active-drv-${driver.id}`} className="text-sm">{driver.is_active ? t('active') : t('status')}</Label>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -346,24 +348,24 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
                           {editingDriver && editingDriver.id === driver.id && (
                             <DialogContent className="sm:max-w-[600px]">
                               <DialogHeader>
-                                <DialogTitle>Edit Driver</DialogTitle>
-                                <DialogDescription>Update driver information.</DialogDescription>
+                                <DialogTitle>{t('editDialogTitle')}</DialogTitle>
+                                <DialogDescription>{t('editDialogDescription')}</DialogDescription>
                               </DialogHeader>
                               <div className="grid grid-cols-1 gap-4 py-4 md:grid-cols-2">
-                              <div className="grid gap-2"><Label htmlFor="edit-driver-first-name">Nombre de Chofer</Label><Input id="edit-driver-first-anme" value={editingDriver.first_name ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, first_name: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-last-name">Apellido(s) de Chofer</Label><Input id="edit-driver-last-name" value={editingDriver.last_name ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, last_name: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-compania">Compañía</Label><Input id="edit-driver-compania" value={editingDriver.company ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, company: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-procedencia">Procedencia</Label><Input id="edit-driver-procedencia" value={editingDriver.origin ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, origin: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-destino">Destino</Label><Input id="edit-driver-destino" value={editingDriver.destination ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, destination: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-placas">Placas</Label><Input id="edit-driver-placas" value={editingDriver.vehicle_plates ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, vehicle_plates: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="grid gap-2"><Label htmlFor="edit-driver-numeroEconomico">Número Económico</Label><Input id="edit-driver-numeroEconomico" value={editingDriver.economic_number ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, economic_number: e.target.value })} disabled={isSubmittingDriver}/></div>
-                                <div className="flex items-center space-x-2 md:col-span-2"><Switch id="edit-driver-active" checked={editingDriver.is_active} onCheckedChange={(checked) => setEditingDriver({ ...editingDriver, is_active: checked })} disabled={isSubmittingDriver}/><Label htmlFor="edit-driver-active">Active</Label></div>
+                              <div className="grid gap-2"><Label htmlFor="edit-driver-first-name">{t('firstName')}</Label><Input id="edit-driver-first-name" value={editingDriver.first_name ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, first_name: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-last-name">{t('lastName')}</Label><Input id="edit-driver-last-name" value={editingDriver.last_name ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, last_name: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-company">{t('company')}</Label><Input id="edit-driver-company" value={editingDriver.company ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, company: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-origin">{t('origin')}</Label><Input id="edit-driver-origin" value={editingDriver.origin ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, origin: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-destination">{t('destination')}</Label><Input id="edit-driver-destination" value={editingDriver.destination ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, destination: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-vehicle_plates">{t('vehiclePlates')}</Label><Input id="edit-driver-vehicle_plates" value={editingDriver.vehicle_plates ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, vehicle_plates: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="grid gap-2"><Label htmlFor="edit-driver-economic_number">{t('economicNumber')}</Label><Input id="edit-driver-economic_number" value={editingDriver.economic_number ?? ''} onChange={(e) => setEditingDriver({ ...editingDriver, economic_number: e.target.value })} disabled={isSubmittingDriver}/></div>
+                                <div className="flex items-center space-x-2 md:col-span-2"><Switch id="edit-driver-active" checked={editingDriver.is_active} onCheckedChange={(checked) => setEditingDriver({ ...editingDriver, is_active: checked })} disabled={isSubmittingDriver}/><Label htmlFor="edit-driver-active">{t('active')}</Label></div>
                               </div>
                               <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsEditDriverDialogOpen(false)} disabled={isSubmittingDriver}>Cancel</Button>
+                                <Button variant="outline" onClick={() => setIsEditDriverDialogOpen(false)} disabled={isSubmittingDriver}>{t('cancel')}</Button>
                                 <Button onClick={handleEditDriver} disabled={isSubmittingDriver}>
                                   {isSubmittingDriver ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                  {isSubmittingDriver ? 'Saving...' : 'Save Changes'}
+                                  {isSubmittingDriver ? t('saving') : t('save')}
                                 </Button>
                               </DialogFooter>
                             </DialogContent>
@@ -372,20 +374,20 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
                         {/* Deactivate Driver Button */}
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteDriver(driver.id)} className="text-destructive hover:text-destructive" disabled={isSubmittingDriver || !driver.is_active} title={driver.is_active ? "Deactivate Driver" : "Driver is Inactive"}>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteDriver(driver.id)} className="text-destructive hover:text-destructive" disabled={isSubmittingDriver || !driver.is_active} title={driver.is_active ? t('deactivateTitle') : t('status')}>
                               <Trash className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Deactivate Driver</AlertDialogTitle>
+                              <AlertDialogTitle>{t('deactivateTitle')}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to deactivate driver {pendingDeleteDriver?.first_name} {pendingDeleteDriver?.last_name}? This action cannot be undone.
+                                {t('deactivateDescription', { name: `${pendingDeleteDriver?.first_name ?? ''} ${pendingDeleteDriver?.last_name ?? ''}`.trim() })}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setPendingDeleteDriver(null)}>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={confirmDeleteDriver} disabled={isSubmittingDriver}>Deactivate</AlertDialogAction>
+                              <AlertDialogCancel onClick={() => setPendingDeleteDriver(null)}>{t('cancel')}</AlertDialogCancel>
+                              <AlertDialogAction onClick={confirmDeleteDriver} disabled={isSubmittingDriver}>{t('deactivateConfirm')}</AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
@@ -400,15 +402,15 @@ export default function DriverManagement({ supabase }: DriverManagementProps) {
         <AlertDialog open={!!pendingToggleDriver} onOpenChange={(open) => { if (!open) setPendingToggleDriver(null); }}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{pendingToggleDriver?.currentStatus ? 'Deactivate' : 'Activate'} Driver</AlertDialogTitle>
+              <AlertDialogTitle>{t('toggleTitle', { action: pendingToggleDriver?.currentStatus ? t('deactivate') : t('activate') })}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to {pendingToggleDriver?.currentStatus ? 'deactivate' : 'activate'} driver {`${pendingToggleDriver?.first_name ?? ''} ${pendingToggleDriver?.last_name ?? ''}`.trim()}? This action can be undone.
+                {t('toggleDescription', { action: pendingToggleDriver?.currentStatus ? t('deactivate') : t('activate'), name: `${pendingToggleDriver?.first_name ?? ''} ${pendingToggleDriver?.last_name ?? ''}`.trim() })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setPendingToggleDriver(null)}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel onClick={() => setPendingToggleDriver(null)}>{t('cancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={confirmToggleDriverActive} disabled={isSubmittingDriver}>
-                {pendingToggleDriver?.currentStatus ? 'Deactivate' : 'Activate'}
+                {pendingToggleDriver?.currentStatus ? t('deactivate') : t('activate')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

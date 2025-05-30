@@ -12,6 +12,7 @@ import { createClient } from "@/src/utils/supabase/client";
 import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
 import type { ResiduoDetails } from "@/src/utils/log/log-utils";
 import { useUser } from "@/src/hooks/useUser";
+import { useTranslations } from "next-intl";
 
 // Import new sub-components
 import AutomaticInfo from './waste-disposal-form/AutomaticInfo';
@@ -148,6 +149,7 @@ export default function WasteDisposalForm() {
 
   const supabase = createClient();
   const { profile } = useUser();
+  const t = useTranslations('wasteDisposalForm');
 
   // Fetch Drivers Effect
   useEffect(() => {
@@ -403,9 +405,9 @@ export default function WasteDisposalForm() {
         {submitSuccess ? (
           // Success Message View
           <div className="bg-green-50 p-4 rounded-md mb-6">
-            <p className="text-green-800 font-medium">Registro guardado exitosamente</p>
+            <p className="text-green-800 font-medium">{t('successMessage')}</p>
             <Button variant="outline"className="mt-4" onClick={() => setSubmitSuccess(false)}>
-              Crear nuevo registro
+              {t('newRecordButton')}
             </Button>
           </div>
         ) : (
@@ -441,7 +443,7 @@ export default function WasteDisposalForm() {
 
               {/* Submit Button */}
               <Button type="submit" variant="outline" disabled={isSubmitting || isLoadingDrivers}>
-                {isSubmitting ? "Guardando..." : "Guardar Registro"}
+                {isSubmitting ? t('saving') : t('saveButton')}
               </Button>
             </form>
           </Form>

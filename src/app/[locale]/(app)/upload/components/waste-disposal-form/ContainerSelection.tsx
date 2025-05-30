@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/src/components/ui/select";
 import { WasteDisposalFormValues } from "../waste-disposal-form";
+import { useTranslations } from "next-intl";
 
 // Define container types locally or import from a shared constants file
 export const containerTypes = [
@@ -32,23 +33,24 @@ interface ContainerSelectionProps {
 }
 
 export default function ContainerSelection({ form }: ContainerSelectionProps) {
+  const t = useTranslations('wasteDisposalForm');
   return (
     <FormField
       control={form.control}
       name="tipoContenedor"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Tipo de Contenedor</FormLabel>
+          <FormLabel>{t('containerTypeLabel')}</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo de contenedor" />
+                <SelectValue placeholder={t('selectContainerPlaceholder')} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {containerTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
+              {Object.entries(t.raw('containerTypes')).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label as string}
                 </SelectItem>
               ))}
             </SelectContent>

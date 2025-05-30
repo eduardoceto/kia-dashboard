@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/src/components/ui/select";
 import { WasteDisposalFormValues } from "../waste-disposal-form";
+import { useTranslations } from "next-intl";
 
 // Define material types locally or import from a shared constants file
 export const materialTypes = [
@@ -34,23 +35,24 @@ interface MaterialTypeSelectionProps {
 }
 
 const MaterialTypeSelection: React.FC<MaterialTypeSelectionProps> = ({ form }) => {
+  const t = useTranslations('wasteDisposalForm');
   return (
     <FormField
       control={form.control}
       name="tipoMaterial"
       render={({ field }) => (
         <FormItem>
-          <FormLabel><h1>Tipo de Material</h1><p className='text-xs text-neutral-500'>Dependiendo del Registro</p></FormLabel>
+          <FormLabel><h1>{t('materialTypeLabel')}</h1><p className='text-xs text-neutral-500'>{t('materialTypeDescription')}</p></FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo de material" />
+                <SelectValue placeholder={t('selectMaterialPlaceholder')} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {materialTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
+              {Object.entries(t.raw('materialTypes')).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label as string}
                 </SelectItem>
               ))}
             </SelectContent>

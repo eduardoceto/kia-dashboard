@@ -9,8 +9,10 @@ import { useUser } from "@/src/hooks/useUser"
 import { useLocale } from "next-intl"
 import { createClient } from "@/src/utils/supabase/client"
 import DashboardHeader from "@/src/components/DashboardHeader"
+import { useTranslations } from "next-intl"
 
 export default function SettingsPage() {
+  const t = useTranslations('settingsPage')
   const currentUser = useUser().profile
   const router = useRouter()
   const pathname = usePathname()
@@ -38,47 +40,47 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <DashboardHeader variant="page" title="User Settings" />
+      <DashboardHeader variant="page" title={t('title')} />
 
       <div className="flex justify-center">
         <div className="grid gap-6 md:grid-cols-2 w-full max-w-5xl">
           <Card>
             <CardHeader>
-              <CardTitle>Your Profile</CardTitle>
-              <CardDescription>View your account information</CardDescription>
+              <CardTitle>{t('profileTitle')}</CardTitle>
+              <CardDescription>{t('profileDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">Name:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('nameLabel')}</p>
                   <p className="col-span-2 text-sm">{currentUser?.first_name} {currentUser?.last_name}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">Email:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('emailLabel')}</p>
                   <p className="col-span-2 text-sm">{currentUser?.email}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">ID Number:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('idLabel')}</p>
                   <p className="col-span-2 text-sm">{currentUser?.employee_id}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">Role:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('roleLabel')}</p>
                   <p className="col-span-2 text-sm">{currentUser?.role}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">Status:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('statusLabel')}</p>
                   <p className="col-span-2 text-sm">
                     <span
                       className={`inline-block h-2 w-2 rounded-full ${currentUser?.is_active ? "bg-green-500" : "bg-red-500"} mr-2`}
                     ></span>
-                    {currentUser?.is_active ? "Active" : "Inactive"}
+                    {currentUser?.is_active ? t('active') : t('inactive')}
                   </p>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
-                  <p className="text-sm font-medium text-muted-foreground">Join Date:</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('joinDateLabel')}</p>
                   {/* Format the date and time */}
                   <p className="col-span-2 text-sm">
-                    {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleString() : 'N/A'}
+                    {currentUser?.created_at ? new Date(currentUser.created_at).toLocaleString() : t('notAvailable')}
                   </p>
                 </div>
               </div>
@@ -87,8 +89,8 @@ export default function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Language Settings</CardTitle>
-              <CardDescription>Choose your preferred language</CardDescription>
+              <CardTitle>{t('languageTitle')}</CardTitle>
+              <CardDescription>{t('languageDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <RadioGroup 
@@ -100,14 +102,14 @@ export default function SettingsPage() {
                   <RadioGroupItem value="en" id="english" />
                   <Label htmlFor="english" className="flex items-center gap-2 font-normal">
                     <Languages className="h-4 w-4" />
-                    English
+                    {t('english')}
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="es" id="spanish" />
                   <Label htmlFor="spanish" className="flex items-center gap-2 font-normal">
                     <Languages className="h-4 w-4" />
-                    Español
+                    {t('spanish')}
                   </Label>
                 </div>
               </RadioGroup>
