@@ -39,13 +39,15 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/en/login') &&
-    !request.nextUrl.pathname.startsWith('/es/login')
+    !request.nextUrl.pathname.match(/^\/[a-zA-Z-]+\/login/) &&
+    !request.nextUrl.pathname.match(/^\/[a-zA-Z-]+\/auth/)
   ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/en/login'
-    return NextResponse.redirect(url)
+    // no user, respond by redirecting the user to the login page for the correct locale
+    const url = request.nextUrl.clone();
+    const pathname = request.nextUrl.pathname;
+    const locale = pathname.split('/')[1] || 'es'; // fallback to 'es' if not found
+    url.pathname = `/${locale}/login`;
+    return NextResponse.redirect(url);
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
