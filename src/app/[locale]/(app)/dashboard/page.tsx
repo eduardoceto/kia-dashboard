@@ -25,6 +25,7 @@ import { generatePdf } from "@/src/actions/generatePdf";
 import { formatDate } from "@/src/utils/log/log-utils";
 import DashboardHeader from "@/src/components/DashboardHeader";
 import { fetchWasteDisposalLogs } from "@/src/actions/submitWasteDisposal";
+import Loader from "@/src/components/ui/Loader";
 
 
 const MONTHLY_TARGET = 10000; // monthly target in kg
@@ -165,7 +166,12 @@ export default function Dashboard() {
 
   const recentLogs = useMemo<LogEntry[]>(() => getRecentLogs(logs, 5), [logs]);
 
-  if (loading) return <div className="p-8 text-center text-lg">{tCommon('loading')}</div>;
+  if (loading) return (
+    <div className="p-8 text-center flex flex-col items-center">
+      <Loader />
+      <span className="mt-4 text-lg">{tCommon('loading')}</span>
+    </div>
+  );
   if (error) return <div className="p-8 text-center text-red-500">{tCommon('errorLoading')}</div>;
 
   return (

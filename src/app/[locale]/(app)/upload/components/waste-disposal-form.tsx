@@ -371,7 +371,7 @@ export default function WasteDisposalForm() {
         horaSalida: currentTime,
         folio: generatedNumber,
         departamento: "EHS",
-        motivo: "residuos",
+        motivo: "Residuos",
         residuos,
         pesoTotal: log.quantity?.toFixed ? log.quantity.toFixed(2) : String(log.quantity),
       };
