@@ -47,6 +47,7 @@ const getWasteByMaterialForMonth = (logs: LogEntry[], year: number, month: numbe
 export default function Dashboard() {
   const t = useTranslations('dashboardPage');
   const tCommon = useTranslations('common');
+  const tMaterialTypes = useTranslations('wasteDisposalForm');
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -283,7 +284,7 @@ export default function Dashboard() {
                       <td className="px-2 py-2">
                         <span className={`inline-flex items-center gap-1`}>
                           <span className={`w-3 h-3 rounded-full ${typeColor} inline-block`} />
-                          <span className="capitalize font-medium">{t('materialTypes.' + log.tipoMaterial)}</span>
+                          <span className="capitalize font-medium">{tMaterialTypes('materialTypes.' + log.tipoMaterial)}</span>
                         </span>
                       </td>
                       <td className="px-2 py-2">{log.fecha}</td>
@@ -369,7 +370,7 @@ export default function Dashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                   <div>
                                     <h3 className="text-sm font-medium text-muted-foreground">{t('materialInfo.materialType')}</h3>
-                                    <p>{t('materialTypes.' + selectedLog.tipoMaterial)}</p>
+                                    <p>{tMaterialTypes('materialTypes.' + selectedLog.tipoMaterial)}</p>
                                   </div>
                                   <div>
                                     <h3 className="text-sm font-medium text-muted-foreground">{t('materialInfo.containerType')}</h3>
@@ -388,114 +389,106 @@ export default function Dashboard() {
                                   {(() => {
                                     if (!selectedLog.residuos) return null;
                                     switch (selectedLog.tipoMaterial) {
-                                      case "Lodos": {
+                                      case "lodos": {
                                         const details = selectedLog.residuos as LodosResiduo;
                                         return (
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('lodos.residueName')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('lodos.nombreResiduo')}</h4>
                                               <p>{details.nombreResiduo || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('lodos.manifestNo')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('lodos.manifiestoNo')}</h4>
                                               <p>{details.manifiestoNo || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('lodos.area')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('lodos.area')}</h4>
                                               <p>{details.area || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('lodos.transportNoServices')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('lodos.transportNoServices')}</h4>
                                               <p>{details.transporteNoServicios || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('lodos.weightKg')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('lodos.weightKg')}</h4>
                                               <p>{details.pesoKg || "-"}</p>
                                             </div>
                                           </div>
                                         );
                                       }
-                                      case "Metal": {
+                                      case "metal": {
                                         const details = selectedLog.residuos as MetalResiduo;
                                         return (
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('metal.residueType')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('metal.tipoResiduo')}</h4>
                                               <p>{details.tipoResiduo || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('metal.item')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('metal.item')}</h4>
                                               <p>{details.item || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('metal.amount')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('metal.cantidad')}</h4>
                                               <p>{details.cantidad || "-"} {details.unidad || ""}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('metal.remisionHMMX')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('metal.remisionHMMX')}</h4>
                                               <p>{details.remisionHMMX || "-"}</p>
-                                            </div>
-                                            <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('metal.remisionKia')}</h4>
-                                              <p>{details.remisionKia || "-"}</p>
                                             </div>
                                           </div>
                                         );
                                       }
-                                      case "Otros": {
+                                      case "otros": {
                                         const details = selectedLog.residuos as OtrosResiduo;
                                         return (
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('otros.wasteType')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('otros.tipoDesecho')}</h4>
                                               <p>{details.tipoDesecho || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('otros.item')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('otros.item')}</h4>
                                               <p>{details.item || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('otros.amount')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('otros.cantidad')}</h4>
                                               <p>{details.cantidad || "-"} {details.unidad || ""}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('otros.remisionHMMX')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('otros.remisionHMMX')}</h4>
                                               <p>{details.remisionHMMX || "-"}</p>
-                                            </div>
-                                            <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('otros.remisionKia')}</h4>
-                                              <p>{details.remisionKia || "-"}</p>
                                             </div>
                                           </div>
                                         );
                                       }
-                                      case "Destruidas": {
+                                      case "destruidas": {
                                         const details = selectedLog.residuos as DestruidasResiduo;
                                         return (
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('destruidas.residues')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('destruidas.residuos')}</h4>
                                               <p>{details.residuos || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('destruidas.area')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('destruidas.area')}</h4>
                                               <p>{details.area || "-"}</p>
                                             </div>
                                             <div>
-                                              <h4 className="text-sm font-medium text-muted-foreground">{t('destruidas.weight')}</h4>
+                                              <h4 className="text-sm font-medium text-muted-foreground">{tMaterialTypes('destruidas.peso')}</h4>
                                               <p>{details.peso || "-"} {tCommon('kg')}</p>
                                             </div>
                                           </div>
                                         );
                                       }
                                       default:
-                                        return <p>{t('noDetails')}</p>;
+                                        return <p>{tCommon('noDetails')}</p>;
                                     }
                                   })()}
                                 </div>
                                 <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => selectedLog && generatePdf(selectedLog)}>
                                   <Download className="h-4 w-4" />
-                                  {t('downloadPdf')}
+                                  {tCommon('downloadPdf')}
                                 </Button>
                               </div>
                             )}

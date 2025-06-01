@@ -11,7 +11,9 @@
     "errorLoading": "Error loading",
     "loadingData": "Loading...",
     "noItemsAvailable": "No items available",
-    "kg": "kg"
+    "kg": "kg",
+    "noDetails": "No details available for this material type.",
+    "downloadPdf": "Download PDF"
   },
   "metadata": {
     "title": "Kia Dashboard",
@@ -122,7 +124,8 @@
       "item": "Item",
       "cantidad": "Amount",
       "unidad": "Unit",
-      "remisionHMMX": "Remission HMMX"
+      "remisionHMMX": "Remission HMMX",
+      "remisionKia": "Remission KIA"
     },
     "otros": {
       "tipoDesecho": "Waste Type",

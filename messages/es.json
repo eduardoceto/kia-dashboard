@@ -11,7 +11,9 @@
       "errorLoading": "Error al cargar",
       "loadingData": "Cargando...",
       "noItemsAvailable": "No hay elementos disponibles",
-      "kg": "kg"
+      "kg": "kg",
+      "noDetails": "No hay detalles disponibles para este tipo de material.",
+      "downloadPdf": "Descargar PDF"
     },
     "metadata": {
       "title": "Panel de Kia",
@@ -476,8 +478,6 @@
         "area": "Área",
         "peso": "Peso (kg)"
       },
-      "noDetails": "No hay detalles disponibles para este tipo de material.",
-      "downloadPdf": "Descargar PDF",
       "wasteByMaterialMonth": "Residuos por Material (Este Mes)",
       "wasteLogCount": "Conteo de Registros de Residuos",
       "year": "Año",
