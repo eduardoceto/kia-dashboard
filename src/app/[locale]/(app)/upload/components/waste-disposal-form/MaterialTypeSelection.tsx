@@ -50,9 +50,14 @@ const MaterialTypeSelection: React.FC<MaterialTypeSelectionProps> = ({ form }) =
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {Object.entries(t.raw('materialTypes')).map(([value, label]) => (
+              {[
+                { value: 'lodos', label: t('materialTypes.lodos') },
+                { value: 'metal', label: t('materialTypes.metal') },
+                { value: 'otros', label: t('materialTypes.otros') },
+                { value: 'destruidas', label: t('materialTypes.destruidas') },
+              ].map(({ value, label }) => (
                 <SelectItem key={value} value={value}>
-                  {label as string}
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>

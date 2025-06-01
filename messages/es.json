@@ -89,14 +89,11 @@
       "totalWeightLabel": "Peso Total:",
       "saveButton": "Guardar Registro",
       "materialTypes": {
-        "organico": "Orgánico",
-        "plastico": "Plástico",
-        "metal": "Metal",
-        "papel": "Papel/Cartón",
-        "vidrio": "Vidrio",
-        "peligroso": "Residuo Peligroso",
-        "electronico": "Electrónico",
-        "otro": "Otro"
+        "metal": "Metal / No Metálico",
+        "otro": "Otro",
+        "lodos": "Lodos",
+        "otros": "Otros Reciclables",
+        "destruidas": "Uretano / Vidrio / Autopartes Destruidas"
       },
       "containerTypes": {
         "bolsa": "Bolsa",
@@ -112,7 +109,34 @@
       "downloadDialogTitle": "Confirmar Descarga",
       "downloadDialogDescription": "¿Quieres descargar el archivo PDF del registro?",
       "download": "Descargar",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "lodos": {
+        "manifiestoNo": "No. de Manifiesto",
+        "area": "Área",
+        "transportNoServices": "No. de Servicios de Transporte",
+        "weightKg": "Peso (kg)",
+        "nombreResiduo": "Nombre del Residuo"
+      },
+      "metal": {
+        "tipoResiduo": "Tipo de Residuo",
+        "item": "Ítem",
+        "cantidad": "Cantidad",
+        "unidad": "Unidad",
+        "remisionHMMX": "Remisión HMMX"
+      },
+      "otros": {
+        "tipoDesecho": "Tipo de Desecho",
+        "item": "Ítem",
+        "cantidad": "Cantidad",
+        "unidad": "Unidad",
+        "remisionHMMX": "Remisión HMMX"
+      },
+      "destruidas": {
+        "residuos": "Residuos",
+        "area": "Área",
+        "peso": "Peso (kg)"
+      },
+      "saving": "Guardando..."
     },
     "logUploadModal": {
       "title": "Subir Registro de Tarea",
@@ -427,30 +451,30 @@
       },
       "materialSpecificDetails": "Detalles Específicos del Material",
       "lodos": {
-        "residueName": "Nombre del Residuo",
         "manifiestoNo": "No. de Manifiesto",
         "area": "Área",
         "transportNoServices": "No. de Servicios de Transporte",
-        "weightKg": "Peso (kg)"
+        "weightKg": "Peso (kg)",
+        "nombreResiduo": "Nombre del Residuo"
       },
       "metal": {
-        "residueType": "Tipo de Residuo",
+        "tipoResiduo": "Tipo de Residuo",
         "item": "Ítem",
-        "amount": "Cantidad",
-        "remisionHMMX": "Remisión HMMX",
-        "remisionKia": "Remisión KIA"
+        "cantidad": "Cantidad",
+        "unidad": "Unidad",
+        "remisionHMMX": "Remisión HMMX"
       },
       "otros": {
-        "wasteType": "Tipo de Desecho",
+        "tipoDesecho": "Tipo de Desecho",
         "item": "Ítem",
-        "amount": "Cantidad",
-        "remisionHMMX": "Remisión HMMX",
-        "remisionKia": "Remisión KIA"
+        "cantidad": "Cantidad",
+        "unidad": "Unidad",
+        "remisionHMMX": "Remisión HMMX"
       },
       "destruidas": {
-        "residues": "Residuos",
+        "residuos": "Residuos",
         "area": "Área",
-        "weight": "Peso"
+        "peso": "Peso (kg)"
       },
       "noDetails": "No hay detalles disponibles para este tipo de material.",
       "downloadPdf": "Descargar PDF",

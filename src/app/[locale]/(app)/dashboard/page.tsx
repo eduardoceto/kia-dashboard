@@ -61,10 +61,10 @@ export default function Dashboard() {
       const result = await fetchWasteDisposalLogs();
       if (result.success) {
         const excelIdToTipoMaterial: Record<string, string> = {
-          "1": "Lodos",
-          "2": "Destruidas",
-          "3": "Otros",
-          "4": "Metal",
+          "1": "lodos",
+          "2": "destruidas",
+          "3": "otros",
+          "4": "metal",
         };
         const mappedLogs = (result.data || []).map((log: unknown) => {
           const l = log as Record<string, unknown>;
@@ -81,7 +81,7 @@ export default function Dashboard() {
           };
           const tipoMaterial = excelIdToTipoMaterial[String(l.excel_id)] || "";
           let residuos = {};
-          if (tipoMaterial === "Lodos") {
+          if (tipoMaterial === "lodos") {
             residuos = {
               nombreResiduo: l.waste_name,
               manifiestoNo: l["Manifiesto No."],
@@ -89,7 +89,7 @@ export default function Dashboard() {
               transporteNoServicios: l.transport_num_services,
               pesoKg: l.quantity,
             };
-          } else if (tipoMaterial === "Metal") {
+          } else if (tipoMaterial === "metal") {
             residuos = {
               tipoResiduo: l.waste_type,
               item: l.waste_name,
@@ -97,7 +97,7 @@ export default function Dashboard() {
               unidad: l.quantity_type,
               remisionHMMX: l.REM ? String(l.REM) : undefined,
             };
-          } else if (tipoMaterial === "Otros") {
+          } else if (tipoMaterial === "otros") {
             residuos = {
               tipoDesecho: l.waste_type,
               item: l.waste_name,
@@ -105,7 +105,7 @@ export default function Dashboard() {
               unidad: l.quantity_type,
               remisionHMMX: l.REM ? String(l.REM) : undefined,
             };
-          } else if (tipoMaterial === "Destruidas") {
+          } else if (tipoMaterial === "destruidas") {
             residuos = {
               residuos: l.waste_name,
               area: l.area,
@@ -283,7 +283,7 @@ export default function Dashboard() {
                       <td className="px-2 py-2">
                         <span className={`inline-flex items-center gap-1`}>
                           <span className={`w-3 h-3 rounded-full ${typeColor} inline-block`} />
-                          <span className="capitalize font-medium">{log.tipoMaterial}</span>
+                          <span className="capitalize font-medium">{t('materialTypes.' + log.tipoMaterial)}</span>
                         </span>
                       </td>
                       <td className="px-2 py-2">{log.fecha}</td>
@@ -369,7 +369,7 @@ export default function Dashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4 border-muted">
                                   <div>
                                     <h3 className="text-sm font-medium text-muted-foreground">{t('materialInfo.materialType')}</h3>
-                                    <p>{selectedLog.tipoMaterial}</p>
+                                    <p>{t('materialTypes.' + selectedLog.tipoMaterial)}</p>
                                   </div>
                                   <div>
                                     <h3 className="text-sm font-medium text-muted-foreground">{t('materialInfo.containerType')}</h3>

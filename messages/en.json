@@ -89,14 +89,11 @@
     "totalWeightLabel": "Total Weight:",
     "saveButton": "Save Record",
     "materialTypes": {
-      "organico": "Organic",
-      "plastico": "Plastic",
-      "metal": "Metal",
-      "papel": "Paper/Cardboard",
-      "vidrio": "Glass",
-      "peligroso": "Hazardous Waste",
-      "electronico": "Electronic",
-      "otro": "Other"
+      "metal": "Metal / Non Metal",
+      "otro": "Other",
+      "lodos": "Sludge",
+      "otros": "Other Recyclables",
+      "destruidas": "Urethane / Glass / Destroyed Parts"
     },
     "containerTypes": {
       "bolsa": "Bag",
@@ -112,7 +109,34 @@
     "downloadDialogTitle": "Download Confirmation",
     "downloadDialogDescription": "Do you want to download the PDF file for this record?",
     "download": "Download",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "lodos": {
+      "manifiestoNo": "Manifest No.",
+      "area": "Area",
+      "transportNoServices": "Transport No. Services",
+      "weightKg": "Weight (kg)",
+      "nombreResiduo": "Residue Name"
+    },
+    "metal": {
+      "tipoResiduo": "Residue Type",
+      "item": "Item",
+      "cantidad": "Amount",
+      "unidad": "Unit",
+      "remisionHMMX": "Remission HMMX"
+    },
+    "otros": {
+      "tipoDesecho": "Waste Type",
+      "item": "Item",
+      "cantidad": "Amount",
+      "unidad": "Unit",
+      "remisionHMMX": "Remission HMMX"
+    },
+    "destruidas": {
+      "residuos": "Residues",
+      "area": "Area",
+      "peso": "Weight (kg)"
+    },
+    "saving": "Saving..."
   },
   "logUploadModal": {
     "title": "Upload Task Log",
@@ -426,35 +450,6 @@
       "totalWeight": "Total Weight"
     },
     "materialSpecificDetails": "Material Specific Details",
-    "lodos": {
-      "residueName": "Residue Name",
-      "manifestNo": "Manifest No.",
-      "area": "Area",
-      "transportNoServices": "Transport No. Services",
-      "weightKg": "Weight (kg)",
-      "manifiestoNo": "Manifest No."
-    },
-    "metal": {
-      "residueType": "Residue Type",
-      "item": "Item",
-      "amount": "Amount",
-      "remisionHMMX": "Remisión HMMX",
-      "remisionKia": "Remisión KIA"
-    },
-    "otros": {
-      "wasteType": "Waste Type",
-      "item": "Item",
-      "amount": "Amount",
-      "remisionHMMX": "Remisión HMMX",
-      "remisionKia": "Remisión KIA"
-    },
-    "destruidas": {
-      "residues": "Residues",
-      "area": "Area",
-      "weight": "Weight"
-    },
-    "noDetails": "No details available for this material type.",
-    "downloadPdf": "Download PDF",
     "wasteByMaterialMonth": "Waste by Material (This Month)",
     "wasteLogCount": "Waste Log Count",
     "year": "Year",
@@ -534,26 +529,27 @@
       "manifiestoNo": "Manifest No.",
       "area": "Area",
       "transportNoServices": "Transport No. Services",
-      "weightKg": "Weight (kg)"
+      "weightKg": "Weight (kg)",
+      "nombreResiduo": "Residue Name"
     },
     "metal": {
       "residueType": "Residue Type",
       "item": "Item",
       "amount": "Amount",
       "unit": "Unit",
-      "remisionHMMX": "Remisión HMMX"
+      "remisionHMMX": "Remission HMMX"
     },
     "otros": {
       "wasteType": "Waste Type",
       "item": "Item",
       "amount": "Amount",
       "unit": "Unit",
-      "remisionHMMX": "Remisión HMMX"
+      "remisionHMMX": "Remission HMMX"
     },
     "destruidas": {
       "residues": "Residues",
       "area": "Area",
-      "weight": "Weight"
+      "weight": "Weight (kg)"
     },
     "noDetails": "No details available for this material type."
   },

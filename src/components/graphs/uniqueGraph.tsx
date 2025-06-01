@@ -9,14 +9,23 @@ import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, X
 import { createClient } from "@/src/utils/supabase/client"
 import { useTranslations } from "next-intl"
 
+// Use internal keys for logic
 const MATERIAL_KEYS = [
-  'material.metal',
-  'material.other',
-  'material.sludge',
-  'material.uretano',
-  'material.vidrio',
-  'material.autopartes',
+  'metal',
+  'other',
+  'sludge',
+  'uretano',
+  'vidrio',
+  'autopartes',
 ]
+const MATERIAL_LABELS: Record<string, string> = {
+  metal: 'material.metal',
+  other: 'material.other',
+  sludge: 'material.sludge',
+  uretano: 'material.uretano',
+  vidrio: 'material.vidrio',
+  autopartes: 'material.autopartes',
+}
 const TIME_RANGE_KEYS = [
   'lastWeek',
   'lastMonth',
@@ -26,12 +35,12 @@ const TIME_RANGE_KEYS = [
 
 // Map material to excel_id
 const MATERIAL_TO_EXCEL_ID: Record<string, number[]> = {
-  "Sludge": [1],
-  "Uretano": [2],
-  "Vidrio": [2],
-  "Autopartes Destruida": [2],
-  "Other Recycables": [3],
-  "Metal/Non metallic": [4],
+  sludge: [1],
+  uretano: [2],
+  vidrio: [2],
+  autopartes: [2],
+  other: [3],
+  metal: [4],
 }
 
 // Define a type for chart data points
@@ -48,10 +57,8 @@ interface GraphProps {
 
 export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
   const t = useTranslations('analyticsPage')
-  const MATERIALS = MATERIAL_KEYS.map((key) => t(key))
-  const TIME_RANGES = TIME_RANGE_KEYS.map((key) => t(key))
-  const [material, setMaterial] = useState(MATERIALS[0])
-  const [timeRange, setTimeRange] = useState(TIME_RANGES[0])
+  const [material, setMaterial] = useState<string>(MATERIAL_KEYS[0])
+  const [timeRange, setTimeRange] = useState<string>(TIME_RANGE_KEYS[0])
   const [data, setData] = useState<ChartDataPoint[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,9 +72,9 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
         // Calculate date range
         const now = new Date()
         const fromDate = new Date()
-        if (timeRange === "Last Week") fromDate.setDate(now.getDate() - 6)
-        else if (timeRange === "Last Month") fromDate.setDate(now.getDate() - 29)
-        else if (timeRange === "Last Quarter") fromDate.setMonth(now.getMonth() - 2)
+        if (timeRange === 'lastWeek') fromDate.setDate(now.getDate() - 6)
+        else if (timeRange === 'lastMonth') fromDate.setDate(now.getDate() - 29)
+        else if (timeRange === 'lastQuarter') fromDate.setMonth(now.getMonth() - 2)
         else fromDate.setFullYear(now.getFullYear() - 1)
         // Map material to excel_id(s)
         const excelIds = MATERIAL_TO_EXCEL_ID[material] || []
@@ -89,9 +96,9 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
         // Group by day/week/month as needed
         let points = 7
         let groupKey = 'day'
-        if (timeRange === "Last Month") { points = 30; groupKey = 'day' }
-        else if (timeRange === "Last Quarter") { points = 3; groupKey = 'month' }
-        else if (timeRange === "Last Year") { points = 12; groupKey = 'month' }
+        if (timeRange === 'lastMonth') { points = 30; groupKey = 'day' }
+        else if (timeRange === 'lastQuarter') { points = 3; groupKey = 'month' }
+        else if (timeRange === 'lastYear') { points = 12; groupKey = 'month' }
         const grouped = Array.from({ length: points }, (_, i) => {
           let label
           let start, end
@@ -137,7 +144,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
       <CardHeader className={totalGraphs > 4 ? "p-3" : "pb-1 pt-3 px-4"}>
         <div className="flex items-center justify-between">
           <CardTitle className={`${totalGraphs > 6 ? "text-sm" : "text-md"} truncate pr-2 KiaSignatureBold`}>
-            {material} - {timeRange}
+            {t(MATERIAL_LABELS[material])} - {t(timeRange)}
           </CardTitle>
           <Button variant="ghost" size="icon" onClick={() => onRemove(id)} className="h-7 w-7 flex-shrink-0">
             <X className="h-4 w-4" />
@@ -153,9 +160,9 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                 <SelectValue placeholder="Select material" />
               </SelectTrigger>
               <SelectContent>
-                {MATERIALS.map((mat) => (
-                  <SelectItem key={mat} value={mat}>
-                    {mat}
+                {MATERIAL_KEYS.map((key) => (
+                  <SelectItem key={key} value={key}>
+                    {t(MATERIAL_LABELS[key])}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -168,9 +175,9 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                 <SelectValue placeholder="Select time range" />
               </SelectTrigger>
               <SelectContent>
-                {TIME_RANGES.map((range) => (
+                {TIME_RANGE_KEYS.map((range) => (
                   <SelectItem key={range} value={range}>
-                    {range}
+                    {t(range)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -201,11 +208,11 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                     totalGraphs <= 6
                       ? {
                           value:
-                            timeRange === t('lastWeek')
+                            timeRange === 'lastWeek'
                               ? t('days')
-                              : timeRange === t('lastMonth')
+                              : timeRange === 'lastMonth'
                                 ? t('days')
-                                : timeRange === t('lastQuarter')
+                                : timeRange === 'lastQuarter'
                                   ? t('months')
                                   : t('months'),
                           position: "insideBottomRight",
@@ -229,13 +236,13 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                   }
                 />
                 <Tooltip
-                  formatter={(value) => [`${value} ${t('kg')}`, `${material} ${t('waste')}`]}
+                  formatter={(value) => [`${value} ${t('kg')}`, `${t(MATERIAL_LABELS[material])} ${t('waste')}`]}
                   labelFormatter={(label) => {
-                    if (timeRange === t('lastWeek')) {
+                    if (timeRange === 'lastWeek') {
                       return `${t('day')} ${Number.parseInt(label) + 1}`
-                    } else if (timeRange === t('lastMonth')) {
+                    } else if (timeRange === 'lastMonth') {
                       return `${t('day')} ${Number.parseInt(label) + 1}`
-                    } else if (timeRange === t('lastQuarter')) {
+                    } else if (timeRange === 'lastQuarter') {
                       return `${t('month')} ${label}`
                     } else {
                       return `${t('month')} ${label}`
@@ -246,7 +253,7 @@ export function UniqueGraph({ id, onRemove, totalGraphs }: GraphProps) {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  name={`${material} waste`}
+                  name={`${t(MATERIAL_LABELS[material])} waste`}
                   stroke={color}
                   fill={color}
                   fillOpacity={0.3}
