@@ -12,7 +12,7 @@ import { FaFileUpload } from "react-icons/fa";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { Home } from "lucide-react"
-import Link from "next/link"
+import { Link } from '@/src/i18n/navigation'
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import kiaLogo from "@/public/kia-logo-white.svg"

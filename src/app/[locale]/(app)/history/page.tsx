@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
+import { Link } from '@/src/i18n/navigation'
 import { format, isAfter, isBefore, isEqual } from "date-fns"
 import { es } from "date-fns/locale"
 import { ChevronDown, ChevronUp, Download, FileSpreadsheet, Filter, Info, Search, Pencil } from "lucide-react"

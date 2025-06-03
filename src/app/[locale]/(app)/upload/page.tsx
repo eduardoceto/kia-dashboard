@@ -1,5 +1,5 @@
 'use client';
-import Link from "next/link"
+import { Link } from '@/src/i18n/navigation';
 import WasteDisposalForm from "@/src/app/[locale]/(app)/upload/components/waste-disposal-form"
 import { Button } from "@/src/components/ui/button"
 import { ClipboardList, FileSpreadsheet } from "lucide-react"

@@ -2,7 +2,7 @@
 "use client" // Add "use client" directive
 
 import { LogOut, MoveUpRight, Settings } from "lucide-react"
-import Link from "next/link"
+import { Link } from '@/src/i18n/navigation'
 import { createClient } from "../utils/supabase/client" // Use client Supabase client
 import { useRouter } from 'next/navigation' // Import useRouter for redirection
 import { FaCircleUser } from "react-icons/fa6"

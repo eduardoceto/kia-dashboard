@@ -191,7 +191,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Waste by Type Pie Chart - bigger and better spaced */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaWeight className="text-green-500" />{t('wasteByType')}</span>} className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaWeight className="text-green-500" />{t('wasteByType')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[260px]">
           <div className="flex flex-col items-center gap-6 mt-2 mb-2">
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
@@ -214,7 +214,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Monthly Summary Widget */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900 mb-4"><FaChartBar className="text-yellow-500" />{t('monthlySummary')}</span>} className="bg-gradient-to-br from-yellow-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-start h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900 mb-4"><FaChartBar className="text-yellow-500" />{t('monthlySummary')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-start h-full min-h-[260px]">
           <div className="flex flex-col items-center justify-start h-full gap-6">
             <span className="text-5xl font-extrabold text-yellow-700">{logCountMonth}</span>
             <span className="text-base text-gray-700">{t('logsThisMonth')}</span>
@@ -226,7 +226,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Monthly Waste Trend */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-indigo-500" />{t('monthlyWasteTrend')}</span>} className="bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[320px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-indigo-500" />{t('monthlyWasteTrend')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[320px]">
           <div className="flex flex-col justify-center h-full">
             <ResponsiveContainer width="100%" height={320}>
               <LineChart data={monthlyWaste} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -253,7 +253,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Recent Waste Logs Table (redesigned, wide) */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-gray-500" />{t('recentWasteLogs')}</span>} className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-md p-6 col-span-2 flex flex-col justify-between h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-gray-500" />{t('recentWasteLogs')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 col-span-2 flex flex-col justify-between h-full min-h-[260px]">
           <div className="overflow-x-auto">
             <table className="min-w-full text-xs border-separate border-spacing-y-2">
               <thead>
@@ -503,7 +503,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Waste by Material (bar chart, this month) */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-pink-500" />{t('wasteByMaterialMonth')}</span>} className="bg-gradient-to-br from-pink-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[320px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-pink-500" />{t('wasteByMaterialMonth')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-between h-full min-h-[320px]">
           <div className="flex flex-col justify-center h-full">
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={wasteByMaterialMonth} layout="vertical" margin={{ left: 20, right: 20, top: 10, bottom: 10 }}>
@@ -521,7 +521,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Waste Log Count (Year/Month) */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-blue-400" />{t('wasteLogCount')}</span>} className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-evenly h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900"><FaChartBar className="text-blue-400" />{t('wasteLogCount')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-evenly h-full min-h-[260px]">
           <div className="flex flex-col items-center justify-evenly h-full gap-6">
             <div className="flex flex-col items-center gap-1">
               <span className="text-xs text-gray-500">{t('year')}</span>
@@ -537,7 +537,7 @@ export default function Dashboard() {
           </div>
         </DashboardCard>
         {/* Average Waste per Log (with selector) */}
-        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900 mb-4"><FaWeight className="text-green-500" />{t('averageWastePerLog')}</span>} className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md p-6 flex flex-col justify-start h-full min-h-[260px]">
+        <DashboardCard title={<span className="flex items-center gap-2 text-lg font-semibold text-blue-900 mb-4"><FaWeight className="text-green-500" />{t('averageWastePerLog')}</span>} className="bg-primary-foreground rounded-xl shadow-md p-6 flex flex-col justify-start h-full min-h-[260px]">
           <div className="flex flex-col items-center justify-start h-full gap-6">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg font-semibold text-green-900">{t('type')}</span>
