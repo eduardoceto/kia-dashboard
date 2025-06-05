@@ -3,6 +3,36 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+    // Initialize Supabase client for session verification
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Verify the user's session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Unauthorized - No valid session' },
+        { status: 401 }
+      );
+    }
+
+    // Check if the user has admin role
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', session.user.id)
+      .single();
+
+    if (userError || !userData || userData.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Forbidden - Admin privileges required' },
+        { status: 403 }
+      );
+    }
+
     const { userId, newPassword } = await request.json();
 
     if (!userId || !newPassword) {
@@ -13,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     // Create a Supabase client with the service role key
-    const supabase = createClient(
+    const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!, // Make sure this is set in your .env.local
       {
@@ -25,7 +55,7 @@ export async function POST(request: Request) {
     );
 
     // Update the user's password
-    const { error } = await supabase.auth.admin.updateUserById(
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
       userId,
       { password: newPassword }
     );
