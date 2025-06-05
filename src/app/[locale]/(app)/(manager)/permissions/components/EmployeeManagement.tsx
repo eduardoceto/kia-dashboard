@@ -58,6 +58,9 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
   const [isSubmittingEmployee, setIsSubmittingEmployee] = useState(false);
   const [pendingDeleteEmployee, setPendingDeleteEmployee] = useState<Employee | null>(null);
   const [pendingToggleEmployee, setPendingToggleEmployee] = useState<{id: string, currentStatus: boolean, first_name: string, last_name: string} | null>(null);
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // --- Fetch Function ---
   const fetchEmployees = useCallback(async () => {
@@ -234,6 +237,52 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!editingEmployee) return;
+    if (!newPassword || !confirmPassword) {
+      toast.error("Please fill in both password fields.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setIsSubmittingEmployee(true);
+    try {
+      // Call the secure API route instead of direct Supabase admin call
+      const response = await fetch("/api/admin/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: editingEmployee.id,
+          newPassword: newPassword
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to change password");
+      }
+
+      toast.success("Password updated successfully!");
+      setNewPassword("");
+      setConfirmPassword("");
+      setIsChangePasswordDialogOpen(false);
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      console.error("Error changing password:", error);
+      toast.error(`Failed to change password: ${errMsg}`);
+    } finally {
+      setIsSubmittingEmployee(false);
+    }
+  };
+
   // --- Render Logic ---
   return (
     <AccordionItem value="employees">
@@ -365,15 +414,62 @@ export default function EmployeeManagement({ supabase }: EmployeeManagementProps
                                 <div className="grid gap-2"><Label htmlFor="edit-role">{t('role')}</Label><Input id="edit-role" value={editingEmployee.role ?? ''} onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })} disabled={isSubmittingEmployee}/></div>
                                 <div className="flex items-center space-x-2"><Switch id="edit-active" checked={editingEmployee.is_active} onCheckedChange={(checked) => setEditingEmployee({ ...editingEmployee, is_active: checked })} disabled={isSubmittingEmployee}/><Label htmlFor="edit-active">{t('active')}</Label></div>
                               </div>
-                              <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsEditEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>{t('cancel')}</Button>
-                                <Button onClick={handleEditEmployee} disabled={isSubmittingEmployee}>
-                                  {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                  {isSubmittingEmployee ? t('saving') : t('save')}
+                              <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                              <Button variant="secondary" onClick={() => setIsChangePasswordDialogOpen(true)} disabled={isSubmittingEmployee}>
+                                  {t('changePassword')}
                                 </Button>
+                                <div className="flex gap-2">
+                                  <Button variant="outline" onClick={() => setIsEditEmployeeDialogOpen(false)} disabled={isSubmittingEmployee}>{t('cancel')}</Button>
+                                  <Button onClick={handleEditEmployee} disabled={isSubmittingEmployee}>
+                                    {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {isSubmittingEmployee ? t('saving') : t('save')}
+                                  </Button>
+                                </div>
                               </DialogFooter>
                             </DialogContent>
                           )}
+                        </Dialog>
+                        {/* Change Password Dialog */}
+                        <Dialog open={isChangePasswordDialogOpen} onOpenChange={setIsChangePasswordDialogOpen}>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{t('changePasswordTitle')}</DialogTitle>
+                              <DialogDescription>{t('changePasswordDescription')}</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid gap-2">
+                                <Label htmlFor="new-password">{t('newPassword')}</Label>
+                                <Input
+                                  id="new-password"
+                                  type="password"
+                                  value={newPassword}
+                                  onChange={(e) => setNewPassword(e.target.value)}
+                                  disabled={isSubmittingEmployee}
+                                  placeholder="Enter new password"
+                                />
+                              </div>
+                              <div className="grid gap-2">
+                                <Label htmlFor="confirm-password">{t('confirmPassword')}</Label>
+                                <Input
+                                  id="confirm-password"
+                                  type="password"
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  disabled={isSubmittingEmployee}
+                                  placeholder="Confirm new password"
+                                />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setIsChangePasswordDialogOpen(false)} disabled={isSubmittingEmployee}>
+                                {t('cancel')}
+                              </Button>
+                              <Button onClick={handleChangePassword} disabled={isSubmittingEmployee}>
+                                {isSubmittingEmployee ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                {isSubmittingEmployee ? t('changing') : t('change')}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
                         </Dialog>
                         {/* Deactivate Employee Button */}
                         <AlertDialog>

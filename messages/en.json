@@ -152,6 +152,13 @@
       "saving": "Saving...",
       "add": "Add Employee",
       "adding": "Adding...",
+      "changePassword": "Change Password",
+      "changePasswordTitle": "Change Password",
+      "changePasswordDescription": "Enter a new password for this employee.",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "changing": "Changing...",
+      "change": "Change",
       "table": {
         "employeeId": "Employee ID",
         "name": "Name",

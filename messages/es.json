@@ -152,6 +152,13 @@
         "saving": "Guardando...",
         "add": "Agregar Empleado",
         "adding": "Agregando...",
+        "changePassword": "Cambiar Contraseña",
+        "changePasswordTitle": "Cambiar Contraseña",
+        "changePasswordDescription": "Ingrese una nueva contraseña para este empleado.",
+        "newPassword": "Nueva Contraseña",
+        "confirmPassword": "Confirmar Contraseña",
+        "changing": "Cambiando...",
+        "change": "Cambiar",
         "table": {
           "employeeId": "ID de Empleado",
           "name": "Nombre",
