@@ -604,5 +604,16 @@
       "languageDescription": "Elige tu idioma preferido",
       "english": "Inglés",
       "spanish": "Español"
+    },
+    "loginPage": {
+      "title": "Iniciar Sesión",
+      "emailPlaceholder": "Correo electrónico",
+      "passwordPlaceholder": "Contraseña",
+      "loginButton": "Iniciar Sesión",
+      "loggingIn": "Iniciando sesión...",
+      "pleaseWait": "Por favor espera un momento.",
+      "successMessage": "Inicio de sesión exitoso",
+      "errorMessage": "Usuario o contraseña incorrectos",
+      "loginError": "Error al iniciar sesión"
     }
   }

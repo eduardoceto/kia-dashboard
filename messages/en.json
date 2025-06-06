@@ -580,5 +580,16 @@
     "languageDescription": "Choose your preferred language",
     "english": "English",
     "spanish": "Spanish"
+  },
+  "loginPage": {
+    "title": "Login",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "loginButton": "Sign In",
+    "loggingIn": "Signing in...",
+    "pleaseWait": "Please wait a moment.",
+    "successMessage": "Login successful",
+    "errorMessage": "Invalid email or password",
+    "loginError": "Error signing in"
   }
 }

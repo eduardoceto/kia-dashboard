@@ -8,12 +8,14 @@ import { Input } from "@/src/components/ui/input"
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
+    const t = useTranslations('loginPage')
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -21,14 +23,14 @@ export default function LoginForm() {
         try {
             const result = await login(email, password)
             if (result.success) {
-                toast.success('Inicio de sesión exitoso')
+                toast.success(t('successMessage'))
                 router.push(`/${result.locale}/dashboard`)
             } else {
-                toast.error('Usuario o contraseña incorrectos')
+                toast.error(t('errorMessage'))
             }
         } catch (error) {
             console.error('Login error:', error)
-            toast.error('Error al iniciar sesión')
+            toast.error(t('loginError'))
         } finally {
             setIsLoading(false)
         }
@@ -39,8 +41,8 @@ export default function LoginForm() {
             {isLoading ? (
                 <div className="flex flex-col items-center space-y-4 text-[#05141F]">
                     <Loader2 className="h-12 w-12 animate-spin" />
-                    <p className="text-lg font-medium">Iniciando sesión...</p>
-                    <p className="text-sm text-muted-foreground">Por favor espera un momento.</p>
+                    <p className="text-lg font-medium">{t('loggingIn')}</p>
+                    <p className="text-sm text-muted-foreground">{t('pleaseWait')}</p>
                 </div>
             ) : (
                 <div className="w-full max-w-md flex flex-col items-center">
@@ -53,7 +55,7 @@ export default function LoginForm() {
                             id='email'
                             name='email'
                             type="email"
-                            placeholder="Email"
+                            placeholder={t('emailPlaceholder')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full rounded-b-sm h-12 px-4 bg-accent-foreground/60 focus:bg-tertiarty/20 transition-colors duration-400"
@@ -66,7 +68,7 @@ export default function LoginForm() {
                             id='password'
                             name='password'
                             type="password"
-                            placeholder="Contraseña"
+                            placeholder={t('passwordPlaceholder')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full rounded-b-sm h-12 px-4 bg-accent-foreground/60  focus:bg-tertiarty/20 transition-colors duration-400"
@@ -83,10 +85,10 @@ export default function LoginForm() {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin text-[#05141F]" />
-                                    Iniciando...
+                                    {t('loggingIn')}
                                 </>
                             ) : (
-                                'Iniciar Sesión'
+                                t('loginButton')
                             )}
                         </Button>
                         </div>
