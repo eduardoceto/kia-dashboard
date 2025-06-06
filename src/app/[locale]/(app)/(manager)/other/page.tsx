@@ -22,9 +22,9 @@ export default function Other() {
     }
 
     return (
-        <main className="mx-auto py-10 px-4">
+        <main className="mx-auto py-10 px-4 w-full">
             <DashboardHeader variant="page" title={t('title')} />
-            <div className=" items-start sm:items-center gap-4 mb-6">
+            <div className="items-start sm:items-center gap-4 mb-6">
                 <Card className="w-full">
                     <CardContent>
                         <Accordion type="single" collapsible className="w-full">
