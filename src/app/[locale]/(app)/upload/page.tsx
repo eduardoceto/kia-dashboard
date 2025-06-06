@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 export default function Upload() {
   const t = useTranslations('uploadPage');
   return (
-    <main className="container mx-auto py-10 px-4">
+    <div className="container mx-auto">
       <DashboardHeader
         variant="page"
         title={t('title')}
@@ -55,6 +55,6 @@ export default function Upload() {
         </Accordion>
         </CardContent>
       </Card>
-    </main>
+    </div>
   )
 }

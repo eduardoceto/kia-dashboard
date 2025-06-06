@@ -688,7 +688,7 @@ export default function ExportPage() {
             </CardHeader>
             <CardContent className="p-0">
               {filteredLogs.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div>
                   <Table>
                     <TableHeader>
                       <TableRow className="bg-muted/30 hover:bg-muted/40">

@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import { generatePdf } from '@/src/actions/generatePdf';
 import { Button } from "@/src/components/ui/button";
 import { Form } from "@/src/components/ui/form";
-import { Card, CardContent } from "@/src/components/ui/card";
 import { createClient } from "@/src/utils/supabase/client";
 import { submitWasteDisposal } from "@/src/actions/submitWasteDisposal";
 import type { ResiduoDetails } from "@/src/utils/log/log-utils";
@@ -400,8 +399,8 @@ export default function WasteDisposalForm() {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardContent className="pt-6">
+    <div className="w-full sticky top-0">
+
         {submitSuccess ? (
           // Success Message View
           <div className="bg-green-50 p-4 rounded-md mb-6">
@@ -448,7 +447,6 @@ export default function WasteDisposalForm() {
             </form>
           </Form>
         )}
-      </CardContent>
 
       {/* Download Confirmation Dialog (using the new component) */}
       <DownloadConfirmationDialog
@@ -456,6 +454,6 @@ export default function WasteDisposalForm() {
         onConfirm={handleDownloadConfirm}
         onCancel={handleDownloadCancel}
       />
-    </Card>
+    </div>
   );
 }

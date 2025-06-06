@@ -21,12 +21,10 @@ export default function HeaderSide({ children }: LayoutProps) {
 
 
     return (
-        <div className={`flex h-screen bg-[#05141F]`}>
+        <div className={`flex h-screen`}>
             <Sidebar />
-            <div className="KiaSignature w-full flex flex-1 flex-col">
-                <main className="flex-1 overflow-auto p-6 bg-background">
+            <div className="KiaSignature w-full flex flex-1 p-6 flex-col bg-background overflow-y-auto">
                     {children}
-                </main>
             </div>
         </div>
     )
